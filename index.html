@@ -557,12 +557,35 @@ function updateSyncPill(offline) {
 }
 
 // ---------- money & dates
-function fmt(n) {
+function money(n, opts) {
   const cur = (data.settings.currency || 'DKK').toUpperCase();
   try {
-    return new Intl.NumberFormat('da-DK', { style: 'currency', currency: cur, maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(n);
+    return new Intl.NumberFormat('da-DK', Object.assign({ style: 'currency', currency: cur }, opts)).format(n);
   } catch (e) { return n.toFixed(2) + ' ' + cur; }
 }
+// How many decimals this currency uses: 2 for DKK/EUR, 0 for JPY, 3 for BHD.
+const _curDigits = {};
+function curDigits() {
+  const cur = (data.settings.currency || 'DKK').toUpperCase();
+  if (_curDigits[cur] === undefined) {
+    try {
+      _curDigits[cur] = new Intl.NumberFormat('da-DK', { style: 'currency', currency: cur })
+        .resolvedOptions().maximumFractionDigits;
+    } catch (e) { _curDigits[cur] = 2; }
+  }
+  return _curDigits[cur];
+}
+// Default: round amounts drop the decimals entirely, but anything with a
+// fraction shows all of them — 1.492,40 kr., never a partial 1.492,4 kr.
+function fmt(n) {
+  const dp = curDigits();
+  const unit = Math.pow(10, dp);
+  const d = dp && Math.round(Math.abs(n) * unit) % unit ? dp : 0;
+  return money(n, { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+// Account balances are read as a column (see .acct-bal tabular-nums), so keep
+// the currency's own decimals there — aligned digits are easier to compare.
+function fmtAligned(n) { return money(n, null); }
 function fmtSigned(n) { return (n > 0 ? '+' : '') + fmt(n); }
 function parseAmount(s) {
   const n = Number(String(s).trim().replace(/\./g, m => s.includes(',') ? '' : m).replace(',', '.'));
@@ -733,7 +756,7 @@ function renderAccounts() {
     const row = document.createElement('div');
     row.className = 'acct-row';
     row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmt(bal) + '</div>';
+      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
     row.onclick = () => openAccountModal(a);
