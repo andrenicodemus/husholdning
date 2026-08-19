@@ -128,11 +128,34 @@ section.view.active { display: block; animation: fadein .15s ease; }
 .tint-transfer .chip.on { background: var(--transfer); border-color: var(--transfer); }
 
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+/* 1fr is minmax(auto,1fr): without this a native date input's intrinsic
+   width widens its column and squeezes the sibling. */
+.row2 > * { min-width: 0; }
 .text-input {
   width: 100%; padding: 11px 12px; border-radius: 10px;
-  border: 1px solid var(--line); background: var(--bg); outline: none;
+  border: 1px solid var(--line); background-color: var(--bg); outline: none;
+  line-height: 1.45;
 }
-.text-input:focus { border-color: var(--brand); background: #fff; }
+.text-input:focus { border-color: var(--brand); background-color: #fff; }
+
+/* iOS WebKit gives date inputs native sizing that ignores our padding and
+   never draws a calendar affordance, so flatten the control and supply one. */
+input[type="date"].text-input {
+  -webkit-appearance: none; appearance: none;
+  min-width: 0; padding-right: 38px; text-align: left;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236B776F' stroke-width='2' stroke-linecap='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='3'/%3E%3Cpath d='M8 3v4M16 3v4M3 10h18'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 11px center;
+  background-size: 17px 17px;
+}
+input[type="date"].text-input::-webkit-date-and-time-value { text-align: left; margin: 0; }
+input[type="date"].text-input::-webkit-datetime-edit { padding: 0; line-height: 1.45; }
+/* Desktop WebKit draws its own indicator; keep it as an invisible click target
+   over our icon. The negative margin means it costs no layout width. */
+input[type="date"].text-input::-webkit-calendar-picker-indicator {
+  opacity: 0; padding: 0; margin: 0 -38px 0 0;
+  width: 38px; height: 24px; cursor: pointer;
+}
 
 .btn-primary {
   width: 100%; padding: 16px; border-radius: var(--radius);
