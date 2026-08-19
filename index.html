@@ -70,6 +70,7 @@ header h1 {
   background: var(--card); border: 1px solid var(--line);
   font-size: 17px;
 }
+.icon { display: inline-block; width: 1em; height: 1em; vertical-align: -0.15em; flex-shrink: 0; }
 
 main { padding: 0 16px; max-width: 560px; margin: 0 auto; }
 section.view { display: none; }
@@ -93,6 +94,7 @@ section.view.active { display: block; animation: fadein .15s ease; }
   border-radius: var(--radius); padding: 6px; margin-bottom: 14px;
 }
 .type-seg button {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
   padding: 10px 0; border-radius: 9px; font-weight: 600; font-size: 15px;
   color: var(--muted); transition: all .12s ease;
 }
@@ -168,6 +170,7 @@ input[type="date"].text-input::-webkit-calendar-picker-indicator {
 .tint-income .btn-primary { background: var(--income); }
 .tint-transfer .btn-primary { background: var(--transfer); }
 .btn-ghost {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
   width: 100%; padding: 12px; border-radius: 10px; font-weight: 600;
   border: 1px dashed var(--line); color: var(--muted); margin-top: 10px;
 }
@@ -324,7 +327,7 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
   <h1 id="app-title">Husholdning</h1>
   <div class="header-actions">
     <span class="pill" id="sync-pill"></span>
-    <button class="icon-btn" id="btn-settings" aria-label="Settings">⚙︎</button>
+    <button class="icon-btn" id="btn-settings" aria-label="Settings"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></button>
   </div>
 </header>
 
@@ -332,9 +335,9 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
   <!-- ENTRY -->
   <section class="view active" id="view-entry">
     <div class="type-seg" id="type-seg">
-      <button data-type="expense" class="sel-expense">− Expense</button>
-      <button data-type="income">+ Income</button>
-      <button data-type="transfer">⇄ Transfer</button>
+      <button data-type="expense" class="sel-expense"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>Expense</button>
+      <button data-type="income"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Income</button>
+      <button data-type="transfer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>Transfer</button>
     </div>
     <div class="card tint-expense" id="entry-card">
       <div class="amount-wrap">
@@ -382,7 +385,7 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
     <div class="card">
       <h2>Accounts</h2>
       <div id="accounts-list"></div>
-      <button class="btn-ghost" id="btn-add-account">+ Add account</button>
+      <button class="btn-ghost" id="btn-add-account"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add account</button>
     </div>
   </section>
 
@@ -395,16 +398,16 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
     <div class="card">
       <h2>Categories</h2>
       <div id="categories-list"></div>
-      <button class="btn-ghost" id="btn-add-category">+ Add category</button>
+      <button class="btn-ghost" id="btn-add-category"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add category</button>
     </div>
   </section>
 
   <!-- SUMMARY -->
   <section class="view" id="view-summary">
     <div class="month-nav">
-      <button id="month-prev" aria-label="Previous month">‹</button>
+      <button id="month-prev" aria-label="Previous month"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
       <div class="label" id="month-label"></div>
-      <button id="month-next" aria-label="Next month">›</button>
+      <button id="month-next" aria-label="Next month"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
     </div>
     <div class="stat-grid">
       <div class="stat"><div class="k">Spent</div><div class="v" id="sum-spent"></div><div class="t" id="sum-spent-t"></div></div>
@@ -428,10 +431,10 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
 </main>
 
 <nav>
-  <button data-view="entry" class="on"><span class="ic">＋</span>New</button>
-  <button data-view="accounts"><span class="ic">◫</span>Accounts</button>
-  <button data-view="budgets"><span class="ic">◔</span>Budgets</button>
-  <button data-view="summary"><span class="ic">≣</span>Summary</button>
+  <button data-view="entry" class="on"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>New</button>
+  <button data-view="accounts"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>Accounts</button>
+  <button data-view="budgets"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg></span>Budgets</button>
+  <button data-view="summary"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>Summary</button>
 </nav>
 </div>
 
@@ -734,7 +737,7 @@ function renderTxList(elId, txs, withDelete) {
     row.querySelector('.tx-sub').textContent = txSub(t);
     if (withDelete) {
       const del = document.createElement('button');
-      del.className = 'tx-del'; del.textContent = '✕'; del.setAttribute('aria-label', 'Delete');
+      del.className = 'tx-del'; del.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'; del.setAttribute('aria-label', 'Delete');
       del.onclick = () => { if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id }); };
       row.appendChild(del);
     }
@@ -798,7 +801,7 @@ function renderBudgets() {
   for (const c of [...data.categories].sort((x, y) => (x.type + x.name).localeCompare(y.type + y.name))) {
     const row = document.createElement('div');
     row.className = 'acct-row';
-    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-meta">›</div>';
+    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-meta"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>';
     row.querySelector('.acct-name').textContent = c.name;
     row.querySelector('.acct-meta').textContent = c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
     row.onclick = () => openCategoryModal(c);
