@@ -78,12 +78,12 @@ section.view.active { display: block; animation: fadein .15s ease; }
 
 .card {
   background: var(--card); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  border-radius: var(--radius); padding: 24px 16px; margin-bottom: 14px;
 }
 .card h2 {
   font-family: var(--display); font-size: 13px; font-weight: 500;
   text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
-  margin-bottom: 12px;
+  margin-bottom: 24px;
 }
 
 /* Entry view */
@@ -135,9 +135,9 @@ section.view.active { display: block; animation: fadein .15s ease; }
 .text-input:focus { border-color: var(--brand); background: #fff; }
 
 .btn-primary {
-  width: 100%; padding: 15px; border-radius: var(--radius);
+  width: 100%; padding: 16px; border-radius: var(--radius);
   background: var(--brand); color: #fff; font-weight: 700; font-size: 16px;
-  font-family: var(--display); letter-spacing: 0.01em; margin-top: 16px;
+  font-family: var(--display); letter-spacing: 0.01em; margin-top: 32px;
 }
 .btn-primary:active { transform: scale(0.99); }
 .btn-primary:disabled { opacity: 0.4; }
@@ -282,14 +282,13 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
     <div class="logo">Husholdning</div>
     <div class="tag">Your joint finances, in your pocket</div>
     <div class="card">
-      <h2>Connect to your sheet</h2>
-      <div class="field-label">Apps Script web app URL</div>
+      <h2>Connect to Google sheet</h2>
+      <div class="field-label">Web app URL</div>
       <input class="text-input" id="setup-url" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off">
       <div class="field-label">PIN</div>
       <input class="text-input" id="setup-pin" placeholder="1234" inputmode="numeric" autocomplete="off">
       <button class="btn-primary" id="setup-connect">Connect</button>
       <div class="err" id="setup-err"></div>
-      <div class="setup-note">Follow the README to create the Google Sheet and deploy its Apps Script first. Paste the deployment URL here. Both of you use the same URL and PIN.</div>
     </div>
   </main>
 </section>
