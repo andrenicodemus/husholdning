@@ -306,12 +306,14 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
     <div class="tag">Your joint finances, in your pocket</div>
     <div class="card">
       <h2>Connect to Google sheet</h2>
-      <div class="field-label">Web app URL</div>
-      <input class="text-input" id="setup-url" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off">
-      <div class="field-label">PIN</div>
-      <input class="text-input" id="setup-pin" placeholder="1234" inputmode="numeric" autocomplete="off">
-      <button class="btn-primary" id="setup-connect">Connect</button>
-      <div class="err" id="setup-err"></div>
+      <form id="setup-form" autocomplete="on">
+        <div class="field-label">Web app URL</div>
+        <input class="text-input" id="setup-url" name="username" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off" autocomplete="username" inputmode="url">
+        <div class="field-label">PIN</div>
+        <input class="text-input" id="setup-pin" name="password" type="password" placeholder="1234" inputmode="numeric" autocomplete="current-password">
+        <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
+        <div class="err" id="setup-err"></div>
+      </form>
     </div>
   </main>
 </section>
@@ -1043,7 +1045,8 @@ document.getElementById('btn-save').onclick = () => {
 };
 
 // ---------- setup flow
-document.getElementById('setup-connect').onclick = async () => {
+document.getElementById('setup-form').onsubmit = async (e) => {
+  e.preventDefault();
   const url = document.getElementById('setup-url').value.trim();
   const pin = document.getElementById('setup-pin').value.trim();
   const err = document.getElementById('setup-err');
