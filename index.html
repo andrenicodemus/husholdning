@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Husholdning</title>
+<meta name="description" content="Joint household finance tracker">
+<meta name="theme-color" content="#204B3C">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Husholdning">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F3F5F2;
+  --card: #FFFFFF;
+  --ink: #1A241F;
+  --muted: #6B776F;
+  --line: #DFE5DE;
+  --brand: #204B3C;
+  --brand-soft: #E4EEE8;
+  --income: #1E7A4C;
+  --income-soft: #E3F1E9;
+  --expense: #B4432C;
+  --expense-soft: #F7E8E3;
+  --transfer: #2B5F8A;
+  --transfer-soft: #E4EDF4;
+  --radius: 14px;
+  --display: "Space Grotesk", ui-monospace, "SF Mono", monospace;
+  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { height: 100%; }
+body {
+  font-family: var(--body);
+  background: var(--bg);
+  color: var(--ink);
+  min-height: 100%;
+  font-size: 16px;
+  line-height: 1.45;
+  padding-bottom: calc(72px + env(safe-area-inset-bottom));
+}
+button { font-family: inherit; font-size: inherit; border: none; background: none; color: inherit; cursor: pointer; }
+input, select { font-family: inherit; font-size: inherit; color: inherit; }
+
+/* Header */
+header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: calc(14px + env(safe-area-inset-top)) 18px 12px;
+}
+header h1 {
+  font-family: var(--display);
+  font-size: 20px; font-weight: 700; letter-spacing: -0.02em;
+  color: var(--brand);
+}
+.header-actions { display: flex; gap: 8px; align-items: center; }
+.pill {
+  font-size: 12px; padding: 4px 10px; border-radius: 999px;
+  background: var(--brand-soft); color: var(--brand); font-weight: 600;
+  display: none;
+}
+.pill.warn { background: #F6EBDD; color: #8A5A1E; display: inline-block; }
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--card); border: 1px solid var(--line);
+  font-size: 17px;
+}
+
+main { padding: 0 16px; max-width: 560px; margin: 0 auto; }
+section.view { display: none; }
+section.view.active { display: block; animation: fadein .15s ease; }
+@keyframes fadein { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; } }
+
+.card {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+}
+.card h2 {
+  font-family: var(--display); font-size: 13px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted);
+  margin-bottom: 12px;
+}
+
+/* Entry view */
+.type-seg {
+  display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 6px; margin-bottom: 14px;
+}
+.type-seg button {
+  padding: 10px 0; border-radius: 9px; font-weight: 600; font-size: 15px;
+  color: var(--muted); transition: all .12s ease;
+}
+.type-seg button.sel-expense { background: var(--expense-soft); color: var(--expense); }
+.type-seg button.sel-income { background: var(--income-soft); color: var(--income); }
+.type-seg button.sel-transfer { background: var(--transfer-soft); color: var(--transfer); }
+
+.amount-wrap { text-align: center; padding: 18px 0 10px; }
+.amount-input {
+  font-family: var(--display); font-variant-numeric: tabular-nums;
+  font-size: 52px; font-weight: 700; letter-spacing: -0.03em;
+  width: 100%; text-align: center; border: none; background: none; outline: none;
+  color: var(--ink); caret-color: var(--brand);
+}
+.amount-input::placeholder { color: var(--line); }
+.amount-currency { font-size: 14px; color: var(--muted); font-weight: 500; }
+.tint-expense .amount-input { color: var(--expense); }
+.tint-income .amount-input { color: var(--income); }
+.tint-transfer .amount-input { color: var(--transfer); }
+
+.field-label {
+  font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.07em; color: var(--muted); margin: 14px 0 8px;
+}
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 8px 14px; border-radius: 999px; font-size: 14px; font-weight: 500;
+  background: var(--bg); border: 1px solid var(--line); color: var(--ink);
+}
+.chip.on { background: var(--ink); border-color: var(--ink); color: #fff; }
+.tint-expense .chip.on { background: var(--expense); border-color: var(--expense); }
+.tint-income .chip.on { background: var(--income); border-color: var(--income); }
+.tint-transfer .chip.on { background: var(--transfer); border-color: var(--transfer); }
+
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.text-input {
+  width: 100%; padding: 11px 12px; border-radius: 10px;
+  border: 1px solid var(--line); background: var(--bg); outline: none;
+}
+.text-input:focus { border-color: var(--brand); background: #fff; }
+
+.btn-primary {
+  width: 100%; padding: 15px; border-radius: var(--radius);
+  background: var(--brand); color: #fff; font-weight: 700; font-size: 16px;
+  font-family: var(--display); letter-spacing: 0.01em; margin-top: 16px;
+}
+.btn-primary:active { transform: scale(0.99); }
+.btn-primary:disabled { opacity: 0.4; }
+.tint-expense .btn-primary { background: var(--expense); }
+.tint-income .btn-primary { background: var(--income); }
+.tint-transfer .btn-primary { background: var(--transfer); }
+.btn-ghost {
+  width: 100%; padding: 12px; border-radius: 10px; font-weight: 600;
+  border: 1px dashed var(--line); color: var(--muted); margin-top: 10px;
+}
+.btn-danger { color: var(--expense); font-weight: 600; padding: 12px; width: 100%; }
+
+/* Lists */
+.tx-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 0; border-bottom: 1px solid var(--line);
+}
+.tx-row:last-child { border-bottom: none; }
+.tx-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.tx-dot.income { background: var(--income); }
+.tx-dot.expense { background: var(--expense); }
+.tx-dot.transfer { background: var(--transfer); }
+.tx-main { flex: 1; min-width: 0; }
+.tx-title { font-weight: 600; font-size: 14.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tx-sub { font-size: 12.5px; color: var(--muted); }
+.tx-amount { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 15px; white-space: nowrap; }
+.tx-amount.income { color: var(--income); }
+.tx-amount.expense { color: var(--expense); }
+.tx-del { color: var(--muted); font-size: 18px; padding: 6px; }
+
+/* Accounts */
+.balance-hero { text-align: center; padding: 8px 0 14px; }
+.balance-hero .big {
+  font-family: var(--display); font-variant-numeric: tabular-nums;
+  font-size: 40px; font-weight: 700; letter-spacing: -0.03em; color: var(--brand);
+}
+.balance-hero .sub { font-size: 13px; color: var(--muted); }
+.acct-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 0; border-bottom: 1px solid var(--line);
+}
+.acct-row:last-child { border-bottom: none; }
+.acct-name { font-weight: 600; }
+.acct-meta { font-size: 12.5px; color: var(--muted); }
+.acct-bal { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 17px; }
+.acct-bal.neg { color: var(--expense); }
+
+/* Budgets */
+.budget-row { padding: 11px 0; border-bottom: 1px solid var(--line); }
+.budget-row:last-child { border-bottom: none; }
+.budget-top { display: flex; justify-content: space-between; font-size: 14.5px; margin-bottom: 6px; }
+.budget-top .nums { font-family: var(--display); font-variant-numeric: tabular-nums; font-size: 13.5px; color: var(--muted); }
+.bar { height: 8px; border-radius: 999px; background: var(--bg); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; background: var(--brand); transition: width .3s ease; }
+.bar-fill.over { background: var(--expense); }
+.bar-fill.close { background: #C98A2B; }
+
+/* Summary */
+.month-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px;
+}
+.month-nav .label { font-family: var(--display); font-weight: 700; font-size: 18px; }
+.month-nav button { font-size: 20px; padding: 6px 14px; color: var(--brand); }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+.stat {
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 13px;
+}
+.stat .k { font-size: 12px; color: var(--muted); font-weight: 600; }
+.stat .v { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 700; font-size: 19px; margin-top: 2px; }
+.stat .t { font-size: 12px; margin-top: 2px; font-weight: 600; }
+.trend-up { color: var(--income); }
+.trend-down { color: var(--expense); }
+.trend-flat { color: var(--muted); }
+.cat-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14.5px; }
+.cat-row .name { flex: 1; }
+.cat-row .amt { font-family: var(--display); font-variant-numeric: tabular-nums; font-weight: 600; }
+.cat-row .tr { font-size: 12px; width: 62px; text-align: right; font-weight: 600; }
+
+/* Bottom nav */
+nav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  background: var(--card); border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+  z-index: 20;
+}
+nav button {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 7px 0; font-size: 11px; font-weight: 600; color: var(--muted);
+  border-radius: 10px;
+}
+nav button .ic { font-size: 20px; line-height: 1; }
+nav button.on { color: var(--brand); background: var(--brand-soft); }
+
+/* Modal */
+.modal-bg {
+  position: fixed; inset: 0; background: rgba(20, 30, 25, 0.45);
+  display: none; align-items: flex-end; justify-content: center; z-index: 50;
+}
+.modal-bg.open { display: flex; }
+.modal {
+  background: var(--card); width: 100%; max-width: 560px;
+  border-radius: 20px 20px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom));
+  max-height: 85vh; overflow-y: auto;
+}
+.modal h3 { font-family: var(--display); font-size: 18px; margin-bottom: 14px; }
+
+/* Setup screen */
+#setup { padding-top: 8vh; }
+#setup .logo {
+  font-family: var(--display); font-size: 32px; font-weight: 700;
+  color: var(--brand); text-align: center; letter-spacing: -0.03em; margin-bottom: 4px;
+}
+#setup .tag { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 28px; }
+.setup-note { font-size: 13px; color: var(--muted); margin-top: 10px; line-height: 1.5; }
+.err { color: var(--expense); font-size: 13.5px; font-weight: 600; margin-top: 10px; display: none; }
+
+/* Toast */
+#toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(84px + env(safe-area-inset-bottom));
+  background: var(--ink); color: #fff; font-size: 14px; font-weight: 600;
+  padding: 10px 18px; border-radius: 999px; opacity: 0;
+  transition: opacity .2s ease; pointer-events: none; z-index: 60;
+  max-width: 88vw; text-align: center;
+}
+#toast.show { opacity: 1; }
+.empty { color: var(--muted); font-size: 14px; text-align: center; padding: 14px 0; }
+.settle-note { font-size: 12.5px; color: var(--muted); margin-top: 8px; }
+@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- ======================= SETUP SCREEN ======================= -->
+<section id="setup" style="display:none">
+  <main>
+    <div class="logo">Husholdning</div>
+    <div class="tag">Your joint finances, in your pocket</div>
+    <div class="card">
+      <h2>Connect to your sheet</h2>
+      <div class="field-label">Apps Script web app URL</div>
+      <input class="text-input" id="setup-url" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off">
+      <div class="field-label">PIN</div>
+      <input class="text-input" id="setup-pin" placeholder="1234" inputmode="numeric" autocomplete="off">
+      <button class="btn-primary" id="setup-connect">Connect</button>
+      <div class="err" id="setup-err"></div>
+      <div class="setup-note">Follow the README to create the Google Sheet and deploy its Apps Script first. Paste the deployment URL here. Both of you use the same URL and PIN.</div>
+    </div>
+  </main>
+</section>
+
+<!-- ======================= APP ======================= -->
+<div id="app" style="display:none">
+<header>
+  <h1 id="app-title">Husholdning</h1>
+  <div class="header-actions">
+    <span class="pill" id="sync-pill"></span>
+    <button class="icon-btn" id="btn-settings" aria-label="Settings">⚙︎</button>
+  </div>
+</header>
+
+<main>
+  <!-- ENTRY -->
+  <section class="view active" id="view-entry">
+    <div class="type-seg" id="type-seg">
+      <button data-type="expense" class="sel-expense">− Expense</button>
+      <button data-type="income">+ Income</button>
+      <button data-type="transfer">⇄ Transfer</button>
+    </div>
+    <div class="card tint-expense" id="entry-card">
+      <div class="amount-wrap">
+        <input class="amount-input" id="in-amount" inputmode="decimal" placeholder="0" autocomplete="off">
+        <div class="amount-currency" id="amount-cur">DKK</div>
+      </div>
+      <div id="wrap-category">
+        <div class="field-label">Category</div>
+        <div class="chips" id="chips-category"></div>
+      </div>
+      <div id="wrap-from">
+        <div class="field-label" id="label-from">From account</div>
+        <div class="chips" id="chips-from"></div>
+      </div>
+      <div id="wrap-to" style="display:none">
+        <div class="field-label" id="label-to">To account</div>
+        <div class="chips" id="chips-to"></div>
+      </div>
+      <div class="row2" style="margin-top:14px">
+        <div>
+          <div class="field-label" style="margin-top:0">Date</div>
+          <input class="text-input" type="date" id="in-date">
+        </div>
+        <div>
+          <div class="field-label" style="margin-top:0">Note</div>
+          <input class="text-input" id="in-note" placeholder="Optional">
+        </div>
+      </div>
+      <button class="btn-primary" id="btn-save">Save expense</button>
+    </div>
+    <div class="card">
+      <h2>Recent</h2>
+      <div id="recent-list"></div>
+    </div>
+  </section>
+
+  <!-- ACCOUNTS -->
+  <section class="view" id="view-accounts">
+    <div class="card">
+      <div class="balance-hero">
+        <div class="sub">Total balance</div>
+        <div class="big" id="total-balance">–</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Accounts</h2>
+      <div id="accounts-list"></div>
+      <button class="btn-ghost" id="btn-add-account">+ Add account</button>
+    </div>
+  </section>
+
+  <!-- BUDGETS -->
+  <section class="view" id="view-budgets">
+    <div class="card">
+      <h2 id="budgets-title">Budgets this month</h2>
+      <div id="budgets-list"></div>
+    </div>
+    <div class="card">
+      <h2>Categories</h2>
+      <div id="categories-list"></div>
+      <button class="btn-ghost" id="btn-add-category">+ Add category</button>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <section class="view" id="view-summary">
+    <div class="month-nav">
+      <button id="month-prev" aria-label="Previous month">‹</button>
+      <div class="label" id="month-label"></div>
+      <button id="month-next" aria-label="Next month">›</button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="k">Spent</div><div class="v" id="sum-spent"></div><div class="t" id="sum-spent-t"></div></div>
+      <div class="stat"><div class="k">Income</div><div class="v" id="sum-income"></div><div class="t" id="sum-income-t"></div></div>
+      <div class="stat"><div class="k">Net this month</div><div class="v" id="sum-net"></div><div class="t" id="sum-net-t"></div></div>
+      <div class="stat"><div class="k">Total balance</div><div class="v" id="sum-balance"></div><div class="t" id="sum-balance-t"></div></div>
+    </div>
+    <div class="card">
+      <h2>Accounts change</h2>
+      <div id="sum-accounts"></div>
+    </div>
+    <div class="card">
+      <h2>Spending by category</h2>
+      <div id="sum-spend-cats"></div>
+    </div>
+    <div class="card">
+      <h2>Income by category</h2>
+      <div id="sum-income-cats"></div>
+    </div>
+  </section>
+</main>
+
+<nav>
+  <button data-view="entry" class="on"><span class="ic">＋</span>New</button>
+  <button data-view="accounts"><span class="ic">◫</span>Accounts</button>
+  <button data-view="budgets"><span class="ic">◔</span>Budgets</button>
+  <button data-view="summary"><span class="ic">≣</span>Summary</button>
+</nav>
+</div>
+
+<!-- ======================= MODALS ======================= -->
+<div class="modal-bg" id="modal-bg">
+  <div class="modal" id="modal-content"></div>
+</div>
+<div id="toast"></div>
+<script>
+/* =================================================================
+   Husholdning — app logic
+   State lives in a Google Sheet via Apps Script; a local cache makes
+   the UI instant and writes are queued so entries work offline.
+   ================================================================= */
+
+// ---------- persistence (degrades gracefully if storage is blocked)
+const store = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  del(k) { try { localStorage.removeItem(k); } catch (e) {} }
+};
+
+let config = store.get('hf_config');            // { url, pin }
+let data = store.get('hf_data') || { accounts: [], transactions: [], categories: [], settings: {} };
+let pending = store.get('hf_pending') || [];    // queued write actions
+let syncing = false;
+
+const uuid = () => (crypto.randomUUID ? crypto.randomUUID() :
+  'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+    const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  }));
+
+// ---------- API
+async function apiCall(action, payload) {
+  const res = await fetch(config.url, {
+    method: 'POST',
+    body: JSON.stringify({ action, pin: config.pin, payload: payload || {} })
+  });
+  const out = await res.json();
+  if (!out.ok) throw new Error(out.error || 'server_error');
+  return out.data;
+}
+
+function acceptServerState(fresh) {
+  // Keep optimistic rows for actions still in the queue
+  data = fresh;
+  for (const p of pending) applyLocal(p, true);
+  store.set('hf_data', data);
+}
+
+// Apply a queued action to the local cache (optimistic UI)
+function applyLocal(item, silent) {
+  const { action, payload } = item;
+  if (action === 'addTransaction' && !data.transactions.some(t => t.id === payload.id)) data.transactions.push(payload);
+  if (action === 'deleteTransaction') data.transactions = data.transactions.filter(t => t.id !== payload.id);
+  if (action === 'addAccount' && !data.accounts.some(a => a.id === payload.id)) data.accounts.push(payload);
+  if (action === 'updateAccount') data.accounts = data.accounts.map(a => a.id === payload.id ? { ...a, ...payload } : a);
+  if (action === 'deleteAccount') data.accounts = data.accounts.filter(a => a.id !== payload.id);
+  if (action === 'addCategory' && !data.categories.some(c => c.id === payload.id)) data.categories.push(payload);
+  if (action === 'updateCategory') data.categories = data.categories.map(c => c.id === payload.id ? { ...c, ...payload } : c);
+  if (action === 'deleteCategory') data.categories = data.categories.filter(c => c.id !== payload.id);
+  if (action === 'updateSettings') data.settings = { ...data.settings, ...payload };
+  if (!silent) { store.set('hf_data', data); renderAll(); }
+}
+
+// Queue a write, apply it locally, kick off a sync
+function submit(action, payload) {
+  const item = { action, payload };
+  pending.push(item);
+  store.set('hf_pending', pending);
+  applyLocal(item);
+  flushQueue();
+}
+
+async function flushQueue() {
+  if (syncing || !config) return;
+  syncing = true;
+  updateSyncPill();
+  try {
+    let lastState = null;
+    while (pending.length) {
+      const item = pending[0];
+      try {
+        lastState = await apiCall(item.action, item.payload);
+      } catch (err) {
+        if (err instanceof TypeError || /fetch|network/i.test(String(err))) throw err; // offline → keep queued
+        // Logical server error → drop the action, tell the user, resync
+        pending.shift(); store.set('hf_pending', pending);
+        toast('Rejected by server: ' + err.message);
+        lastState = await apiCall('getAll').catch(() => null);
+        continue;
+      }
+      pending.shift(); store.set('hf_pending', pending);
+    }
+    if (lastState) { acceptServerState(lastState); renderAll(); }
+  } catch (e) {
+    /* offline — queue stays */
+  } finally {
+    syncing = false;
+    updateSyncPill();
+  }
+}
+
+async function backgroundRefresh() {
+  if (!config || pending.length) { flushQueue(); return; }
+  try {
+    const fresh = await apiCall('getAll');
+    acceptServerState(fresh);
+    renderAll();
+  } catch (e) { updateSyncPill(true); }
+}
+
+function updateSyncPill(offline) {
+  const pill = document.getElementById('sync-pill');
+  if (pending.length) {
+    pill.className = 'pill warn';
+    pill.textContent = syncing ? 'Syncing…' : pending.length + ' unsynced';
+  } else if (offline) {
+    pill.className = 'pill warn';
+    pill.textContent = 'Offline';
+  } else {
+    pill.className = 'pill';
+    pill.textContent = '';
+  }
+}
+
+// ---------- money & dates
+function fmt(n) {
+  const cur = (data.settings.currency || 'DKK').toUpperCase();
+  try {
+    return new Intl.NumberFormat('da-DK', { style: 'currency', currency: cur, maximumFractionDigits: 2, minimumFractionDigits: 0 }).format(n);
+  } catch (e) { return n.toFixed(2) + ' ' + cur; }
+}
+function fmtSigned(n) { return (n > 0 ? '+' : '') + fmt(n); }
+function parseAmount(s) {
+  const n = Number(String(s).trim().replace(/\./g, m => s.includes(',') ? '' : m).replace(',', '.'));
+  return isNaN(n) ? NaN : n;
+}
+const todayISO = () => new Date().toISOString().slice(0, 10);
+const monthKey = d => String(d).slice(0, 7);
+function shiftMonth(key, delta) {
+  const [y, m] = key.split('-').map(Number);
+  const d = new Date(y, m - 1 + delta, 1);
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
+}
+function monthLabel(key) {
+  const [y, m] = key.split('-').map(Number);
+  return new Date(y, m - 1, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+}
+
+// ---------- derived numbers
+function accountBalance(id, uptoMonth) {
+  const acc = data.accounts.find(a => a.id === id);
+  if (!acc) return 0;
+  let bal = Number(acc.initial_balance) || 0;
+  for (const t of data.transactions) {
+    if (uptoMonth && monthKey(t.date) > uptoMonth) continue;
+    const amt = Number(t.amount) || 0;
+    if (t.type === 'income' && t.to_account === id) bal += amt;
+    if (t.type === 'expense' && t.from_account === id) bal -= amt;
+    if (t.type === 'transfer') {
+      if (t.from_account === id) bal -= amt;
+      if (t.to_account === id) bal += amt;
+    }
+  }
+  return bal;
+}
+function totalBalance(uptoMonth) {
+  return data.accounts.reduce((s, a) => s + accountBalance(a.id, uptoMonth), 0);
+}
+function monthTx(key) { return data.transactions.filter(t => monthKey(t.date) === key); }
+function sumBy(txs, type) {
+  const by = {}; let total = 0;
+  for (const t of txs) if (t.type === type) {
+    const amt = Number(t.amount) || 0;
+    by[t.category || '—'] = (by[t.category || '—'] || 0) + amt;
+    total += amt;
+  }
+  return { by, total };
+}
+function accountNetChange(id, key) {
+  let net = 0;
+  for (const t of monthTx(key)) {
+    const amt = Number(t.amount) || 0;
+    if (t.type === 'income' && t.to_account === id) net += amt;
+    if (t.type === 'expense' && t.from_account === id) net -= amt;
+    if (t.type === 'transfer') {
+      if (t.from_account === id) net -= amt;
+      if (t.to_account === id) net += amt;
+    }
+  }
+  return net;
+}
+const accName = id => (data.accounts.find(a => a.id === id) || {}).name || '?';
+
+// ---------- rendering
+let entryType = 'expense';
+let sel = { category: null, from: null, to: null };
+let summaryMonth = monthKey(todayISO());
+
+function renderAll() {
+  renderEntryForm();
+  renderRecent();
+  renderAccounts();
+  renderBudgets();
+  renderSummary();
+  updateSyncPill();
+  document.getElementById('amount-cur').textContent = (data.settings.currency || 'DKK').toUpperCase();
+}
+
+function chipRow(container, items, selectedId, onPick) {
+  const el = document.getElementById(container);
+  el.innerHTML = '';
+  for (const it of items) {
+    const b = document.createElement('button');
+    b.className = 'chip' + (it.id === selectedId ? ' on' : '');
+    b.textContent = it.label;
+    b.onclick = () => { onPick(it.id); renderEntryForm(); };
+    el.appendChild(b);
+  }
+  if (!items.length) el.innerHTML = '<div class="empty">None yet</div>';
+}
+
+function renderEntryForm() {
+  const card = document.getElementById('entry-card');
+  card.className = 'card tint-' + entryType;
+  document.querySelectorAll('#type-seg button').forEach(b => {
+    b.className = b.dataset.type === entryType ? 'sel-' + entryType : '';
+  });
+
+  const cats = data.categories.filter(c => c.type === (entryType === 'income' ? 'income' : 'expense'));
+  document.getElementById('wrap-category').style.display = entryType === 'transfer' ? 'none' : '';
+  if (entryType !== 'transfer') {
+    if (!cats.some(c => c.id === sel.category)) sel.category = cats.length ? cats[0].id : null;
+    chipRow('chips-category', cats.map(c => ({ id: c.id, label: c.name })), sel.category, id => sel.category = id);
+  }
+
+  const accs = data.accounts.map(a => ({ id: a.id, label: a.name }));
+  const showFrom = entryType !== 'income';
+  const showTo = entryType !== 'expense';
+  document.getElementById('wrap-from').style.display = showFrom ? '' : 'none';
+  document.getElementById('wrap-to').style.display = showTo ? '' : 'none';
+  if (showFrom) {
+    if (!accs.some(a => a.id === sel.from)) sel.from = accs.length ? accs[0].id : null;
+    chipRow('chips-from', accs, sel.from, id => sel.from = id);
+  }
+  if (showTo) {
+    const toAccs = entryType === 'transfer' ? accs.filter(a => a.id !== sel.from) : accs;
+    if (!toAccs.some(a => a.id === sel.to)) sel.to = toAccs.length ? toAccs[0].id : null;
+    chipRow('chips-to', toAccs, sel.to, id => sel.to = id);
+  }
+  document.getElementById('label-to').textContent = entryType === 'income' ? 'Receiving account' : 'To account';
+  document.getElementById('btn-save').textContent =
+    entryType === 'expense' ? 'Save expense' : entryType === 'income' ? 'Save income' : 'Save transfer';
+}
+
+function txTitle(t) {
+  if (t.type === 'transfer') return accName(t.from_account) + ' → ' + accName(t.to_account);
+  return t.category || '—';
+}
+function txSub(t) {
+  const acc = t.type === 'income' ? accName(t.to_account) : t.type === 'expense' ? accName(t.from_account) : '';
+  return [t.date, acc, t.note].filter(Boolean).join(' · ');
+}
+function renderTxList(elId, txs, withDelete) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  if (!txs.length) { el.innerHTML = '<div class="empty">No transactions yet</div>'; return; }
+  for (const t of txs) {
+    const row = document.createElement('div');
+    row.className = 'tx-row';
+    const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
+    row.innerHTML = '<div class="tx-dot ' + t.type + '"></div>' +
+      '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub"></div></div>' +
+      '<div class="tx-amount ' + t.type + '">' + sign + fmt(Number(t.amount)) + '</div>';
+    row.querySelector('.tx-title').textContent = txTitle(t);
+    row.querySelector('.tx-sub').textContent = txSub(t);
+    if (withDelete) {
+      const del = document.createElement('button');
+      del.className = 'tx-del'; del.textContent = '✕'; del.setAttribute('aria-label', 'Delete');
+      del.onclick = () => { if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id }); };
+      row.appendChild(del);
+    }
+    el.appendChild(row);
+  }
+}
+function renderRecent() {
+  const txs = [...data.transactions]
+    .sort((a, b) => (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')))
+    .slice(0, 8);
+  renderTxList('recent-list', txs, true);
+}
+
+function renderAccounts() {
+  document.getElementById('total-balance').textContent = fmt(totalBalance());
+  const el = document.getElementById('accounts-list');
+  el.innerHTML = '';
+  if (!data.accounts.length) el.innerHTML = '<div class="empty">Add your first account to get started</div>';
+  for (const a of data.accounts) {
+    const bal = accountBalance(a.id);
+    const row = document.createElement('div');
+    row.className = 'acct-row';
+    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmt(bal) + '</div>';
+    row.querySelector('.acct-name').textContent = a.name;
+    row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
+    row.onclick = () => openAccountModal(a);
+    el.appendChild(row);
+  }
+}
+function ownerName(o) {
+  if (o === 'a') return data.settings.name_a || 'A';
+  if (o === 'b') return data.settings.name_b || 'B';
+  return 'Joint';
+}
+
+function renderBudgets() {
+  const key = monthKey(todayISO());
+  document.getElementById('budgets-title').textContent = 'Budgets — ' + monthLabel(key);
+  const { by } = sumBy(monthTx(key), 'expense');
+  const el = document.getElementById('budgets-list');
+  el.innerHTML = '';
+  const budgeted = data.categories.filter(c => c.type === 'expense' && Number(c.monthly_budget) > 0);
+  if (!budgeted.length) el.innerHTML = '<div class="empty">Set a monthly budget on a category below</div>';
+  for (const c of budgeted) {
+    const spent = by[c.name] || 0;
+    const budget = Number(c.monthly_budget);
+    const pct = Math.min(100, spent / budget * 100);
+    const cls = spent > budget ? ' over' : pct >= 85 ? ' close' : '';
+    const row = document.createElement('div');
+    row.className = 'budget-row';
+    row.innerHTML = '<div class="budget-top"><span></span><span class="nums">' +
+      fmt(spent) + ' / ' + fmt(budget) + '</span></div>' +
+      '<div class="bar"><div class="bar-fill' + cls + '" style="width:' + pct + '%"></div></div>';
+    row.querySelector('.budget-top span').textContent = c.name;
+    el.appendChild(row);
+  }
+  // category management list
+  const cl = document.getElementById('categories-list');
+  cl.innerHTML = '';
+  for (const c of [...data.categories].sort((x, y) => (x.type + x.name).localeCompare(y.type + y.name))) {
+    const row = document.createElement('div');
+    row.className = 'acct-row';
+    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-meta">›</div>';
+    row.querySelector('.acct-name').textContent = c.name;
+    row.querySelector('.acct-meta').textContent = c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
+    row.onclick = () => openCategoryModal(c);
+    cl.appendChild(row);
+  }
+}
+
+function trendEl(id, cur, prev, invert) {
+  const el = document.getElementById(id);
+  if (prev === 0 && cur === 0) { el.textContent = '—'; el.className = 't trend-flat'; return; }
+  const diff = cur - prev;
+  const good = invert ? diff < 0 : diff > 0;
+  el.textContent = (diff === 0 ? '=' : fmtSigned(diff)) + ' vs last mo.';
+  el.className = 't ' + (diff === 0 ? 'trend-flat' : good ? 'trend-up' : 'trend-down');
+}
+
+function renderSummary() {
+  const key = summaryMonth, prev = shiftMonth(key, -1);
+  document.getElementById('month-label').textContent = monthLabel(key);
+  const cur = { spend: sumBy(monthTx(key), 'expense'), inc: sumBy(monthTx(key), 'income') };
+  const old = { spend: sumBy(monthTx(prev), 'expense'), inc: sumBy(monthTx(prev), 'income') };
+
+  document.getElementById('sum-spent').textContent = fmt(cur.spend.total);
+  trendEl('sum-spent-t', cur.spend.total, old.spend.total, true);
+  document.getElementById('sum-income').textContent = fmt(cur.inc.total);
+  trendEl('sum-income-t', cur.inc.total, old.inc.total, false);
+
+  const netCur = cur.inc.total - cur.spend.total;
+  const netOld = old.inc.total - old.spend.total;
+  document.getElementById('sum-net').textContent = fmtSigned(netCur);
+  trendEl('sum-net-t', netCur, netOld, false);
+
+  document.getElementById('sum-balance').textContent = fmt(totalBalance(key));
+  trendEl('sum-balance-t', totalBalance(key), totalBalance(prev), false);
+
+  // per-account net change
+  const ael = document.getElementById('sum-accounts');
+  ael.innerHTML = '';
+  if (!data.accounts.length) ael.innerHTML = '<div class="empty">No accounts</div>';
+  for (const a of data.accounts) {
+    const c = accountNetChange(a.id, key), p = accountNetChange(a.id, prev);
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.innerHTML = '<span class="name"></span><span class="amt ' + (c < 0 ? 'trend-down' : c > 0 ? 'trend-up' : '') + '">' +
+      fmtSigned(c) + '</span><span class="tr trend-flat">prev ' + fmtSigned(p) + '</span>';
+    row.querySelector('.name').textContent = a.name;
+    ael.appendChild(row);
+  }
+
+  renderCatBreakdown('sum-spend-cats', cur.spend.by, old.spend.by, true);
+  renderCatBreakdown('sum-income-cats', cur.inc.by, old.inc.by, false);
+}
+
+function renderCatBreakdown(elId, curBy, oldBy, invert) {
+  const el = document.getElementById(elId);
+  el.innerHTML = '';
+  const names = [...new Set([...Object.keys(curBy), ...Object.keys(oldBy)])]
+    .sort((a, b) => (curBy[b] || 0) - (curBy[a] || 0));
+  if (!names.length) { el.innerHTML = '<div class="empty">Nothing this month</div>'; return; }
+  for (const n of names) {
+    const c = curBy[n] || 0, p = oldBy[n] || 0, d = c - p;
+    const cls = d === 0 ? 'trend-flat' : (invert ? d < 0 : d > 0) ? 'trend-up' : 'trend-down';
+    const row = document.createElement('div');
+    row.className = 'cat-row';
+    row.innerHTML = '<span class="name"></span><span class="amt">' + fmt(c) +
+      '</span><span class="tr ' + cls + '">' + (d === 0 ? '=' : fmtSigned(d)) + '</span>';
+    row.querySelector('.name').textContent = n;
+    el.appendChild(row);
+  }
+}
+</script>
+<script>
+// ---------- modals
+const modalBg = document.getElementById('modal-bg');
+const modalContent = document.getElementById('modal-content');
+function openModal(html) { modalContent.innerHTML = html; modalBg.classList.add('open'); }
+function closeModal() { modalBg.classList.remove('open'); }
+modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
+
+function ownerOptions(selected) {
+  return ['a', 'b', 'joint'].map(o =>
+    '<option value="' + o + '"' + (o === selected ? ' selected' : '') + '>' + ownerName(o) + '</option>').join('');
+}
+
+function openAccountModal(acc) {
+  const isNew = !acc;
+  acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
+  openModal(
+    '<h3>' + (isNew ? 'New account' : 'Edit account') + '</h3>' +
+    '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
+    '<div class="row2" style="margin-top:4px">' +
+    '<div><div class="field-label">Type</div><select class="text-input" id="m-type">' +
+    '<option value="current"' + (acc.type === 'current' ? ' selected' : '') + '>Current</option>' +
+    '<option value="savings"' + (acc.type === 'savings' ? ' selected' : '') + '>Savings</option></select></div>' +
+    '<div><div class="field-label">Owner</div><select class="text-input" id="m-owner">' + ownerOptions(acc.owner) + '</select></div></div>' +
+    '<div class="field-label">Initial balance</div><input class="text-input" id="m-init" inputmode="decimal">' +
+    '<div class="settle-note">The starting balance when you begin tracking. Current balance = initial + all recorded transactions.</div>' +
+    '<button class="btn-primary" id="m-save">' + (isNew ? 'Add account' : 'Save changes') + '</button>' +
+    (isNew ? '' : '<button class="btn-danger" id="m-del">Delete account</button>')
+  );
+  document.getElementById('m-name').value = acc.name;
+  document.getElementById('m-init').value = acc.initial_balance;
+  document.getElementById('m-save').onclick = () => {
+    const name = document.getElementById('m-name').value.trim();
+    const init = parseAmount(document.getElementById('m-init').value || '0');
+    if (!name) return toast('Give the account a name');
+    if (isNaN(init)) return toast('Initial balance is not a number');
+    const payload = {
+      id: acc.id || uuid(), name,
+      type: document.getElementById('m-type').value,
+      owner: document.getElementById('m-owner').value,
+      initial_balance: init,
+      created_at: acc.created_at || new Date().toISOString()
+    };
+    submit(isNew ? 'addAccount' : 'updateAccount', payload);
+    closeModal();
+  };
+  if (!isNew) document.getElementById('m-del').onclick = () => {
+    const used = data.transactions.some(t => t.from_account === acc.id || t.to_account === acc.id);
+    if (used) return toast('Account has transactions — delete them first');
+    if (confirm('Delete ' + acc.name + '?')) { submit('deleteAccount', { id: acc.id }); closeModal(); }
+  };
+}
+
+function openCategoryModal(cat) {
+  const isNew = !cat;
+  cat = cat || { name: '', type: 'expense', monthly_budget: 0 };
+  openModal(
+    '<h3>' + (isNew ? 'New category' : 'Edit category') + '</h3>' +
+    '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
+    '<div class="row2" style="margin-top:4px">' +
+    '<div><div class="field-label">Type</div><select class="text-input" id="m-type"' + (isNew ? '' : ' disabled') + '>' +
+    '<option value="expense"' + (cat.type === 'expense' ? ' selected' : '') + '>Expense</option>' +
+    '<option value="income"' + (cat.type === 'income' ? ' selected' : '') + '>Income</option></select></div>' +
+    '<div><div class="field-label">Monthly budget</div><input class="text-input" id="m-budget" inputmode="decimal" placeholder="0 = none"></div></div>' +
+    '<button class="btn-primary" id="m-save">' + (isNew ? 'Add category' : 'Save changes') + '</button>' +
+    (isNew ? '' : '<button class="btn-danger" id="m-del">Delete category</button>')
+  );
+  document.getElementById('m-name').value = cat.name;
+  document.getElementById('m-budget').value = cat.monthly_budget || '';
+  document.getElementById('m-save').onclick = () => {
+    const name = document.getElementById('m-name').value.trim();
+    const budget = parseAmount(document.getElementById('m-budget').value || '0');
+    if (!name) return toast('Give the category a name');
+    if (isNaN(budget)) return toast('Budget is not a number');
+    submit(isNew ? 'addCategory' : 'updateCategory', {
+      id: cat.id || uuid(), name,
+      type: document.getElementById('m-type').value,
+      monthly_budget: budget
+    });
+    closeModal();
+  };
+  if (!isNew) document.getElementById('m-del').onclick = () => {
+    if (data.transactions.some(t => t.category === cat.name)) return toast('Category is used by transactions');
+    if (confirm('Delete ' + cat.name + '?')) { submit('deleteCategory', { id: cat.id }); closeModal(); }
+  };
+}
+
+function openSettingsModal() {
+  const s = data.settings;
+  openModal(
+    '<h3>Settings</h3>' +
+    '<div class="row2"><div><div class="field-label">Name A</div><input class="text-input" id="m-na"></div>' +
+    '<div><div class="field-label">Name B</div><input class="text-input" id="m-nb"></div></div>' +
+    '<div class="row2" style="margin-top:4px"><div><div class="field-label">Currency</div><input class="text-input" id="m-cur" maxlength="3" autocapitalize="characters"></div>' +
+    '<div><div class="field-label">PIN</div><input class="text-input" id="m-pin" inputmode="numeric"></div></div>' +
+    '<button class="btn-primary" id="m-save">Save settings</button>' +
+    '<button class="btn-ghost" id="m-resync">Force full resync</button>' +
+    '<button class="btn-danger" id="m-disconnect">Disconnect from sheet</button>'
+  );
+  document.getElementById('m-na').value = s.name_a || 'A';
+  document.getElementById('m-nb').value = s.name_b || 'B';
+  document.getElementById('m-cur').value = s.currency || 'DKK';
+  document.getElementById('m-pin').value = s.pin || '';
+  document.getElementById('m-save').onclick = () => {
+    const payload = {
+      name_a: document.getElementById('m-na').value.trim() || 'A',
+      name_b: document.getElementById('m-nb').value.trim() || 'B',
+      currency: (document.getElementById('m-cur').value.trim() || 'DKK').toUpperCase(),
+      pin: document.getElementById('m-pin').value.trim() || data.settings.pin
+    };
+    submit('updateSettings', payload);
+    config.pin = payload.pin; store.set('hf_config', config);
+    closeModal();
+    toast('Settings saved — remind your partner if the PIN changed');
+  };
+  document.getElementById('m-resync').onclick = async () => {
+    closeModal(); toast('Syncing…');
+    await backgroundRefresh(); toast('Up to date');
+  };
+  document.getElementById('m-disconnect').onclick = () => {
+    if (!confirm('Disconnect this device? Your sheet data is untouched.')) return;
+    store.del('hf_config'); store.del('hf_data'); store.del('hf_pending');
+    location.reload();
+  };
+}
+
+// ---------- toast
+let toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+}
+
+// ---------- events
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
+  document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+  if (b.dataset.view === 'summary') { summaryMonth = monthKey(todayISO()); renderSummary(); }
+});
+document.querySelectorAll('#type-seg button').forEach(b => b.onclick = () => { entryType = b.dataset.type; renderEntryForm(); });
+document.getElementById('month-prev').onclick = () => { summaryMonth = shiftMonth(summaryMonth, -1); renderSummary(); };
+document.getElementById('month-next').onclick = () => { summaryMonth = shiftMonth(summaryMonth, 1); renderSummary(); };
+document.getElementById('btn-settings').onclick = openSettingsModal;
+document.getElementById('btn-add-account').onclick = () => openAccountModal(null);
+document.getElementById('btn-add-category').onclick = () => openCategoryModal(null);
+
+document.getElementById('btn-save').onclick = () => {
+  const amount = parseAmount(document.getElementById('in-amount').value);
+  if (!(amount > 0)) return toast('Enter an amount');
+  if (!data.accounts.length) return toast('Add an account first (Accounts tab)');
+  const t = {
+    id: uuid(),
+    date: document.getElementById('in-date').value || todayISO(),
+    type: entryType,
+    amount,
+    category: entryType === 'transfer' ? '' : (data.categories.find(c => c.id === sel.category) || {}).name || '',
+    from_account: entryType === 'income' ? '' : sel.from,
+    to_account: entryType === 'expense' ? '' : sel.to,
+    note: document.getElementById('in-note').value.trim(),
+    created_at: new Date().toISOString()
+  };
+  if (entryType !== 'transfer' && !t.category) return toast('Pick a category');
+  if (entryType !== 'income' && !t.from_account) return toast('Pick an account');
+  if (entryType !== 'expense' && !t.to_account) return toast('Pick an account');
+  if (entryType === 'transfer' && t.from_account === t.to_account) return toast('Pick two different accounts');
+  submit('addTransaction', t);
+  document.getElementById('in-amount').value = '';
+  document.getElementById('in-note').value = '';
+  toast('Saved ' + fmt(amount));
+};
+
+// ---------- setup flow
+document.getElementById('setup-connect').onclick = async () => {
+  const url = document.getElementById('setup-url').value.trim();
+  const pin = document.getElementById('setup-pin').value.trim();
+  const err = document.getElementById('setup-err');
+  err.style.display = 'none';
+  if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) {
+    err.textContent = 'That does not look like an Apps Script URL (it should start with https://script.google.com/…)';
+    err.style.display = 'block'; return;
+  }
+  const btn = document.getElementById('setup-connect');
+  btn.disabled = true; btn.textContent = 'Connecting…';
+  config = { url, pin };
+  try {
+    const fresh = await apiCall('getAll');
+    store.set('hf_config', config);
+    data = fresh; store.set('hf_data', data);
+    boot();
+  } catch (e) {
+    config = null;
+    err.textContent = String(e.message).includes('bad_pin') ? 'Wrong PIN — check the Settings tab of your sheet.'
+      : 'Could not connect: ' + e.message + '. Check the URL, and that the deployment access is set to "Anyone".';
+    err.style.display = 'block';
+  }
+  btn.disabled = false; btn.textContent = 'Connect';
+};
+
+function boot() {
+  if (!config) {
+    document.getElementById('setup').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+    return;
+  }
+  document.getElementById('setup').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('in-date').value = todayISO();
+  renderAll();
+  backgroundRefresh();
+}
+
+window.addEventListener('online', flushQueue);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) backgroundRefresh(); });
+boot();
+
+// ---------- service worker
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>
