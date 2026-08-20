@@ -60,6 +60,30 @@ function renderEntryForm() {
     entryType === 'expense' ? 'Save expense' : entryType === 'income' ? 'Save income' : 'Save transfer';
 }
 
+// Amount input mask: typed digits fill in from the decimals outward (like a
+// till), so "200" becomes 2,00 instead of requiring "2,00" to be typed out.
+function setupAmountInput(input, initial) {
+  let raw = initial > 0 ? String(Math.round(initial * Math.pow(10, curDigits()))) : '';
+
+  function render() { input.value = raw ? formatRawAmount(raw, curDigits()) : ''; }
+  function caretToEnd() { input.setSelectionRange(input.value.length, input.value.length); }
+
+  // Money mask: there's only ever one valid insertion point (the end), so a
+  // click/tap anywhere in the field — which sets the caret by coordinates
+  // after focus fires — must be pulled back to the end too.
+  input.onfocus = () => { if (!raw) raw = '0'; render(); caretToEnd(); };
+  input.onclick = caretToEnd;
+  input.oninput = () => {
+    raw = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '') || '0';
+    render();
+    caretToEnd();
+  };
+  input.onblur = () => { if (!raw || Number(raw) === 0) raw = ''; render(); };
+
+  render();
+  return { reset() { raw = ''; render(); } };
+}
+
 function txTitle(t) {
   if (t.type === 'transfer') return accName(t.from_account) + ' → ' + accName(t.to_account);
   return t.category || '—';

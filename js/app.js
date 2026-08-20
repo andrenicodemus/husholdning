@@ -9,6 +9,7 @@ function toast(msg) {
 }
 
 // ---------- events
+const entryAmountInput = setupAmountInput(document.getElementById('in-amount'));
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
@@ -41,7 +42,7 @@ document.getElementById('btn-save').onclick = () => {
   if (entryType !== 'expense' && !t.to_account) return toast('Pick an account');
   if (entryType === 'transfer' && t.from_account === t.to_account) return toast('Pick two different accounts');
   submit('addTransaction', t);
-  document.getElementById('in-amount').value = '';
+  entryAmountInput.reset();
   document.getElementById('in-note').value = '';
   toast('Saved ' + fmt(amount));
 };

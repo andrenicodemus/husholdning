@@ -28,6 +28,14 @@ function fmt(n) {
 // Account balances are read as a column (see .acct-bal tabular-nums), so keep
 // the currency's own decimals there — aligned digits are easier to compare.
 function fmtAligned(n) { return money(n, null); }
+// Turns a plain digit string (smallest-unit amount, e.g. cents typed right-to-left)
+// into a grouped decimal string for the amount input mask — no currency symbol.
+function formatRawAmount(raw, decimals) {
+  const n = Number(raw || '0') / Math.pow(10, decimals);
+  try {
+    return new Intl.NumberFormat('da-DK', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
+  } catch (e) { return n.toFixed(decimals); }
+}
 function fmtSigned(n) { return (n > 0 ? '+' : '') + fmt(n); }
 function parseAmount(s) {
   const n = Number(String(s).trim().replace(/\./g, m => s.includes(',') ? '' : m).replace(',', '.'));

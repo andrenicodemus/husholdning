@@ -142,7 +142,7 @@ function openTransactionModal(t) {
   openModal(
     'Edit transaction',
     '<div class="card" id="m-card" style="padding:0;border:none;margin:0">' +
-      '<div class="amount-wrap"><input class="amount-input" id="m-amount" inputmode="decimal"><div class="amount-currency">' + (data.settings.currency || 'DKK').toUpperCase() + '</div></div>' +
+      '<div class="amount-wrap"><input class="amount-input" id="m-amount" inputmode="numeric"><div class="amount-currency">' + (data.settings.currency || 'DKK').toUpperCase() + '</div></div>' +
       '<div id="m-wrap-category"><div class="field-label">Category</div><div class="chips" id="m-chips-category"></div></div>' +
       '<div id="m-wrap-from"><div class="field-label" id="m-label-from">From account</div><div class="chips" id="m-chips-from"></div></div>' +
       '<div id="m-wrap-to" style="display:none"><div class="field-label" id="m-label-to">To account</div><div class="chips" id="m-chips-to"></div></div>' +
@@ -154,7 +154,7 @@ function openTransactionModal(t) {
       '<button class="btn-danger" id="m-del">Delete transaction</button>' +
     '</div>'
   );
-  document.getElementById('m-amount').value = t.amount;
+  setupAmountInput(document.getElementById('m-amount'), Number(t.amount));
   document.getElementById('m-date').value = t.date;
   document.getElementById('m-note').value = t.note || '';
   renderTxModalBody();
