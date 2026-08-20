@@ -37,7 +37,7 @@ A zero-cost, two-person finance app. The UI is a PWA hosted on GitHub Pages; the
 ## Part 2 — Frontend (~10 min)
 
 1. Create a GitHub account if you don't have one, then a **new public repository** (e.g. `husholdning`).
-2. Upload the four files from `pwa/` to the repository root: `index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png` (drag-and-drop works on github.com → *Add file → Upload files*).
+2. Upload the app files to the repository root: `index.html`, `style.css`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png`, and the `js/` folder (`format.js`, `store.js`, `render.js`, `modals.js`, `app.js`) (drag-and-drop works on github.com → *Add file → Upload files*).
 3. Repository **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder `/ (root)` → Save.
 4. After a minute your app is live at `https://YOURUSERNAME.github.io/husholdning/`.
 

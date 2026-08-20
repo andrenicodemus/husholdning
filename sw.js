@@ -1,6 +1,10 @@
-/* Husholdning service worker — app shell cache, v1 */
-const CACHE = 'husholdning-v1';
-const SHELL = ['./', './index.html', './manifest.json', './icon-192.png', './icon-512.png'];
+/* Husholdning service worker — app shell cache */
+const CACHE = 'husholdning-v2';
+const SHELL = [
+  './', './index.html', './manifest.json', './icon-192.png', './icon-512.png',
+  './style.css',
+  './js/format.js', './js/store.js', './js/render.js', './js/modals.js', './js/app.js'
+];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
