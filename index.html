@@ -44,6 +44,7 @@ body {
   line-height: 1.45;
   padding-bottom: calc(72px + env(safe-area-inset-bottom));
 }
+body.modal-open { overflow: hidden; position: fixed; inset: 0; width: 100%; overflow-anchor: none; }
 button { font-family: inherit; font-size: inherit; border: none; background: none; color: inherit; cursor: pointer; }
 input, select { font-family: inherit; font-size: inherit; color: inherit; }
 
@@ -268,10 +269,22 @@ nav button.on { color: var(--brand); background: var(--brand-soft); }
 .modal-bg.open { display: flex; }
 .modal {
   background: var(--card); width: 100%; max-width: 560px;
-  border-radius: 20px 20px 0 0; padding: 20px 18px calc(20px + env(safe-area-inset-bottom));
-  max-height: 85vh; overflow-y: auto;
+  border-radius: 20px 20px 0 0;
+  max-height: 85vh; display: flex; flex-direction: column;
 }
-.modal h3 { font-family: var(--display); font-size: 18px; margin-bottom: 14px; }
+.modal-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 18px 18px 14px; flex-shrink: 0; border-bottom: 1px solid var(--line);
+}
+.modal-head h3 { font-family: var(--display); font-size: 18px; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--muted);
+}
+.modal-body {
+  overflow-y: auto; padding: 16px 18px calc(20px + env(safe-area-inset-bottom));
+}
 
 /* Setup screen */
 #setup { padding-top: 8vh; }
@@ -489,6 +502,7 @@ function acceptServerState(fresh) {
 function applyLocal(item, silent) {
   const { action, payload } = item;
   if (action === 'addTransaction' && !data.transactions.some(t => t.id === payload.id)) data.transactions.push(payload);
+  if (action === 'updateTransaction') data.transactions = data.transactions.map(t => t.id === payload.id ? { ...t, ...payload } : t);
   if (action === 'deleteTransaction') data.transactions = data.transactions.filter(t => t.id !== payload.id);
   if (action === 'addAccount' && !data.accounts.some(a => a.id === payload.id)) data.accounts.push(payload);
   if (action === 'updateAccount') data.accounts = data.accounts.map(a => a.id === payload.id ? { ...a, ...payload } : a);
@@ -668,14 +682,15 @@ function renderAll() {
   document.getElementById('amount-cur').textContent = (data.settings.currency || 'DKK').toUpperCase();
 }
 
-function chipRow(container, items, selectedId, onPick) {
+function chipRow(container, items, selectedId, onPick, after) {
+  after = after || renderEntryForm;
   const el = document.getElementById(container);
   el.innerHTML = '';
   for (const it of items) {
     const b = document.createElement('button');
     b.className = 'chip' + (it.id === selectedId ? ' on' : '');
     b.textContent = it.label;
-    b.onclick = () => { onPick(it.id); renderEntryForm(); };
+    b.onclick = () => { onPick(it.id); after(); };
     el.appendChild(b);
   }
   if (!items.length) el.innerHTML = '<div class="empty">None yet</div>';
@@ -735,10 +750,12 @@ function renderTxList(elId, txs, withDelete) {
       '<div class="tx-amount ' + t.type + '">' + sign + fmt(Number(t.amount)) + '</div>';
     row.querySelector('.tx-title').textContent = txTitle(t);
     row.querySelector('.tx-sub').textContent = txSub(t);
+    row.style.cursor = 'pointer';
+    row.onclick = () => openTransactionModal(t);
     if (withDelete) {
       const del = document.createElement('button');
       del.className = 'tx-del'; del.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'; del.setAttribute('aria-label', 'Delete');
-      del.onclick = () => { if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id }); };
+      del.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id }); };
       row.appendChild(del);
     }
     el.appendChild(row);
@@ -877,8 +894,26 @@ function renderCatBreakdown(elId, curBy, oldBy, invert) {
 // ---------- modals
 const modalBg = document.getElementById('modal-bg');
 const modalContent = document.getElementById('modal-content');
-function openModal(html) { modalContent.innerHTML = html; modalBg.classList.add('open'); }
-function closeModal() { modalBg.classList.remove('open'); }
+let modalScrollY = 0;
+function openModal(title, bodyHtml) {
+  modalContent.innerHTML =
+    '<div class="modal-head"><h3></h3><button class="modal-close" aria-label="Close">' +
+    '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>' +
+    '</button></div><div class="modal-body"></div>';
+  modalContent.querySelector('.modal-head h3').textContent = title;
+  modalContent.querySelector('.modal-body').innerHTML = bodyHtml;
+  modalContent.querySelector('.modal-close').onclick = closeModal;
+  modalBg.classList.add('open');
+  modalScrollY = window.scrollY;
+  document.body.style.top = -modalScrollY + 'px';
+  document.body.classList.add('modal-open');
+}
+function closeModal() {
+  modalBg.classList.remove('open');
+  document.body.classList.remove('modal-open');
+  document.body.style.top = '';
+  window.scrollTo(0, modalScrollY);
+}
 modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
 
 function ownerOptions(selected) {
@@ -890,7 +925,7 @@ function openAccountModal(acc) {
   const isNew = !acc;
   acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
   openModal(
-    '<h3>' + (isNew ? 'New account' : 'Edit account') + '</h3>' +
+    isNew ? 'New account' : 'Edit account',
     '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
     '<div class="row2" style="margin-top:4px">' +
     '<div><div class="field-label">Type</div><select class="text-input" id="m-type">' +
@@ -930,7 +965,7 @@ function openCategoryModal(cat) {
   const isNew = !cat;
   cat = cat || { name: '', type: 'expense', monthly_budget: 0 };
   openModal(
-    '<h3>' + (isNew ? 'New category' : 'Edit category') + '</h3>' +
+    isNew ? 'New category' : 'Edit category',
     '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
     '<div class="row2" style="margin-top:4px">' +
     '<div><div class="field-label">Type</div><select class="text-input" id="m-type"' + (isNew ? '' : ' disabled') + '>' +
@@ -960,10 +995,95 @@ function openCategoryModal(cat) {
   };
 }
 
+let editSel = { type: null, category: null, from: null, to: null };
+
+function renderTxModalBody() {
+  const type = editSel.type;
+  document.getElementById('m-card').className = 'card tint-' + type;
+
+  const cats = data.categories.filter(c => c.type === (type === 'income' ? 'income' : 'expense'));
+  document.getElementById('m-wrap-category').style.display = type === 'transfer' ? 'none' : '';
+  if (type !== 'transfer') {
+    if (!cats.some(c => c.id === editSel.category)) editSel.category = cats.length ? cats[0].id : null;
+    chipRow('m-chips-category', cats.map(c => ({ id: c.id, label: c.name })), editSel.category, id => editSel.category = id, renderTxModalBody);
+  }
+
+  const accs = data.accounts.map(a => ({ id: a.id, label: a.name }));
+  const showFrom = type !== 'income';
+  const showTo = type !== 'expense';
+  document.getElementById('m-wrap-from').style.display = showFrom ? '' : 'none';
+  document.getElementById('m-wrap-to').style.display = showTo ? '' : 'none';
+  if (showFrom) {
+    if (!accs.some(a => a.id === editSel.from)) editSel.from = accs.length ? accs[0].id : null;
+    chipRow('m-chips-from', accs, editSel.from, id => editSel.from = id, renderTxModalBody);
+  }
+  if (showTo) {
+    const toAccs = type === 'transfer' ? accs.filter(a => a.id !== editSel.from) : accs;
+    if (!toAccs.some(a => a.id === editSel.to)) editSel.to = toAccs.length ? toAccs[0].id : null;
+    chipRow('m-chips-to', toAccs, editSel.to, id => editSel.to = id, renderTxModalBody);
+  }
+  document.getElementById('m-label-to').textContent = type === 'income' ? 'Receiving account' : 'To account';
+}
+
+function openTransactionModal(t) {
+  editSel = {
+    type: t.type,
+    category: (data.categories.find(c => c.name === t.category) || {}).id || null,
+    from: t.from_account || null,
+    to: t.to_account || null
+  };
+  openModal(
+    'Edit transaction',
+    '<div class="card" id="m-card" style="padding:0;border:none;margin:0">' +
+      '<div class="amount-wrap"><input class="amount-input" id="m-amount" inputmode="decimal"><div class="amount-currency">' + (data.settings.currency || 'DKK').toUpperCase() + '</div></div>' +
+      '<div id="m-wrap-category"><div class="field-label">Category</div><div class="chips" id="m-chips-category"></div></div>' +
+      '<div id="m-wrap-from"><div class="field-label" id="m-label-from">From account</div><div class="chips" id="m-chips-from"></div></div>' +
+      '<div id="m-wrap-to" style="display:none"><div class="field-label" id="m-label-to">To account</div><div class="chips" id="m-chips-to"></div></div>' +
+      '<div class="row2" style="margin-top:14px">' +
+        '<div><div class="field-label" style="margin-top:0">Date</div><input class="text-input" type="date" id="m-date"></div>' +
+        '<div><div class="field-label" style="margin-top:0">Note</div><input class="text-input" id="m-note" placeholder="Optional"></div>' +
+      '</div>' +
+      '<button class="btn-primary" id="m-save">Save changes</button>' +
+      '<button class="btn-danger" id="m-del">Delete transaction</button>' +
+    '</div>'
+  );
+  document.getElementById('m-amount').value = t.amount;
+  document.getElementById('m-date').value = t.date;
+  document.getElementById('m-note').value = t.note || '';
+  renderTxModalBody();
+
+  document.getElementById('m-save').onclick = () => {
+    const amount = parseAmount(document.getElementById('m-amount').value);
+    if (!(amount > 0)) return toast('Enter an amount');
+    const type = editSel.type;
+    const updated = {
+      id: t.id,
+      date: document.getElementById('m-date').value || todayISO(),
+      type,
+      amount,
+      category: type === 'transfer' ? '' : (data.categories.find(c => c.id === editSel.category) || {}).name || '',
+      from_account: type === 'income' ? '' : editSel.from,
+      to_account: type === 'expense' ? '' : editSel.to,
+      note: document.getElementById('m-note').value.trim(),
+      created_at: t.created_at || new Date().toISOString()
+    };
+    if (type !== 'transfer' && !updated.category) return toast('Pick a category');
+    if (type !== 'income' && !updated.from_account) return toast('Pick an account');
+    if (type !== 'expense' && !updated.to_account) return toast('Pick an account');
+    if (type === 'transfer' && updated.from_account === updated.to_account) return toast('Pick two different accounts');
+    submit('updateTransaction', updated);
+    closeModal();
+    toast('Saved');
+  };
+  document.getElementById('m-del').onclick = () => {
+    if (confirm('Delete this transaction?')) { submit('deleteTransaction', { id: t.id }); closeModal(); }
+  };
+}
+
 function openSettingsModal() {
   const s = data.settings;
   openModal(
-    '<h3>Settings</h3>' +
+    'Settings',
     '<div class="row2"><div><div class="field-label">Name A</div><input class="text-input" id="m-na"></div>' +
     '<div><div class="field-label">Name B</div><input class="text-input" id="m-nb"></div></div>' +
     '<div class="row2" style="margin-top:4px"><div><div class="field-label">Currency</div><input class="text-input" id="m-cur" maxlength="3" autocapitalize="characters"></div>' +
