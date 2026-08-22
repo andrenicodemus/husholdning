@@ -496,11 +496,6 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tx-amount.expense {
   color: var(--expense);
 }
-.tx-del {
-  color: var(--muted);
-  font-size: 18px;
-  padding: 6px;
-}
 
 .tx-row.pending .tx-title,
 .tx-row.pending .tx-amount {
@@ -694,6 +689,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .stat .t {
   font-size: 12px;
+  font-weight: 500;
   margin-top: 2px;
 }
 .trend-up {
@@ -708,22 +704,24 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .cat-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 0;
   font-size: 14px;
 }
 .cat-row .name {
-  flex: 1;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+.cat-row .tr {
+  font-size: 12px;
   font-weight: 500;
+  text-align: right;
 }
 .cat-row .amt {
   font-family: var(--mono);
   font-variant-numeric: tabular-nums;
   font-weight: 600;
-}
-.cat-row .tr {
-  font-size: 12px;
-  width: 62px;
+  flex: 1;
   text-align: right;
 }
 

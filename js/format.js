@@ -28,6 +28,16 @@ function fmt(n) {
 // Account balances are read as a column (see .acct-bal tabular-nums), so keep
 // the currency's own decimals there — aligned digits are easier to compare.
 function fmtAligned(n) { return money(n, null); }
+// Summary breakdown cards (accounts change, spending/income by category): the
+// opposite default of fmt() — always show full decimals, except an exact
+// zero, which stays a plain "0 kr." rather than "0,00 kr.".
+function fmtDecimals(n) {
+  const dp = curDigits();
+  const isZero = Math.round(n * Math.pow(10, dp)) === 0;
+  const d = isZero ? 0 : dp;
+  return money(n, { minimumFractionDigits: d, maximumFractionDigits: d });
+}
+function fmtSignedDecimals(n) { return (n > 0 ? '+' : '') + fmtDecimals(n); }
 // Turns a plain digit string (smallest-unit amount, e.g. cents typed right-to-left)
 // into a grouped decimal string for the amount input mask — no currency symbol.
 function formatRawAmount(raw, decimals) {

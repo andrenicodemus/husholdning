@@ -135,7 +135,8 @@ function txSub(t, pending) {
   // Pending rows carry the date in their "due" badge, so don't repeat it here.
   return [pending ? '' : t.date, acc, t.note].filter(Boolean).join(' · ');
 }
-function txRowEl(t, withDelete) {
+
+function txRowEl(t) {
   const pending = isPending(t);
   const row = document.createElement('div');
   row.className = 'tx-row' + (pending ? ' pending' : '');
@@ -158,27 +159,16 @@ function txRowEl(t, withDelete) {
   if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
   row.style.cursor = 'pointer';
   row.onclick = () => openTransactionModal(t);
-  if (withDelete) {
-    const del = document.createElement('button');
-    del.className = 'tx-del';
-    del.innerHTML = '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>';
-    del.setAttribute('aria-label', 'Delete');
-    del.onclick = (e) => {
-      e.stopPropagation();
-      if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id });
-    };
-    row.appendChild(del);
-  }
   return row;
 }
-function renderTxList(elId, txs, withDelete, emptyText) {
+function renderTxList(elId, txs, emptyText) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
   if (!txs.length) {
     el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>';
     return;
   }
-  for (const t of txs) el.appendChild(txRowEl(t, withDelete));
+  for (const t of txs) el.appendChild(txRowEl(t));
 }
 function renderRecent() {
   // Pending entries get their own group: soonest first, all of them, since the
@@ -193,8 +183,8 @@ function renderRecent() {
 
   document.getElementById('upcoming-wrap').style.display = upcoming.length ? '' : 'none';
   document.getElementById('recorded-label').style.display = upcoming.length ? '' : 'none';
-  if (upcoming.length) renderTxList('upcoming-list', upcoming, true);
-  renderTxList('recent-list', done, true, upcoming.length ? 'Nothing recorded yet' : null);
+  if (upcoming.length) renderTxList('upcoming-list', upcoming);
+  renderTxList('recent-list', done, upcoming.length ? 'Nothing recorded yet' : null);
 }
 
 // Rebuilds a filter <select>'s options from scratch (accounts/categories can
@@ -223,7 +213,9 @@ function renderAllTransactions() {
     'All accounts',
     allFilter.account,
   );
-  const cats = [...data.categories].sort((x, y) => (x.type + x.name).localeCompare(y.type + y.name));
+  const cats = [...data.categories].sort((x, y) =>
+    (x.type + x.name).localeCompare(y.type + y.name),
+  );
   populateFilterSelect(
     catSel,
     cats.map((c) => ({ id: c.id, label: c.name })),
@@ -239,7 +231,9 @@ function renderAllTransactions() {
     const catName = (data.categories.find((c) => c.id === allFilter.category) || {}).name;
     txs = txs.filter((t) => t.category === catName);
   }
-  txs = [...txs].sort((a, b) => (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')));
+  txs = [...txs].sort((a, b) =>
+    (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')),
+  );
 
   const el = document.getElementById('all-tx-list');
   el.innerHTML = '';
@@ -263,7 +257,7 @@ function renderAllTransactions() {
       group.appendChild(groupBody);
       el.appendChild(group);
     }
-    groupBody.appendChild(txRowEl(t, true));
+    groupBody.appendChild(txRowEl(t));
   }
 }
 
@@ -414,7 +408,7 @@ function trendEl(id, cur, prev, invert) {
   }
   const diff = cur - prev;
   const good = invert ? diff < 0 : diff > 0;
-  el.textContent = (diff === 0 ? '=' : fmtSigned(diff)) + ' vs last mo.';
+  el.textContent = diff === 0 ? '=' : fmtSigned(diff);
   el.className = 't ' + (diff === 0 ? 'trend-flat' : good ? 'trend-up' : 'trend-down');
 }
 
@@ -443,17 +437,14 @@ function renderSummary() {
   ael.innerHTML = '';
   if (!data.accounts.length) ael.innerHTML = '<div class="empty">No accounts</div>';
   for (const a of data.accounts) {
-    const c = accountNetChange(a.id, key),
-      p = accountNetChange(a.id, prev);
+    const c = accountNetChange(a.id, key);
     const row = document.createElement('div');
     row.className = 'cat-row';
     row.innerHTML =
       '<span class="name"></span><span class="amt ' +
       (c < 0 ? 'trend-down' : c > 0 ? 'trend-up' : '') +
       '">' +
-      fmtSigned(c) +
-      '</span><span class="tr trend-flat">prev ' +
-      fmtSigned(p) +
+      fmtSignedDecimals(c) +
       '</span>';
     row.querySelector('.name').textContent = a.name;
     ael.appendChild(row);
@@ -481,12 +472,12 @@ function renderCatBreakdown(elId, curBy, oldBy, invert) {
     const row = document.createElement('div');
     row.className = 'cat-row';
     row.innerHTML =
-      '<span class="name"></span><span class="amt">' +
-      fmt(c) +
-      '</span><span class="tr ' +
+      '<span class="name"></span><span class="tr ' +
       cls +
       '">' +
-      (d === 0 ? '=' : fmtSigned(d)) +
+      (d === 0 ? '=' : fmtSignedDecimals(d)) +
+      '</span><span class="amt">' +
+      fmtDecimals(c) +
       '</span>';
     row.querySelector('.name').textContent = n;
     el.appendChild(row);
