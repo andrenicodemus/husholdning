@@ -11,6 +11,8 @@ function renderAll() {
   renderBudgets();
   renderSummary();
   renderAllTransactions();
+  renderConfigAccounts();
+  renderConfigCategories();
   updateSyncPill();
   document.getElementById('amount-cur').textContent = (
     data.settings.currency || 'DKK'
@@ -295,13 +297,9 @@ function renderAccounts() {
     // Accounts with nothing pending keep the plain single-line right column.
     row.innerHTML =
       '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      '<div class="acct-side">' +
       (pend
         ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>'
-        : balHtml) +
-      '<button class="acct-edit" aria-label="Edit account">' +
-      '<svg class="icon"><use href="icons/sprite.svg#edit"></use></svg></button>' +
-      '</div>';
+        : balHtml);
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
     if (pend) {
@@ -311,10 +309,6 @@ function renderAccounts() {
       p.textContent = projectedNote(projected, pend);
     }
     row.onclick = () => openAllTx({ account: a.id });
-    row.querySelector('.acct-edit').onclick = (e) => {
-      e.stopPropagation();
-      openAccountModal(a);
-    };
     el.appendChild(row);
   }
 }
@@ -322,6 +316,29 @@ function ownerName(o) {
   if (o === 'a') return data.settings.name_a || 'A';
   if (o === 'b') return data.settings.name_b || 'B';
   return 'Joint';
+}
+
+// Metadata-only account list (Settings › Accounts) — editing and deleting
+// happen from here instead of the main Accounts view now.
+function renderConfigAccounts() {
+  const el = document.getElementById('config-accounts-list');
+  el.innerHTML = '';
+  if (!data.accounts.length) {
+    el.innerHTML = '<div class="empty">Add your first account to get started</div>';
+    return;
+  }
+  for (const a of data.accounts) {
+    const row = document.createElement('div');
+    row.className = 'acct-row';
+    row.style.cursor = 'pointer';
+    row.innerHTML =
+      '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      '<div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
+    row.querySelector('.acct-name').textContent = a.name;
+    row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
+    row.onclick = () => openAccountModal(a);
+    el.appendChild(row);
+  }
 }
 
 function renderBudgets() {
@@ -334,7 +351,7 @@ function renderBudgets() {
     (c) => c.type === 'expense' && Number(c.monthly_budget) > 0,
   );
   if (!budgeted.length)
-    el.innerHTML = '<div class="empty">Set a monthly budget on a category below</div>';
+    el.innerHTML = '<div class="empty">Set a monthly budget from Settings › Categories</div>';
   for (const c of budgeted) {
     const spent = by[c.name] || 0;
     const budget = Number(c.monthly_budget);
@@ -365,7 +382,11 @@ function renderBudgets() {
     row.onclick = () => openAllTx({ category: c.id });
     el.appendChild(row);
   }
-  // category management list
+}
+
+// Category management list (Settings › Categories) — editing and deleting
+// happen from here instead of the Budgets view now.
+function renderConfigCategories() {
   const cl = document.getElementById('categories-list');
   cl.innerHTML = '';
   for (const c of [...data.categories].sort((x, y) =>
@@ -373,6 +394,7 @@ function renderBudgets() {
   )) {
     const row = document.createElement('div');
     row.className = 'acct-row';
+    row.style.cursor = 'pointer';
     row.innerHTML =
       '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
     row.querySelector('.acct-name').textContent = c.name;

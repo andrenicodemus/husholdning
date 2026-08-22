@@ -1,19 +1,18 @@
-<div class="row2">
-  <div><div class="field-label">Name A</div><input class="text-input" id="m-na" /></div>
-  <div><div class="field-label">Name B</div><input class="text-input" id="m-nb" /></div>
+<div class="acct-row" id="settings-general" style="cursor: pointer">
+  <div class="acct-name">General</div>
+  <div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>
 </div>
-<div class="row2" style="margin-top: 4px">
-  <div>
-    <div class="field-label">Currency</div>
-    <input class="text-input" id="m-cur" maxlength="3" autocapitalize="characters" />
-  </div>
-  <div>
-    <div class="field-label">PIN</div>
-    <input class="text-input" id="m-pin" inputmode="numeric" />
-  </div>
+<div class="acct-row" id="settings-accounts" style="cursor: pointer">
+  <div class="acct-name">Accounts</div>
+  <div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>
 </div>
-<div class="actions" style="display: flex; flex-direction: column; row-gap: 8px">
-  <button class="btn-primary" id="m-save">Save settings</button>
-  <button class="btn-ghost" id="m-resync">Force full resync</button>
-  <button class="btn-danger" id="m-disconnect">Disconnect from sheet</button>
+<div class="acct-row" id="settings-categories" style="cursor: pointer">
+  <div class="acct-name">Categories</div>
+  <div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>
+</div>
+<div class="acct-row" id="settings-resync" style="cursor: pointer">
+  <div class="acct-name">Force full resync</div>
+</div>
+<div class="acct-row" id="settings-disconnect" style="cursor: pointer">
+  <div class="acct-name" style="color: var(--expense)">Disconnect from sheet</div>
 </div>

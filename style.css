@@ -584,18 +584,6 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   color: var(--expense);
 }
 
-.acct-side {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.acct-edit {
-  color: var(--muted);
-  font-size: 16px;
-  padding: 6px;
-  flex-shrink: 0;
-}
-
 .acct-right {
   text-align: right;
 }

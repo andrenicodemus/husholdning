@@ -217,33 +217,30 @@ function openTransactionModal(t) {
   };
 }
 
+// Settings is now a menu of pages/actions rather than a form — each config
+// page (General, Accounts, Categories) is a full subpage (see app.js), not
+// a modal, so all this does is route to them or run the direct actions.
 function openSettingsModal() {
-  const s = data.settings;
   openModal('Settings', modalTemplates.settings);
-  document.getElementById('m-na').value = s.name_a || 'A';
-  document.getElementById('m-nb').value = s.name_b || 'B';
-  document.getElementById('m-cur').value = s.currency || 'DKK';
-  document.getElementById('m-pin').value = s.pin || '';
-  document.getElementById('m-save').onclick = () => {
-    const payload = {
-      name_a: document.getElementById('m-na').value.trim() || 'A',
-      name_b: document.getElementById('m-nb').value.trim() || 'B',
-      currency: (document.getElementById('m-cur').value.trim() || 'DKK').toUpperCase(),
-      pin: document.getElementById('m-pin').value.trim() || data.settings.pin,
-    };
-    submit('updateSettings', payload);
-    config.pin = payload.pin;
-    store.set('hf_config', config);
+  document.getElementById('settings-general').onclick = () => {
     closeModal();
-    toast('Settings saved — remind your partner if the PIN changed');
+    openGeneralSubpage();
   };
-  document.getElementById('m-resync').onclick = async () => {
+  document.getElementById('settings-accounts').onclick = () => {
+    closeModal();
+    openConfigAccounts();
+  };
+  document.getElementById('settings-categories').onclick = () => {
+    closeModal();
+    openConfigCategories();
+  };
+  document.getElementById('settings-resync').onclick = async () => {
     closeModal();
     toast('Syncing…');
     await backgroundRefresh();
     toast('Up to date');
   };
-  document.getElementById('m-disconnect').onclick = () => {
+  document.getElementById('settings-disconnect').onclick = () => {
     if (!confirm('Disconnect this device? Your sheet data is untouched.')) return;
     store.del('hf_config');
     store.del('hf_data');

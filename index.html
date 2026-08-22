@@ -145,9 +145,6 @@
           <div class="card">
             <h2>Accounts</h2>
             <div id="accounts-list"></div>
-            <button class="btn-ghost" id="btn-add-account">
-              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
-            </button>
           </div>
         </section>
 
@@ -156,13 +153,6 @@
           <div class="card">
             <h2 id="budgets-title">Budgets this month</h2>
             <div id="budgets-list"></div>
-          </div>
-          <div class="card">
-            <h2>Categories</h2>
-            <div id="categories-list"></div>
-            <button class="btn-ghost" id="btn-add-category">
-              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
-            </button>
           </div>
         </section>
 
@@ -216,7 +206,7 @@
         <!-- ALL TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
         <section class="view" id="view-all">
           <div class="subpage-head">
-            <button class="icon-btn" id="alltx-back" aria-label="Back">
+            <button class="icon-btn subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>All transactions</h1>
@@ -236,6 +226,71 @@
           </div>
           <div class="card">
             <div id="all-tx-list"></div>
+          </div>
+        </section>
+
+        <!-- SETTINGS: GENERAL (reached from the Settings menu, not a nav tab) -->
+        <section class="view" id="view-general">
+          <div class="subpage-head">
+            <button class="icon-btn subpage-back" aria-label="Back">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1>General</h1>
+          </div>
+          <div class="card">
+            <div class="row2">
+              <div>
+                <div class="field-label" style="margin-top: 0">Name A</div>
+                <input class="text-input" id="g-na" />
+              </div>
+              <div>
+                <div class="field-label" style="margin-top: 0">Name B</div>
+                <input class="text-input" id="g-nb" />
+              </div>
+            </div>
+            <div class="row2" style="margin-top: 4px">
+              <div>
+                <div class="field-label">Currency</div>
+                <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
+              </div>
+              <div>
+                <div class="field-label">PIN</div>
+                <input class="text-input" id="g-pin" inputmode="numeric" />
+              </div>
+            </div>
+            <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
+          </div>
+        </section>
+
+        <!-- SETTINGS: ACCOUNTS (reached from the Settings menu, not a nav tab) -->
+        <section class="view" id="view-config-accounts">
+          <div class="subpage-head">
+            <button class="icon-btn subpage-back" aria-label="Back">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1>Accounts</h1>
+          </div>
+          <div class="card">
+            <div id="config-accounts-list"></div>
+            <button class="btn-ghost" id="btn-add-account">
+              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
+            </button>
+          </div>
+        </section>
+
+        <!-- SETTINGS: CATEGORIES (reached from the Settings menu, not a nav tab) -->
+        <section class="view" id="view-config-categories">
+          <div class="subpage-head">
+            <button class="icon-btn subpage-back" aria-label="Back">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1>Categories</h1>
+          </div>
+          <div class="card">
+            <div id="categories-list"></div>
+            <button class="btn-ghost" id="btn-add-category">
+              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
+            </button>
           </div>
         </section>
       </main>
