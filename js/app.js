@@ -14,6 +14,7 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
   if (b.dataset.view === 'summary') { summaryMonth = monthKey(todayISO()); renderSummary(); }
+  window.scrollTo(0, 0);
 });
 document.querySelectorAll('#type-seg button').forEach(b => b.onclick = () => { entryType = b.dataset.type; renderEntryForm(); });
 document.getElementById('month-prev').onclick = () => { summaryMonth = shiftMonth(summaryMonth, -1); renderSummary(); };

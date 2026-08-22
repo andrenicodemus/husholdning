@@ -599,6 +599,18 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .bar-fill.close {
   background: #c98a2b;
 }
+.budget-remaining {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: right;
+}
+.budget-remaining.left {
+  color: var(--income);
+}
+.budget-remaining.over {
+  color: var(--expense);
+}
 
 /* Summary */
 .month-nav {

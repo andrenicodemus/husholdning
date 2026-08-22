@@ -256,8 +256,9 @@ function renderBudgets() {
   for (const c of budgeted) {
     const spent = by[c.name] || 0;
     const budget = Number(c.monthly_budget);
+    const over = spent > budget;
     const pct = Math.min(100, (spent / budget) * 100);
-    const cls = spent > budget ? ' over' : pct >= 85 ? ' close' : '';
+    const cls = over ? ' over' : pct >= 85 ? ' close' : '';
     const row = document.createElement('div');
     row.className = 'budget-row';
     row.innerHTML =
@@ -270,8 +271,14 @@ function renderBudgets() {
       cls +
       '" style="width:' +
       pct +
-      '%"></div></div>';
+      '%"></div></div>' +
+      '<div class="budget-remaining ' +
+      (over ? 'over' : 'left') +
+      '"></div>';
     row.querySelector('.budget-top span').textContent = c.name;
+    row.querySelector('.budget-remaining').textContent = over
+      ? fmt(spent - budget) + ' over budget'
+      : fmt(budget - spent) + ' left';
     el.appendChild(row);
   }
   // category management list
