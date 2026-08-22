@@ -1,168 +1,249 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Husholdning</title>
-<meta name="description" content="Joint household finance tracker">
-<meta name="theme-color" content="#204B3C">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Husholdning">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<!-- ======================= SETUP SCREEN ======================= -->
-<section id="setup" style="display:none">
-  <main>
-    <div class="logo">Husholdning</div>
-    <div class="tag">Your joint finances, in your pocket</div>
-    <div class="card">
-      <h2>Connect to Google sheet</h2>
-      <form id="setup-form" autocomplete="on">
-        <div class="field-label">Web app URL</div>
-        <input class="text-input" id="setup-url" name="username" placeholder="https://script.google.com/macros/s/…/exec" autocapitalize="off" autocorrect="off" autocomplete="username" inputmode="url">
-        <div class="field-label">PIN</div>
-        <input class="text-input" id="setup-pin" name="password" type="password" placeholder="1234" inputmode="numeric" autocomplete="current-password">
-        <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
-        <div class="err" id="setup-err"></div>
-      </form>
-    </div>
-  </main>
-</section>
-
-<!-- ======================= APP ======================= -->
-<div id="app" style="display:none">
-<header>
-  <h1 id="app-title">Husholdning</h1>
-  <div class="header-actions">
-    <span class="pill" id="sync-pill"></span>
-    <button class="icon-btn" id="btn-settings" aria-label="Settings"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg></button>
-  </div>
-</header>
-
-<main>
-  <!-- ENTRY -->
-  <section class="view active" id="view-entry">
-    <div class="type-seg" id="type-seg">
-      <button data-type="expense" class="sel-expense"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/></svg>Expense</button>
-      <button data-type="income"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Income</button>
-      <button data-type="transfer"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3 4 7l4 4"/><path d="M4 7h16"/><path d="m16 21 4-4-4-4"/><path d="M20 17H4"/></svg>Transfer</button>
-    </div>
-    <div class="card tint-expense" id="entry-card">
-      <div class="amount-wrap">
-        <input class="amount-input" id="in-amount" inputmode="numeric" placeholder="0,00" autocomplete="off">
-        <div class="amount-currency" id="amount-cur">DKK</div>
-      </div>
-      <div id="wrap-category">
-        <div class="field-label">Category</div>
-        <div class="chips" id="chips-category"></div>
-      </div>
-      <div id="wrap-from">
-        <div class="field-label" id="label-from">From account</div>
-        <div class="chips" id="chips-from"></div>
-      </div>
-      <div id="wrap-to" style="display:none">
-        <div class="field-label" id="label-to">To account</div>
-        <div class="chips" id="chips-to"></div>
-      </div>
-      <div class="row2" style="margin-top:14px">
-        <div>
-          <div class="field-label" style="margin-top:0">Date</div>
-          <input class="text-input" type="date" id="in-date">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Husholdning</title>
+    <meta name="description" content="Joint household finance tracker" />
+    <meta name="theme-color" content="#204B3C" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Husholdning" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- ======================= SETUP SCREEN ======================= -->
+    <section id="setup" style="display: none">
+      <main>
+        <div class="logo">Husholdning</div>
+        <div class="tag">Your joint finances, in your pocket</div>
+        <div class="card">
+          <h2>Connect to Google sheet</h2>
+          <form id="setup-form" autocomplete="on">
+            <div class="field-label">Web app URL</div>
+            <input
+              class="text-input"
+              id="setup-url"
+              name="username"
+              placeholder="https://script.google.com/macros/s/…/exec"
+              autocapitalize="off"
+              autocorrect="off"
+              autocomplete="username"
+              inputmode="url"
+            />
+            <div class="field-label">PIN</div>
+            <input
+              class="text-input"
+              id="setup-pin"
+              name="password"
+              type="password"
+              placeholder="1234"
+              inputmode="numeric"
+              autocomplete="current-password"
+            />
+            <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
+            <div class="err" id="setup-err"></div>
+          </form>
         </div>
-        <div>
-          <div class="field-label" style="margin-top:0">Note</div>
-          <input class="text-input" id="in-note" placeholder="Optional">
+      </main>
+    </section>
+
+    <!-- ======================= APP ======================= -->
+    <div id="app" style="display: none">
+      <header>
+        <h1 id="app-title">Husholdning</h1>
+        <div class="header-actions">
+          <span class="pill" id="sync-pill"></span>
+          <button class="icon-btn" id="btn-settings" aria-label="Settings">
+            <svg class="icon"><use href="icons/sprite.svg#settings"></use></svg>
+          </button>
         </div>
-      </div>
-      <button class="btn-primary" id="btn-save">Save expense</button>
-    </div>
-    <div class="card">
-      <h2>Recent</h2>
-      <div id="recent-list"></div>
-    </div>
-  </section>
+      </header>
 
-  <!-- ACCOUNTS -->
-  <section class="view" id="view-accounts">
-    <div class="card">
-      <div class="balance-hero">
-        <div class="sub">Total balance</div>
-        <div class="big" id="total-balance">–</div>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Accounts</h2>
-      <div id="accounts-list"></div>
-      <button class="btn-ghost" id="btn-add-account"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add account</button>
-    </div>
-  </section>
+      <main>
+        <!-- ENTRY -->
+        <section class="view active" id="view-entry">
+          <div class="type-seg" id="type-seg">
+            <button data-type="expense" class="sel-expense">
+              <svg class="icon"><use href="icons/sprite.svg#minus"></use></svg>
+              Expense
+            </button>
+            <button data-type="income">
+              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>
+              Income
+            </button>
+            <button data-type="transfer">
+              <svg class="icon"><use href="icons/sprite.svg#transfer"></use></svg>Transfer
+            </button>
+          </div>
+          <div class="card tint-expense" id="entry-card">
+            <div class="amount-wrap">
+              <input
+                class="amount-input"
+                id="in-amount"
+                inputmode="numeric"
+                placeholder="0,00"
+                autocomplete="off"
+              />
+              <div class="amount-currency" id="amount-cur">DKK</div>
+            </div>
+            <div id="wrap-category">
+              <div class="field-label">Category</div>
+              <div class="chips" id="chips-category"></div>
+            </div>
+            <div id="wrap-from">
+              <div class="field-label" id="label-from">From account</div>
+              <div class="chips" id="chips-from"></div>
+            </div>
+            <div id="wrap-to" style="display: none">
+              <div class="field-label" id="label-to">To account</div>
+              <div class="chips" id="chips-to"></div>
+            </div>
+            <div class="row2">
+              <div>
+                <div class="field-label">Date</div>
+                <input class="text-input" type="date" id="in-date" />
+              </div>
+              <div>
+                <div class="field-label">Note</div>
+                <input class="text-input" id="in-note" placeholder="Optional" />
+              </div>
+            </div>
+            <button class="btn-primary" id="btn-save">Save expense</button>
+          </div>
+          <div class="card">
+            <h2>Recent</h2>
+            <div id="upcoming-wrap" style="display: none">
+              <div class="list-sub">Upcoming</div>
+              <div id="upcoming-list"></div>
+            </div>
+            <div class="list-sub" id="recorded-label" style="display: none">Recorded</div>
+            <div id="recent-list"></div>
+          </div>
+        </section>
 
-  <!-- BUDGETS -->
-  <section class="view" id="view-budgets">
-    <div class="card">
-      <h2 id="budgets-title">Budgets this month</h2>
-      <div id="budgets-list"></div>
-    </div>
-    <div class="card">
-      <h2>Categories</h2>
-      <div id="categories-list"></div>
-      <button class="btn-ghost" id="btn-add-category"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>Add category</button>
-    </div>
-  </section>
+        <!-- ACCOUNTS -->
+        <section class="view" id="view-accounts">
+          <div class="card">
+            <div class="balance-hero">
+              <div class="sub">Total balance</div>
+              <div class="big" id="total-balance">–</div>
+              <div class="projected" id="total-projected" style="display: none"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Accounts</h2>
+            <div id="accounts-list"></div>
+            <button class="btn-ghost" id="btn-add-account">
+              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
+            </button>
+          </div>
+        </section>
 
-  <!-- SUMMARY -->
-  <section class="view" id="view-summary">
-    <div class="month-nav">
-      <button id="month-prev" aria-label="Previous month"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg></button>
-      <div class="label" id="month-label"></div>
-      <button id="month-next" aria-label="Next month"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></button>
-    </div>
-    <div class="stat-grid">
-      <div class="stat"><div class="k">Spent</div><div class="v" id="sum-spent"></div><div class="t" id="sum-spent-t"></div></div>
-      <div class="stat"><div class="k">Income</div><div class="v" id="sum-income"></div><div class="t" id="sum-income-t"></div></div>
-      <div class="stat"><div class="k">Net this month</div><div class="v" id="sum-net"></div><div class="t" id="sum-net-t"></div></div>
-      <div class="stat"><div class="k">Total balance</div><div class="v" id="sum-balance"></div><div class="t" id="sum-balance-t"></div></div>
-    </div>
-    <div class="card">
-      <h2>Accounts change</h2>
-      <div id="sum-accounts"></div>
-    </div>
-    <div class="card">
-      <h2>Spending by category</h2>
-      <div id="sum-spend-cats"></div>
-    </div>
-    <div class="card">
-      <h2>Income by category</h2>
-      <div id="sum-income-cats"></div>
-    </div>
-  </section>
-</main>
+        <!-- BUDGETS -->
+        <section class="view" id="view-budgets">
+          <div class="card">
+            <h2 id="budgets-title">Budgets this month</h2>
+            <div id="budgets-list"></div>
+          </div>
+          <div class="card">
+            <h2>Categories</h2>
+            <div id="categories-list"></div>
+            <button class="btn-ghost" id="btn-add-category">
+              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
+            </button>
+          </div>
+        </section>
 
-<nav>
-  <button data-view="entry" class="on"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 12h8"/><path d="M12 8v8"/></svg></span>New</button>
-  <button data-view="accounts"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>Accounts</button>
-  <button data-view="budgets"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"/><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/></svg></span>Budgets</button>
-  <button data-view="summary"><span class="ic"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>Summary</button>
-</nav>
-</div>
+        <!-- SUMMARY -->
+        <section class="view" id="view-summary">
+          <div class="month-nav">
+            <button id="month-prev" aria-label="Previous month">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <div class="label" id="month-label"></div>
+            <button id="month-next" aria-label="Next month">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg>
+            </button>
+          </div>
+          <div class="stat-grid">
+            <div class="stat">
+              <div class="k">Spent</div>
+              <div class="v" id="sum-spent"></div>
+              <div class="t" id="sum-spent-t"></div>
+            </div>
+            <div class="stat">
+              <div class="k">Income</div>
+              <div class="v" id="sum-income"></div>
+              <div class="t" id="sum-income-t"></div>
+            </div>
+            <div class="stat">
+              <div class="k">Net this month</div>
+              <div class="v" id="sum-net"></div>
+              <div class="t" id="sum-net-t"></div>
+            </div>
+            <div class="stat">
+              <div class="k">Total balance</div>
+              <div class="v" id="sum-balance"></div>
+              <div class="t" id="sum-balance-t"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Accounts change</h2>
+            <div id="sum-accounts"></div>
+          </div>
+          <div class="card">
+            <h2>Spending by category</h2>
+            <div id="sum-spend-cats"></div>
+          </div>
+          <div class="card">
+            <h2>Income by category</h2>
+            <div id="sum-income-cats"></div>
+          </div>
+        </section>
+      </main>
 
-<!-- ======================= MODALS ======================= -->
-<div class="modal-bg" id="modal-bg">
-  <div class="modal" id="modal-content"></div>
-</div>
-<div id="toast"></div>
-<script src="js/format.js"></script>
-<script src="js/store.js"></script>
-<script src="js/render.js"></script>
-<script src="js/modals.js"></script>
-<script src="js/app.js"></script>
-</body>
+      <nav>
+        <button data-view="entry" class="on">
+          <span class="ic"
+            ><svg class="icon"><use href="icons/sprite.svg#nav-new"></use></svg></span
+          >New
+        </button>
+        <button data-view="accounts">
+          <span class="ic"
+            ><svg class="icon"><use href="icons/sprite.svg#nav-accounts"></use></svg></span
+          >Accounts
+        </button>
+        <button data-view="budgets">
+          <span class="ic"
+            ><svg class="icon"><use href="icons/sprite.svg#nav-budgets"></use></svg></span
+          >Budgets
+        </button>
+        <button data-view="summary">
+          <span class="ic"
+            ><svg class="icon"><use href="icons/sprite.svg#nav-summary"></use></svg></span
+          >Summary
+        </button>
+      </nav>
+    </div>
+
+    <!-- ======================= MODALS ======================= -->
+    <div class="modal-bg" id="modal-bg">
+      <div class="modal" id="modal-content"></div>
+    </div>
+    <div id="toast"></div>
+    <script src="js/format.js"></script>
+    <script src="js/store.js"></script>
+    <script src="js/render.js"></script>
+    <script src="js/modals.js"></script>
+    <script src="js/app.js"></script>
+  </body>
 </html>

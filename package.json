@@ -1,0 +1,10 @@
+{
+  "name": "husholdning",
+  "private": true,
+  "devDependencies": {
+    "prettier": "^3.3.3"
+  },
+  "scripts": {
+    "format": "prettier --write ."
+  }
+}
