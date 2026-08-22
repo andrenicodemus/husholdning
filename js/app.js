@@ -90,7 +90,12 @@ function boot() {
 
 window.addEventListener('online', flushQueue);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) backgroundRefresh(); });
-boot();
+loadModalTemplates()
+  .catch((err) => {
+    console.error(err);
+    toast('Could not load dialog templates — reload the page');
+  })
+  .then(boot);
 
 // ---------- service worker
 if ('serviceWorker' in navigator) {

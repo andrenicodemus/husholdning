@@ -1,0 +1,29 @@
+<div class="field-label">Name</div>
+<input class="text-input" id="m-name" />
+<div class="row2" style="margin-top: 4px">
+  <div>
+    <div class="field-label">Type</div>
+    <select class="select-input" id="m-type">
+      <option value="current">Current</option>
+      <option value="savings">Savings</option>
+    </select>
+  </div>
+  <div>
+    <div class="field-label">Owner</div>
+    <select class="select-input" id="m-owner">
+      <option value="a"></option>
+      <option value="b"></option>
+      <option value="joint"></option>
+    </select>
+  </div>
+</div>
+<div class="field-label">Initial balance</div>
+<input class="text-input" id="m-init" inputmode="decimal" />
+<div class="settle-note">
+  The starting balance when you begin tracking. Current balance = initial + every transaction
+  dated today or earlier; upcoming ones only count from their date.
+</div>
+<div class="actions" style="display: flex; flex-direction: column; row-gap: 8px">
+  <button class="btn-primary" id="m-save"></button>
+  <button class="btn-danger" id="m-del" hidden>Delete account</button>
+</div>
