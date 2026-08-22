@@ -10,7 +10,9 @@ function renderAll() {
   renderBudgets();
   renderSummary();
   updateSyncPill();
-  document.getElementById('amount-cur').textContent = (data.settings.currency || 'DKK').toUpperCase();
+  document.getElementById('amount-cur').textContent = (
+    data.settings.currency || 'DKK'
+  ).toUpperCase();
 }
 
 function chipRow(container, items, selectedId, onPick, after) {
@@ -21,7 +23,10 @@ function chipRow(container, items, selectedId, onPick, after) {
     const b = document.createElement('button');
     b.className = 'chip' + (it.id === selectedId ? ' on' : '');
     b.textContent = it.label;
-    b.onclick = () => { onPick(it.id); after(); };
+    b.onclick = () => {
+      onPick(it.id);
+      after();
+    };
     el.appendChild(b);
   }
   if (!items.length) el.innerHTML = '<div class="empty">None yet</div>';
@@ -30,34 +35,46 @@ function chipRow(container, items, selectedId, onPick, after) {
 function renderEntryForm() {
   const card = document.getElementById('entry-card');
   card.className = 'card tint-' + entryType;
-  document.querySelectorAll('#type-seg button').forEach(b => {
+  document.querySelectorAll('#type-seg button').forEach((b) => {
     b.className = b.dataset.type === entryType ? 'sel-' + entryType : '';
   });
 
-  const cats = data.categories.filter(c => c.type === (entryType === 'income' ? 'income' : 'expense'));
+  const cats = data.categories.filter(
+    (c) => c.type === (entryType === 'income' ? 'income' : 'expense'),
+  );
   document.getElementById('wrap-category').style.display = entryType === 'transfer' ? 'none' : '';
   if (entryType !== 'transfer') {
-    if (!cats.some(c => c.id === sel.category)) sel.category = cats.length ? cats[0].id : null;
-    chipRow('chips-category', cats.map(c => ({ id: c.id, label: c.name })), sel.category, id => sel.category = id);
+    if (!cats.some((c) => c.id === sel.category)) sel.category = cats.length ? cats[0].id : null;
+    chipRow(
+      'chips-category',
+      cats.map((c) => ({ id: c.id, label: c.name })),
+      sel.category,
+      (id) => (sel.category = id),
+    );
   }
 
-  const accs = data.accounts.map(a => ({ id: a.id, label: a.name }));
+  const accs = data.accounts.map((a) => ({ id: a.id, label: a.name }));
   const showFrom = entryType !== 'income';
   const showTo = entryType !== 'expense';
   document.getElementById('wrap-from').style.display = showFrom ? '' : 'none';
   document.getElementById('wrap-to').style.display = showTo ? '' : 'none';
   if (showFrom) {
-    if (!accs.some(a => a.id === sel.from)) sel.from = accs.length ? accs[0].id : null;
-    chipRow('chips-from', accs, sel.from, id => sel.from = id);
+    if (!accs.some((a) => a.id === sel.from)) sel.from = accs.length ? accs[0].id : null;
+    chipRow('chips-from', accs, sel.from, (id) => (sel.from = id));
   }
   if (showTo) {
-    const toAccs = entryType === 'transfer' ? accs.filter(a => a.id !== sel.from) : accs;
-    if (!toAccs.some(a => a.id === sel.to)) sel.to = toAccs.length ? toAccs[0].id : null;
-    chipRow('chips-to', toAccs, sel.to, id => sel.to = id);
+    const toAccs = entryType === 'transfer' ? accs.filter((a) => a.id !== sel.from) : accs;
+    if (!toAccs.some((a) => a.id === sel.to)) sel.to = toAccs.length ? toAccs[0].id : null;
+    chipRow('chips-to', toAccs, sel.to, (id) => (sel.to = id));
   }
-  document.getElementById('label-to').textContent = entryType === 'income' ? 'Receiving account' : 'To account';
+  document.getElementById('label-to').textContent =
+    entryType === 'income' ? 'Receiving account' : 'To account';
   document.getElementById('btn-save').textContent =
-    entryType === 'expense' ? 'Save expense' : entryType === 'income' ? 'Save income' : 'Save transfer';
+    entryType === 'expense'
+      ? 'Save expense'
+      : entryType === 'income'
+        ? 'Save income'
+        : 'Save transfer';
 }
 
 // Amount input mask: typed digits fill in from the decimals outward (like a
@@ -65,23 +82,39 @@ function renderEntryForm() {
 function setupAmountInput(input, initial) {
   let raw = initial > 0 ? String(Math.round(initial * Math.pow(10, curDigits()))) : '';
 
-  function render() { input.value = raw ? formatRawAmount(raw, curDigits()) : ''; }
-  function caretToEnd() { input.setSelectionRange(input.value.length, input.value.length); }
+  function render() {
+    input.value = raw ? formatRawAmount(raw, curDigits()) : '';
+  }
+  function caretToEnd() {
+    input.setSelectionRange(input.value.length, input.value.length);
+  }
 
   // Money mask: there's only ever one valid insertion point (the end), so a
   // click/tap anywhere in the field — which sets the caret by coordinates
   // after focus fires — must be pulled back to the end too.
-  input.onfocus = () => { if (!raw) raw = '0'; render(); caretToEnd(); };
+  input.onfocus = () => {
+    if (!raw) raw = '0';
+    render();
+    caretToEnd();
+  };
   input.onclick = caretToEnd;
   input.oninput = () => {
     raw = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '') || '0';
     render();
     caretToEnd();
   };
-  input.onblur = () => { if (!raw || Number(raw) === 0) raw = ''; render(); };
+  input.onblur = () => {
+    if (!raw || Number(raw) === 0) raw = '';
+    render();
+  };
 
   render();
-  return { reset() { raw = ''; render(); } };
+  return {
+    reset() {
+      raw = '';
+      render();
+    },
+  };
 }
 
 function txTitle(t) {
@@ -89,23 +122,40 @@ function txTitle(t) {
   return t.category || '—';
 }
 function txSub(t, pending) {
-  const acc = t.type === 'income' ? accName(t.to_account) : t.type === 'expense' ? accName(t.from_account) : '';
+  const acc =
+    t.type === 'income'
+      ? accName(t.to_account)
+      : t.type === 'expense'
+        ? accName(t.from_account)
+        : '';
   // Pending rows carry the date in their "due" badge, so don't repeat it here.
   return [pending ? '' : t.date, acc, t.note].filter(Boolean).join(' · ');
 }
 function renderTxList(elId, txs, withDelete, emptyText) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
-  if (!txs.length) { el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>'; return; }
+  if (!txs.length) {
+    el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>';
+    return;
+  }
   for (const t of txs) {
     const pending = isPending(t);
     const row = document.createElement('div');
     row.className = 'tx-row' + (pending ? ' pending' : '');
     const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
-    row.innerHTML = '<div class="tx-dot ' + t.type + '"></div>' +
+    row.innerHTML =
+      '<div class="tx-dot ' +
+      t.type +
+      '"></div>' +
       '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub">' +
-      (pending ? '<span class="due-badge"></span>' : '') + '<span></span></div></div>' +
-      '<div class="tx-amount ' + t.type + '">' + sign + fmt(Number(t.amount)) + '</div>';
+      (pending ? '<span class="due-badge"></span>' : '') +
+      '<span></span></div></div>' +
+      '<div class="tx-amount ' +
+      t.type +
+      '">' +
+      sign +
+      fmt(Number(t.amount)) +
+      '</div>';
     row.querySelector('.tx-title').textContent = txTitle(t);
     row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);
     if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
@@ -113,8 +163,13 @@ function renderTxList(elId, txs, withDelete, emptyText) {
     row.onclick = () => openTransactionModal(t);
     if (withDelete) {
       const del = document.createElement('button');
-      del.className = 'tx-del'; del.innerHTML = '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>'; del.setAttribute('aria-label', 'Delete');
-      del.onclick = (e) => { e.stopPropagation(); if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id }); };
+      del.className = 'tx-del';
+      del.innerHTML = '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>';
+      del.setAttribute('aria-label', 'Delete');
+      del.onclick = (e) => {
+        e.stopPropagation();
+        if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id });
+      };
       row.appendChild(del);
     }
     el.appendChild(row);
@@ -123,9 +178,11 @@ function renderTxList(elId, txs, withDelete, emptyText) {
 function renderRecent() {
   // Pending entries get their own group: soonest first, all of them, since the
   // point of pre-entering them is to see what's still coming.
-  const upcoming = pendingTx()
-    .sort((a, b) => (a.date + (a.created_at || '')).localeCompare(b.date + (b.created_at || '')));
-  const done = data.transactions.filter(t => !isPending(t))
+  const upcoming = pendingTx().sort((a, b) =>
+    (a.date + (a.created_at || '')).localeCompare(b.date + (b.created_at || '')),
+  );
+  const done = data.transactions
+    .filter((t) => !isPending(t))
     .sort((a, b) => (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')))
     .slice(0, 8);
 
@@ -152,16 +209,21 @@ function renderAccounts() {
 
   const el = document.getElementById('accounts-list');
   el.innerHTML = '';
-  if (!data.accounts.length) el.innerHTML = '<div class="empty">Add your first account to get started</div>';
+  if (!data.accounts.length)
+    el.innerHTML = '<div class="empty">Add your first account to get started</div>';
   for (const a of data.accounts) {
     const bal = accountBalance(a.id);
     const pend = pendingTxFor(a.id).length;
-    const balHtml = '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
+    const balHtml =
+      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
     const row = document.createElement('div');
     row.className = 'acct-row';
     // Accounts with nothing pending keep the plain single-line right column.
-    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      (pend ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>' : balHtml);
+    row.innerHTML =
+      '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      (pend
+        ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>'
+        : balHtml);
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
     if (pend) {
@@ -182,34 +244,49 @@ function ownerName(o) {
 
 function renderBudgets() {
   const key = monthKey(todayISO());
-  document.getElementById('budgets-title').textContent = 'Budgets — ' + monthLabel(key);
+  document.getElementById('budgets-title').textContent = 'Budgets · ' + monthLabel(key);
   const { by } = sumBy(monthTx(key), 'expense');
   const el = document.getElementById('budgets-list');
   el.innerHTML = '';
-  const budgeted = data.categories.filter(c => c.type === 'expense' && Number(c.monthly_budget) > 0);
-  if (!budgeted.length) el.innerHTML = '<div class="empty">Set a monthly budget on a category below</div>';
+  const budgeted = data.categories.filter(
+    (c) => c.type === 'expense' && Number(c.monthly_budget) > 0,
+  );
+  if (!budgeted.length)
+    el.innerHTML = '<div class="empty">Set a monthly budget on a category below</div>';
   for (const c of budgeted) {
     const spent = by[c.name] || 0;
     const budget = Number(c.monthly_budget);
-    const pct = Math.min(100, spent / budget * 100);
+    const pct = Math.min(100, (spent / budget) * 100);
     const cls = spent > budget ? ' over' : pct >= 85 ? ' close' : '';
     const row = document.createElement('div');
     row.className = 'budget-row';
-    row.innerHTML = '<div class="budget-top"><span></span><span class="nums">' +
-      fmt(spent) + ' / ' + fmt(budget) + '</span></div>' +
-      '<div class="bar"><div class="bar-fill' + cls + '" style="width:' + pct + '%"></div></div>';
+    row.innerHTML =
+      '<div class="budget-top"><span></span><span class="nums">' +
+      fmt(spent) +
+      ' / ' +
+      fmt(budget) +
+      '</span></div>' +
+      '<div class="bar"><div class="bar-fill' +
+      cls +
+      '" style="width:' +
+      pct +
+      '%"></div></div>';
     row.querySelector('.budget-top span').textContent = c.name;
     el.appendChild(row);
   }
   // category management list
   const cl = document.getElementById('categories-list');
   cl.innerHTML = '';
-  for (const c of [...data.categories].sort((x, y) => (x.type + x.name).localeCompare(y.type + y.name))) {
+  for (const c of [...data.categories].sort((x, y) =>
+    (x.type + x.name).localeCompare(y.type + y.name),
+  )) {
     const row = document.createElement('div');
     row.className = 'acct-row';
-    row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-meta"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></div>';
+    row.innerHTML =
+      '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
     row.querySelector('.acct-name').textContent = c.name;
-    row.querySelector('.acct-meta').textContent = c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
+    row.querySelector('.acct-meta').textContent =
+      c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
     row.onclick = () => openCategoryModal(c);
     cl.appendChild(row);
   }
@@ -217,7 +294,11 @@ function renderBudgets() {
 
 function trendEl(id, cur, prev, invert) {
   const el = document.getElementById(id);
-  if (prev === 0 && cur === 0) { el.textContent = '—'; el.className = 't trend-flat'; return; }
+  if (prev === 0 && cur === 0) {
+    el.textContent = '—';
+    el.className = 't trend-flat';
+    return;
+  }
   const diff = cur - prev;
   const good = invert ? diff < 0 : diff > 0;
   el.textContent = (diff === 0 ? '=' : fmtSigned(diff)) + ' vs last mo.';
@@ -225,7 +306,8 @@ function trendEl(id, cur, prev, invert) {
 }
 
 function renderSummary() {
-  const key = summaryMonth, prev = shiftMonth(key, -1);
+  const key = summaryMonth,
+    prev = shiftMonth(key, -1);
   document.getElementById('month-label').textContent = monthLabel(key);
   const cur = { spend: sumBy(monthTx(key), 'expense'), inc: sumBy(monthTx(key), 'income') };
   const old = { spend: sumBy(monthTx(prev), 'expense'), inc: sumBy(monthTx(prev), 'income') };
@@ -248,11 +330,18 @@ function renderSummary() {
   ael.innerHTML = '';
   if (!data.accounts.length) ael.innerHTML = '<div class="empty">No accounts</div>';
   for (const a of data.accounts) {
-    const c = accountNetChange(a.id, key), p = accountNetChange(a.id, prev);
+    const c = accountNetChange(a.id, key),
+      p = accountNetChange(a.id, prev);
     const row = document.createElement('div');
     row.className = 'cat-row';
-    row.innerHTML = '<span class="name"></span><span class="amt ' + (c < 0 ? 'trend-down' : c > 0 ? 'trend-up' : '') + '">' +
-      fmtSigned(c) + '</span><span class="tr trend-flat">prev ' + fmtSigned(p) + '</span>';
+    row.innerHTML =
+      '<span class="name"></span><span class="amt ' +
+      (c < 0 ? 'trend-down' : c > 0 ? 'trend-up' : '') +
+      '">' +
+      fmtSigned(c) +
+      '</span><span class="tr trend-flat">prev ' +
+      fmtSigned(p) +
+      '</span>';
     row.querySelector('.name').textContent = a.name;
     ael.appendChild(row);
   }
@@ -264,16 +353,28 @@ function renderSummary() {
 function renderCatBreakdown(elId, curBy, oldBy, invert) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
-  const names = [...new Set([...Object.keys(curBy), ...Object.keys(oldBy)])]
-    .sort((a, b) => (curBy[b] || 0) - (curBy[a] || 0));
-  if (!names.length) { el.innerHTML = '<div class="empty">Nothing this month</div>'; return; }
+  const names = [...new Set([...Object.keys(curBy), ...Object.keys(oldBy)])].sort(
+    (a, b) => (curBy[b] || 0) - (curBy[a] || 0),
+  );
+  if (!names.length) {
+    el.innerHTML = '<div class="empty">Nothing this month</div>';
+    return;
+  }
   for (const n of names) {
-    const c = curBy[n] || 0, p = oldBy[n] || 0, d = c - p;
+    const c = curBy[n] || 0,
+      p = oldBy[n] || 0,
+      d = c - p;
     const cls = d === 0 ? 'trend-flat' : (invert ? d < 0 : d > 0) ? 'trend-up' : 'trend-down';
     const row = document.createElement('div');
     row.className = 'cat-row';
-    row.innerHTML = '<span class="name"></span><span class="amt">' + fmt(c) +
-      '</span><span class="tr ' + cls + '">' + (d === 0 ? '=' : fmtSigned(d)) + '</span>';
+    row.innerHTML =
+      '<span class="name"></span><span class="amt">' +
+      fmt(c) +
+      '</span><span class="tr ' +
+      cls +
+      '">' +
+      (d === 0 ? '=' : fmtSigned(d)) +
+      '</span>';
     row.querySelector('.name').textContent = n;
     el.appendChild(row);
   }
