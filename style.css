@@ -124,6 +124,29 @@ header h1 {
   stroke-linejoin: round;
 }
 
+/* Subpages (e.g. All transactions) replace the header + bottom nav with their
+   own back-arrow header, so they need to reclaim the safe-area top padding
+   the header would otherwise provide. */
+#app.subpage > header,
+#app.subpage > nav {
+  display: none;
+}
+body:has(#app.subpage) {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.subpage-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: calc(14px + env(safe-area-inset-top));
+  margin-bottom: 10px;
+}
+.subpage-head h1 {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 main {
   padding: 8px 16px;
   max-width: 560px;
@@ -159,6 +182,20 @@ section.view.active {
   font-weight: 700;
   color: var(--muted);
   margin-bottom: 16px;
+}
+.card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.card-head h2 {
+  margin-bottom: 0;
+}
+.link-btn {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--brand);
 }
 
 #entry-card {
@@ -491,6 +528,9 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   padding-bottom: 6px;
   margin-bottom: 4px;
 }
+.month-group + .month-group {
+  margin-top: 20px;
+}
 #upcoming-wrap {
   padding-bottom: 8px;
   margin-bottom: 16px;
@@ -542,6 +582,18 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .acct-bal.neg {
   color: var(--expense);
+}
+
+.acct-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.acct-edit {
+  color: var(--muted);
+  font-size: 16px;
+  padding: 6px;
+  flex-shrink: 0;
 }
 
 .acct-right {

@@ -8,6 +8,39 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
+// ---------- subpages (e.g. "All transactions" — reached via a link or a tap
+// on an account/budget, not a nav tab, so it gets its own back arrow instead
+// of the bottom nav, and "back" really means back to wherever it was opened
+// from, via the browser's history rather than a hardcoded target view)
+let alltxReturnView = null;
+
+function openAllTx(filter) {
+  allFilter = { account: filter.account || '', category: filter.category || '' };
+  renderAllTransactions();
+  alltxReturnView = document.querySelector('section.view.active');
+  document.querySelectorAll('section.view').forEach((v) => v.classList.remove('active'));
+  document.getElementById('view-all').classList.add('active');
+  document.getElementById('app').classList.add('subpage');
+  window.scrollTo(0, 0);
+  history.pushState({ page: 'alltx' }, '');
+}
+
+function closeAllTx() {
+  document.getElementById('view-all').classList.remove('active');
+  document.getElementById('app').classList.remove('subpage');
+  if (alltxReturnView) alltxReturnView.classList.add('active');
+  alltxReturnView = null;
+  window.scrollTo(0, 0);
+}
+
+// Popping back to any state that isn't the alltx page (whether via our own
+// back arrow, the OS swipe-back gesture, or a hardware back button) closes
+// it and restores whatever was showing before — never a hardcoded view.
+window.addEventListener('popstate', (e) => {
+  if (!e.state || e.state.page !== 'alltx') closeAllTx();
+});
+history.replaceState({ page: 'app' }, '');
+
 // ---------- events
 const entryAmountInput = setupAmountInput(document.getElementById('in-amount'));
 document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
@@ -19,6 +52,10 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
 document.querySelectorAll('#type-seg button').forEach(b => b.onclick = () => { entryType = b.dataset.type; renderEntryForm(); });
 document.getElementById('month-prev').onclick = () => { summaryMonth = shiftMonth(summaryMonth, -1); renderSummary(); };
 document.getElementById('month-next').onclick = () => { summaryMonth = shiftMonth(summaryMonth, 1); renderSummary(); };
+document.getElementById('all-filter-account').onchange = (e) => { allFilter.account = e.target.value; renderAllTransactions(); };
+document.getElementById('all-filter-category').onchange = (e) => { allFilter.category = e.target.value; renderAllTransactions(); };
+document.getElementById('btn-view-all').onclick = () => openAllTx({});
+document.getElementById('alltx-back').onclick = () => history.back();
 document.getElementById('btn-settings').onclick = openSettingsModal;
 document.getElementById('btn-add-account').onclick = () => openAccountModal(null);
 document.getElementById('btn-add-category').onclick = () => openCategoryModal(null);

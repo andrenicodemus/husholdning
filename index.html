@@ -120,7 +120,10 @@
             <button class="btn-primary" id="btn-save">Save expense</button>
           </div>
           <div class="card">
-            <h2>Recent</h2>
+            <div class="card-head">
+              <h2>Recent</h2>
+              <button class="link-btn" id="btn-view-all">View all</button>
+            </div>
             <div id="upcoming-wrap" style="display: none">
               <div class="list-sub">Upcoming</div>
               <div id="upcoming-list"></div>
@@ -207,6 +210,32 @@
           <div class="card">
             <h2>Income by category</h2>
             <div id="sum-income-cats"></div>
+          </div>
+        </section>
+
+        <!-- ALL TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
+        <section class="view" id="view-all">
+          <div class="subpage-head">
+            <button class="icon-btn" id="alltx-back" aria-label="Back">
+              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1>All transactions</h1>
+          </div>
+          <div class="card">
+            <h2>Filter</h2>
+            <div class="row2">
+              <div>
+                <div class="field-label" style="margin-top: 0">Account</div>
+                <select class="select-input" id="all-filter-account"></select>
+              </div>
+              <div>
+                <div class="field-label" style="margin-top: 0">Category</div>
+                <select class="select-input" id="all-filter-category"></select>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div id="all-tx-list"></div>
           </div>
         </section>
       </main>

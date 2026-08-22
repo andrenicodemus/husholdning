@@ -2,6 +2,7 @@
 let entryType = 'expense';
 let sel = { category: null, from: null, to: null };
 let summaryMonth = monthKey(todayISO());
+let allFilter = { account: '', category: '' };
 
 function renderAll() {
   renderEntryForm();
@@ -9,6 +10,7 @@ function renderAll() {
   renderAccounts();
   renderBudgets();
   renderSummary();
+  renderAllTransactions();
   updateSyncPill();
   document.getElementById('amount-cur').textContent = (
     data.settings.currency || 'DKK'
@@ -131,6 +133,42 @@ function txSub(t, pending) {
   // Pending rows carry the date in their "due" badge, so don't repeat it here.
   return [pending ? '' : t.date, acc, t.note].filter(Boolean).join(' · ');
 }
+function txRowEl(t, withDelete) {
+  const pending = isPending(t);
+  const row = document.createElement('div');
+  row.className = 'tx-row' + (pending ? ' pending' : '');
+  const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
+  row.innerHTML =
+    '<div class="tx-dot ' +
+    t.type +
+    '"></div>' +
+    '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub">' +
+    (pending ? '<span class="due-badge"></span>' : '') +
+    '<span></span></div></div>' +
+    '<div class="tx-amount ' +
+    t.type +
+    '">' +
+    sign +
+    fmt(Number(t.amount)) +
+    '</div>';
+  row.querySelector('.tx-title').textContent = txTitle(t);
+  row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);
+  if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
+  row.style.cursor = 'pointer';
+  row.onclick = () => openTransactionModal(t);
+  if (withDelete) {
+    const del = document.createElement('button');
+    del.className = 'tx-del';
+    del.innerHTML = '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>';
+    del.setAttribute('aria-label', 'Delete');
+    del.onclick = (e) => {
+      e.stopPropagation();
+      if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id });
+    };
+    row.appendChild(del);
+  }
+  return row;
+}
 function renderTxList(elId, txs, withDelete, emptyText) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
@@ -138,42 +176,7 @@ function renderTxList(elId, txs, withDelete, emptyText) {
     el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>';
     return;
   }
-  for (const t of txs) {
-    const pending = isPending(t);
-    const row = document.createElement('div');
-    row.className = 'tx-row' + (pending ? ' pending' : '');
-    const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
-    row.innerHTML =
-      '<div class="tx-dot ' +
-      t.type +
-      '"></div>' +
-      '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub">' +
-      (pending ? '<span class="due-badge"></span>' : '') +
-      '<span></span></div></div>' +
-      '<div class="tx-amount ' +
-      t.type +
-      '">' +
-      sign +
-      fmt(Number(t.amount)) +
-      '</div>';
-    row.querySelector('.tx-title').textContent = txTitle(t);
-    row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);
-    if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
-    row.style.cursor = 'pointer';
-    row.onclick = () => openTransactionModal(t);
-    if (withDelete) {
-      const del = document.createElement('button');
-      del.className = 'tx-del';
-      del.innerHTML = '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>';
-      del.setAttribute('aria-label', 'Delete');
-      del.onclick = (e) => {
-        e.stopPropagation();
-        if (confirm('Delete this transaction?')) submit('deleteTransaction', { id: t.id });
-      };
-      row.appendChild(del);
-    }
-    el.appendChild(row);
-  }
+  for (const t of txs) el.appendChild(txRowEl(t, withDelete));
 }
 function renderRecent() {
   // Pending entries get their own group: soonest first, all of them, since the
@@ -190,6 +193,76 @@ function renderRecent() {
   document.getElementById('recorded-label').style.display = upcoming.length ? '' : 'none';
   if (upcoming.length) renderTxList('upcoming-list', upcoming, true);
   renderTxList('recent-list', done, true, upcoming.length ? 'Nothing recorded yet' : null);
+}
+
+// Rebuilds a filter <select>'s options from scratch (accounts/categories can
+// change), keeping whichever value is still valid selected.
+function populateFilterSelect(selectEl, items, allLabel, currentValue) {
+  selectEl.innerHTML = '';
+  const allOpt = document.createElement('option');
+  allOpt.value = '';
+  allOpt.textContent = allLabel;
+  selectEl.appendChild(allOpt);
+  for (const it of items) {
+    const opt = document.createElement('option');
+    opt.value = it.id;
+    opt.textContent = it.label;
+    selectEl.appendChild(opt);
+  }
+  selectEl.value = items.some((it) => it.id === currentValue) ? currentValue : '';
+}
+
+function renderAllTransactions() {
+  const accSel = document.getElementById('all-filter-account');
+  const catSel = document.getElementById('all-filter-category');
+  populateFilterSelect(
+    accSel,
+    data.accounts.map((a) => ({ id: a.id, label: a.name })),
+    'All accounts',
+    allFilter.account,
+  );
+  const cats = [...data.categories].sort((x, y) => (x.type + x.name).localeCompare(y.type + y.name));
+  populateFilterSelect(
+    catSel,
+    cats.map((c) => ({ id: c.id, label: c.name })),
+    'All categories',
+    allFilter.category,
+  );
+  allFilter.account = accSel.value;
+  allFilter.category = catSel.value;
+
+  let txs = data.transactions;
+  if (allFilter.account) txs = txs.filter((t) => txTouches(t, allFilter.account));
+  if (allFilter.category) {
+    const catName = (data.categories.find((c) => c.id === allFilter.category) || {}).name;
+    txs = txs.filter((t) => t.category === catName);
+  }
+  txs = [...txs].sort((a, b) => (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')));
+
+  const el = document.getElementById('all-tx-list');
+  el.innerHTML = '';
+  if (!txs.length) {
+    el.innerHTML = '<div class="empty">No transactions match this filter</div>';
+    return;
+  }
+  let currentMonth = null,
+    groupBody = null;
+  for (const t of txs) {
+    const mk = monthKey(t.date);
+    if (mk !== currentMonth) {
+      currentMonth = mk;
+      const group = document.createElement('div');
+      group.className = 'month-group';
+      const header = document.createElement('div');
+      header.className = 'list-sub';
+      header.textContent = monthLabel(mk);
+      group.appendChild(header);
+      groupBody = document.createElement('div');
+      group.appendChild(groupBody);
+      el.appendChild(group);
+    }
+    groupBody.appendChild(txRowEl(t, true));
+  }
 }
 
 // "1.200,00 kr. after 3 upcoming" — the projected balance and how many
@@ -218,12 +291,17 @@ function renderAccounts() {
       '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
     const row = document.createElement('div');
     row.className = 'acct-row';
+    row.style.cursor = 'pointer';
     // Accounts with nothing pending keep the plain single-line right column.
     row.innerHTML =
       '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      '<div class="acct-side">' +
       (pend
         ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>'
-        : balHtml);
+        : balHtml) +
+      '<button class="acct-edit" aria-label="Edit account">' +
+      '<svg class="icon"><use href="icons/sprite.svg#edit"></use></svg></button>' +
+      '</div>';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
     if (pend) {
@@ -232,7 +310,11 @@ function renderAccounts() {
       p.className = 'projected' + (projected < 0 ? ' neg' : '');
       p.textContent = projectedNote(projected, pend);
     }
-    row.onclick = () => openAccountModal(a);
+    row.onclick = () => openAllTx({ account: a.id });
+    row.querySelector('.acct-edit').onclick = (e) => {
+      e.stopPropagation();
+      openAccountModal(a);
+    };
     el.appendChild(row);
   }
 }
@@ -279,6 +361,8 @@ function renderBudgets() {
     row.querySelector('.budget-remaining').textContent = over
       ? fmt(spent - budget) + ' over budget'
       : fmt(budget - spent) + ' left';
+    row.style.cursor = 'pointer';
+    row.onclick = () => openAllTx({ category: c.id });
     el.appendChild(row);
   }
   // category management list
