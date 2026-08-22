@@ -41,8 +41,23 @@ function parseAmount(s) {
   const n = Number(String(s).trim().replace(/\./g, m => s.includes(',') ? '' : m).replace(',', '.'));
   return isNaN(n) ? NaN : n;
 }
-const todayISO = () => new Date().toISOString().slice(0, 10);
+// Local calendar date, not UTC: transaction dates are plain YYYY-MM-DD strings
+// the user picked in their own timezone, so "today" has to be local too — else
+// an evening entry east of UTC would compare as tomorrow.
+function todayISO() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
 const monthKey = d => String(d).slice(0, 7);
+// A transaction dated after today hasn't happened yet: it's pending. Both sides
+// are YYYY-MM-DD, so a plain string compare is also a date compare.
+const isPending = t => String(t.date) > todayISO();
+// "28 Aug" — built from the parts so the string is never parsed as UTC.
+function dueLabel(iso) {
+  const [y, m, d] = String(iso).split('-').map(Number);
+  const dt = new Date(y, (m || 1) - 1, d || 1);
+  return isNaN(dt) ? String(iso) : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
 function shiftMonth(key, delta) {
   const [y, m] = key.split('-').map(Number);
   const d = new Date(y, m - 1 + delta, 1);
@@ -54,25 +69,41 @@ function monthLabel(key) {
 }
 
 // ---------- derived numbers
-function accountBalance(id, uptoMonth) {
+// What one transaction does to one account's balance (0 if it doesn't touch it).
+function txEffect(t, id) {
+  const amt = Number(t.amount) || 0;
+  if (t.type === 'income') return t.to_account === id ? amt : 0;
+  if (t.type === 'expense') return t.from_account === id ? -amt : 0;
+  if (t.type === 'transfer') {
+    if (t.from_account === id) return -amt;
+    if (t.to_account === id) return amt;
+  }
+  return 0;
+}
+const txTouches = (t, id) => t.from_account === id || t.to_account === id;
+// Initial balance plus every transaction the predicate lets through.
+function foldBalance(id, include) {
   const acc = data.accounts.find(a => a.id === id);
   if (!acc) return 0;
   let bal = Number(acc.initial_balance) || 0;
-  for (const t of data.transactions) {
-    if (uptoMonth && monthKey(t.date) > uptoMonth) continue;
-    const amt = Number(t.amount) || 0;
-    if (t.type === 'income' && t.to_account === id) bal += amt;
-    if (t.type === 'expense' && t.from_account === id) bal -= amt;
-    if (t.type === 'transfer') {
-      if (t.from_account === id) bal -= amt;
-      if (t.to_account === id) bal += amt;
-    }
-  }
+  for (const t of data.transactions) if (include(t)) bal += txEffect(t, id);
   return bal;
 }
-function totalBalance(uptoMonth) {
-  return data.accounts.reduce((s, a) => s + accountBalance(a.id, uptoMonth), 0);
-}
+// The number on the account card: executed transactions only. Future-dated ones
+// are pre-entered plans and must not move the balance until their date arrives.
+const accountBalance = id => foldBalance(id, t => !isPending(t));
+// Where the balance lands once everything already entered has gone through.
+const accountProjected = id => foldBalance(id, () => true);
+// Month-end snapshot for the monthly summary, which counts every transaction in
+// the period — including still-pending ones in the current month.
+const accountBalanceUpto = (id, key) => foldBalance(id, t => monthKey(t.date) <= key);
+
+const totalBalance = () => data.accounts.reduce((s, a) => s + accountBalance(a.id), 0);
+const totalProjected = () => data.accounts.reduce((s, a) => s + accountProjected(a.id), 0);
+const totalBalanceUpto = key => data.accounts.reduce((s, a) => s + accountBalanceUpto(a.id, key), 0);
+
+const pendingTx = () => data.transactions.filter(isPending);
+const pendingTxFor = id => data.transactions.filter(t => isPending(t) && txTouches(t, id));
 function monthTx(key) { return data.transactions.filter(t => monthKey(t.date) === key); }
 function sumBy(txs, type) {
   const by = {}; let total = 0;
@@ -84,16 +115,6 @@ function sumBy(txs, type) {
   return { by, total };
 }
 function accountNetChange(id, key) {
-  let net = 0;
-  for (const t of monthTx(key)) {
-    const amt = Number(t.amount) || 0;
-    if (t.type === 'income' && t.to_account === id) net += amt;
-    if (t.type === 'expense' && t.from_account === id) net -= amt;
-    if (t.type === 'transfer') {
-      if (t.from_account === id) net -= amt;
-      if (t.to_account === id) net += amt;
-    }
-  }
-  return net;
+  return monthTx(key).reduce((net, t) => net + txEffect(t, id), 0);
 }
 const accName = id => (data.accounts.find(a => a.id === id) || {}).name || '?';

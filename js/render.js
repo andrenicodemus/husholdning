@@ -88,23 +88,27 @@ function txTitle(t) {
   if (t.type === 'transfer') return accName(t.from_account) + ' → ' + accName(t.to_account);
   return t.category || '—';
 }
-function txSub(t) {
+function txSub(t, pending) {
   const acc = t.type === 'income' ? accName(t.to_account) : t.type === 'expense' ? accName(t.from_account) : '';
-  return [t.date, acc, t.note].filter(Boolean).join(' · ');
+  // Pending rows carry the date in their "due" badge, so don't repeat it here.
+  return [pending ? '' : t.date, acc, t.note].filter(Boolean).join(' · ');
 }
-function renderTxList(elId, txs, withDelete) {
+function renderTxList(elId, txs, withDelete, emptyText) {
   const el = document.getElementById(elId);
   el.innerHTML = '';
-  if (!txs.length) { el.innerHTML = '<div class="empty">No transactions yet</div>'; return; }
+  if (!txs.length) { el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>'; return; }
   for (const t of txs) {
+    const pending = isPending(t);
     const row = document.createElement('div');
-    row.className = 'tx-row';
+    row.className = 'tx-row' + (pending ? ' pending' : '');
     const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
     row.innerHTML = '<div class="tx-dot ' + t.type + '"></div>' +
-      '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub"></div></div>' +
+      '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub">' +
+      (pending ? '<span class="due-badge"></span>' : '') + '<span></span></div></div>' +
       '<div class="tx-amount ' + t.type + '">' + sign + fmt(Number(t.amount)) + '</div>';
     row.querySelector('.tx-title').textContent = txTitle(t);
-    row.querySelector('.tx-sub').textContent = txSub(t);
+    row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);
+    if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
     row.style.cursor = 'pointer';
     row.onclick = () => openTransactionModal(t);
     if (withDelete) {
@@ -117,25 +121,55 @@ function renderTxList(elId, txs, withDelete) {
   }
 }
 function renderRecent() {
-  const txs = [...data.transactions]
+  // Pending entries get their own group: soonest first, all of them, since the
+  // point of pre-entering them is to see what's still coming.
+  const upcoming = pendingTx()
+    .sort((a, b) => (a.date + (a.created_at || '')).localeCompare(b.date + (b.created_at || '')));
+  const done = data.transactions.filter(t => !isPending(t))
     .sort((a, b) => (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')))
     .slice(0, 8);
-  renderTxList('recent-list', txs, true);
+
+  document.getElementById('upcoming-wrap').style.display = upcoming.length ? '' : 'none';
+  document.getElementById('recorded-label').style.display = upcoming.length ? '' : 'none';
+  if (upcoming.length) renderTxList('upcoming-list', upcoming, true);
+  renderTxList('recent-list', done, true, upcoming.length ? 'Nothing recorded yet' : null);
 }
+
+// "1.200,00 kr. after 3 upcoming" — the projected balance and how many
+// pre-entered transactions it's still waiting on.
+const projectedNote = (projected, count) => fmtAligned(projected) + ' after ' + count + ' upcoming';
 
 function renderAccounts() {
   document.getElementById('total-balance').textContent = fmt(totalBalance());
+  const upcoming = pendingTx().length;
+  const note = document.getElementById('total-projected');
+  note.style.display = upcoming ? '' : 'none';
+  if (upcoming) {
+    const projected = totalProjected();
+    note.className = 'projected' + (projected < 0 ? ' neg' : '');
+    note.textContent = projectedNote(projected, upcoming);
+  }
+
   const el = document.getElementById('accounts-list');
   el.innerHTML = '';
   if (!data.accounts.length) el.innerHTML = '<div class="empty">Add your first account to get started</div>';
   for (const a of data.accounts) {
     const bal = accountBalance(a.id);
+    const pend = pendingTxFor(a.id).length;
+    const balHtml = '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
     const row = document.createElement('div');
     row.className = 'acct-row';
+    // Accounts with nothing pending keep the plain single-line right column.
     row.innerHTML = '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
+      (pend ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>' : balHtml);
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
+    if (pend) {
+      const projected = accountProjected(a.id);
+      const p = row.querySelector('.projected');
+      p.className = 'projected' + (projected < 0 ? ' neg' : '');
+      p.textContent = projectedNote(projected, pend);
+    }
     row.onclick = () => openAccountModal(a);
     el.appendChild(row);
   }
@@ -206,8 +240,8 @@ function renderSummary() {
   document.getElementById('sum-net').textContent = fmtSigned(netCur);
   trendEl('sum-net-t', netCur, netOld, false);
 
-  document.getElementById('sum-balance').textContent = fmt(totalBalance(key));
-  trendEl('sum-balance-t', totalBalance(key), totalBalance(prev), false);
+  document.getElementById('sum-balance').textContent = fmt(totalBalanceUpto(key));
+  trendEl('sum-balance-t', totalBalanceUpto(key), totalBalanceUpto(prev), false);
 
   // per-account net change
   const ael = document.getElementById('sum-accounts');

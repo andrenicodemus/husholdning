@@ -40,7 +40,7 @@ function openAccountModal(acc) {
     '<option value="savings"' + (acc.type === 'savings' ? ' selected' : '') + '>Savings</option></select></div>' +
     '<div><div class="field-label">Owner</div><select class="text-input" id="m-owner">' + ownerOptions(acc.owner) + '</select></div></div>' +
     '<div class="field-label">Initial balance</div><input class="text-input" id="m-init" inputmode="decimal">' +
-    '<div class="settle-note">The starting balance when you begin tracking. Current balance = initial + all recorded transactions.</div>' +
+    '<div class="settle-note">The starting balance when you begin tracking. Current balance = initial + every transaction dated today or earlier; upcoming ones only count from their date.</div>' +
     '<button class="btn-primary" id="m-save">' + (isNew ? 'Add account' : 'Save changes') + '</button>' +
     (isNew ? '' : '<button class="btn-danger" id="m-del">Delete account</button>')
   );

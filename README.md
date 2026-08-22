@@ -54,8 +54,8 @@ A zero-cost, two-person finance app. The UI is a PWA hosted on GitHub Pages; the
 
 ## Daily use
 
-- **New**: log an expense, income, or transfer in a few taps. Entries save instantly and sync in the background (the pill in the header shows anything unsynced — it retries automatically when you're back online).
-- **Accounts**: live balances; tap an account to edit or delete it.
+- **New**: log an expense, income, or transfer in a few taps. Entries save instantly and sync in the background (the pill in the header shows anything unsynced — it retries automatically when you're back online). Post-date one to plan ahead: it lands in **Upcoming** and starts counting on its date.
+- **Accounts**: live balances; tap an account to edit or delete it. Balances only count transactions dated today or earlier — anything upcoming shows as a projected balance beneath.
 - **Budgets**: monthly progress per category; manage categories and budgets below.
 - **Summary**: pick any month — spent/income/net/balance with trends vs the previous month, per-account change, and category breakdowns.
 - ⚙︎ **Settings**: your names, currency, PIN.
