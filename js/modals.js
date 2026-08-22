@@ -2,7 +2,24 @@
 const modalBg = document.getElementById('modal-bg');
 const modalContent = document.getElementById('modal-content');
 let modalScrollY = 0;
+
+// Keep --app-vh synced to the real, currently-visible viewport height so
+// .modal-bg (position:fixed) can size itself against it — see the comment
+// on .modal-bg in style.css for why this is needed on iOS.
+function syncAppVh() {
+  const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+  document.documentElement.style.setProperty('--app-vh', h + 'px');
+}
+syncAppVh();
+if (window.visualViewport) window.visualViewport.addEventListener('resize', syncAppVh);
+else window.addEventListener('resize', syncAppVh);
+
 function openModal(title, bodyHtml) {
+  if (!bodyHtml) {
+    console.error('openModal: no template content for "' + title + '" — modalTemplates not loaded?');
+    toast('Could not open this dialog — try reloading the page');
+    return;
+  }
   modalContent.innerHTML =
     '<div class="modal-head"><h3></h3><button class="modal-close" aria-label="Close">' +
     '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>' +
@@ -25,49 +42,30 @@ modalBg.addEventListener('click', (e) => {
   if (e.target === modalBg) closeModal();
 });
 
-function ownerOptions(selected) {
-  return ['a', 'b', 'joint']
-    .map(
-      (o) =>
-        '<option value="' +
-        o +
-        '"' +
-        (o === selected ? ' selected' : '') +
-        '>' +
-        ownerName(o) +
-        '</option>',
-    )
-    .join('');
+function fillOwnerOptions(select, selected) {
+  select.querySelectorAll('option').forEach((o) => (o.textContent = ownerName(o.value)));
+  select.value = selected;
+}
+
+// iOS only opens the on-screen keyboard when focus() runs synchronously
+// within the user gesture, so this must stay a plain, immediate call —
+// .modal-bg's height (see style.css) is what keeps the modal above the
+// keyboard once it opens.
+function focusSoon(el) {
+  el.focus();
 }
 
 function openAccountModal(acc) {
   const isNew = !acc;
   acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
-  openModal(
-    isNew ? 'New account' : 'Edit account',
-    '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
-      '<div class="row2" style="margin-top:4px">' +
-      '<div><div class="field-label">Type</div><select class="text-input" id="m-type">' +
-      '<option value="current"' +
-      (acc.type === 'current' ? ' selected' : '') +
-      '>Current</option>' +
-      '<option value="savings"' +
-      (acc.type === 'savings' ? ' selected' : '') +
-      '>Savings</option></select></div>' +
-      '<div><div class="field-label">Owner</div><select class="text-input" id="m-owner">' +
-      ownerOptions(acc.owner) +
-      '</select></div></div>' +
-      '<div class="field-label">Initial balance</div><input class="text-input" id="m-init" inputmode="decimal">' +
-      '<div class="settle-note">The starting balance when you begin tracking. Current balance = initial + every transaction dated today or earlier; upcoming ones only count from their date.</div>' +
-      '<div class="actions" style="display:flex;flex-direction:column;row-gap:8px;">' +
-      '<button class="btn-primary" id="m-save">' +
-      (isNew ? 'Add account' : 'Save changes') +
-      '</button>' +
-      (isNew ? '' : '<button class="btn-danger" id="m-del">Delete account</button>') +
-      '</div>',
-  );
+  openModal(isNew ? 'New account' : 'Edit account', modalTemplates.account);
   document.getElementById('m-name').value = acc.name;
+  document.getElementById('m-type').value = acc.type;
+  fillOwnerOptions(document.getElementById('m-owner'), acc.owner);
   document.getElementById('m-init').value = acc.initial_balance;
+  if (isNew) focusSoon(document.getElementById('m-name'));
+  document.getElementById('m-save').textContent = isNew ? 'Add account' : 'Save changes';
+  document.getElementById('m-del').hidden = isNew;
   document.getElementById('m-save').onclick = () => {
     const name = document.getElementById('m-name').value.trim();
     const init = parseAmount(document.getElementById('m-init').value || '0');
@@ -100,29 +98,14 @@ function openAccountModal(acc) {
 function openCategoryModal(cat) {
   const isNew = !cat;
   cat = cat || { name: '', type: 'expense', monthly_budget: 0 };
-  openModal(
-    isNew ? 'New category' : 'Edit category',
-    '<div class="field-label">Name</div><input class="text-input" id="m-name">' +
-      '<div class="row2" style="margin-top:4px">' +
-      '<div><div class="field-label">Type</div><select class="text-input" id="m-type"' +
-      (isNew ? '' : ' disabled') +
-      '>' +
-      '<option value="expense"' +
-      (cat.type === 'expense' ? ' selected' : '') +
-      '>Expense</option>' +
-      '<option value="income"' +
-      (cat.type === 'income' ? ' selected' : '') +
-      '>Income</option></select></div>' +
-      '<div><div class="field-label">Monthly budget</div><input class="text-input" id="m-budget" inputmode="decimal" placeholder="0 = none"></div></div>' +
-      '<div class="actions" style="display:flex;flex-direction:column;row-gap:8px;">' +
-      '<button class="btn-primary" id="m-save">' +
-      (isNew ? 'Add category' : 'Save changes') +
-      '</button>' +
-      (isNew ? '' : '<button class="btn-danger" id="m-del">Delete category</button>') +
-      '</div>',
-  );
+  openModal(isNew ? 'New category' : 'Edit category', modalTemplates.category);
   document.getElementById('m-name').value = cat.name;
+  document.getElementById('m-type').value = cat.type;
+  document.getElementById('m-type').disabled = !isNew;
   document.getElementById('m-budget').value = cat.monthly_budget || '';
+  document.getElementById('m-save').textContent = isNew ? 'Add category' : 'Save changes';
+  document.getElementById('m-del').hidden = isNew;
+  if (isNew) focusSoon(document.getElementById('m-name'));
   document.getElementById('m-save').onclick = () => {
     const name = document.getElementById('m-name').value.trim();
     const budget = parseAmount(document.getElementById('m-budget').value || '0');
@@ -192,25 +175,8 @@ function openTransactionModal(t) {
     from: t.from_account || null,
     to: t.to_account || null,
   };
-  openModal(
-    'Edit transaction',
-    '<div class="card" id="m-card" style="padding:0;border:none;margin:0">' +
-      '<div class="amount-wrap"><input class="amount-input" id="m-amount" inputmode="numeric"><div class="amount-currency">' +
-      (data.settings.currency || 'DKK').toUpperCase() +
-      '</div></div>' +
-      '<div id="m-wrap-category"><div class="field-label">Category</div><div class="chips" id="m-chips-category"></div></div>' +
-      '<div id="m-wrap-from"><div class="field-label" id="m-label-from">From account</div><div class="chips" id="m-chips-from"></div></div>' +
-      '<div id="m-wrap-to" style="display:none"><div class="field-label" id="m-label-to">To account</div><div class="chips" id="m-chips-to"></div></div>' +
-      '<div class="row2" style="margin-top:14px">' +
-      '<div><div class="field-label" style="margin-top:0">Date</div><input class="text-input" type="date" id="m-date"></div>' +
-      '<div><div class="field-label" style="margin-top:0">Note</div><input class="text-input" id="m-note" placeholder="Optional"></div>' +
-      '</div>' +
-      '<div class="actions" style="display:flex;flex-direction:column;row-gap:8px;">' +
-      '<button class="btn-primary" id="m-save">Save changes</button>' +
-      '<button class="btn-danger" id="m-del">Delete transaction</button>' +
-      '</div>' +
-      '</div>',
-  );
+  openModal('Edit transaction', modalTemplates.transaction);
+  document.getElementById('m-amount-cur').textContent = (data.settings.currency || 'DKK').toUpperCase();
   setupAmountInput(document.getElementById('m-amount'), Number(t.amount));
   document.getElementById('m-date').value = t.date;
   document.getElementById('m-note').value = t.note || '';
@@ -253,18 +219,7 @@ function openTransactionModal(t) {
 
 function openSettingsModal() {
   const s = data.settings;
-  openModal(
-    'Settings',
-    '<div class="row2"><div><div class="field-label">Name A</div><input class="text-input" id="m-na"></div>' +
-      '<div><div class="field-label">Name B</div><input class="text-input" id="m-nb"></div></div>' +
-      '<div class="row2" style="margin-top:4px"><div><div class="field-label">Currency</div><input class="text-input" id="m-cur" maxlength="3" autocapitalize="characters"></div>' +
-      '<div><div class="field-label">PIN</div><input class="text-input" id="m-pin" inputmode="numeric"></div></div>' +
-      '<div class="actions" style="display:flex;flex-direction:column;row-gap:8px;">' +
-      '<button class="btn-primary" id="m-save">Save settings</button>' +
-      '<button class="btn-ghost" id="m-resync">Force full resync</button>' +
-      '<button class="btn-danger" id="m-disconnect">Disconnect from sheet</button>' +
-      '</div>',
-  );
+  openModal('Settings', modalTemplates.settings);
   document.getElementById('m-na').value = s.name_a || 'A';
   document.getElementById('m-nb').value = s.name_b || 'B';
   document.getElementById('m-cur').value = s.currency || 'DKK';
