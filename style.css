@@ -288,8 +288,7 @@ section.view.active {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
-/* 1fr is minmax(auto,1fr): without this a native date input's intrinsic
-   width widens its column and squeezes the sibling. */
+
 .row2 > * {
   min-width: 0;
 }
@@ -307,9 +306,6 @@ section.view.active {
   background-color: #fff;
 }
 
-/* Selects need appearance:none so the native control's own chrome (which
-   ignores our padding/line-height on iOS/Android) can't push its box height
-   out of sync with sibling text inputs. */
 .select-input {
   width: 100%;
   padding: 11px 34px 11px 12px;
@@ -336,8 +332,6 @@ section.view.active {
   cursor: not-allowed;
 }
 
-/* iOS WebKit gives date inputs native sizing that ignores our padding and
-   never draws a calendar affordance, so flatten the control and supply one. */
 input[type='date'].text-input {
   -webkit-appearance: none;
   appearance: none;
@@ -357,8 +351,7 @@ input[type='date'].text-input::-webkit-datetime-edit {
   padding: 0;
   line-height: 1.45;
 }
-/* Desktop WebKit draws its own indicator; keep it as an invisible click target
-   over our icon. The negative margin means it costs no layout width. */
+
 input[type='date'].text-input::-webkit-calendar-picker-indicator {
   opacity: 0;
   padding: 0;
@@ -472,7 +465,6 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   padding: 6px;
 }
 
-/* Pending (future-dated) rows: greyed back, because they haven't moved money yet */
 .tx-row.pending .tx-title,
 .tx-row.pending .tx-amount {
   color: var(--muted);
@@ -551,8 +543,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .acct-bal.neg {
   color: var(--expense);
 }
-/* Where the balance lands once the pending transactions go through. Only
-   rendered for accounts that have some, so untouched rows keep their height. */
+
 .acct-right {
   text-align: right;
 }
@@ -723,12 +714,6 @@ nav button.on {
   top: 0;
   left: 0;
   right: 0;
-  /* iOS keeps position:fixed elements spanning the full layout viewport when
-     the on-screen keyboard opens — only the *visual* viewport shrinks. That
-     leaves this bottom-anchored modal aligned to the bottom of a box that
-     still extends behind the keyboard, so it slides under it instead of
-     sitting above it. --app-vh (kept in sync with visualViewport in
-     modals.js) gives the real, keyboard-aware visible height instead. */
   height: var(--app-vh, 100dvh);
   background: rgba(20, 30, 25, 0.45);
   display: none;
@@ -744,13 +729,6 @@ nav button.on {
   width: 100%;
   max-width: 560px;
   border-radius: 20px 20px 0 0;
-  /* vh is measured against mobile browsers' "large" viewport (as if the
-     toolbar were hidden), so 85vh can exceed what's actually visible when
-     the toolbar is showing. dvh tracks the real, currently-visible area, but
-     neither accounts for the on-screen keyboard shrinking things further —
-     --app-vh (see modals.js) does, keeping the modal's own height in step
-     with .modal-bg's so it can't overflow off the top once the keyboard
-     eats into the available space. */
   max-height: 85vh;
   max-height: 85dvh;
   max-height: calc(var(--app-vh, 100dvh) * 0.85);
