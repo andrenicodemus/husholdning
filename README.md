@@ -46,7 +46,7 @@ A zero-cost, two-person finance app. The UI is a PWA hosted on GitHub Pages; the
 ## Part 3 — On your phones (~2 min each)
 
 1. Open the GitHub Pages URL in **Safari** (iPhone) / **Chrome** (Android).
-2. Paste the Apps Script URL and your PIN → **Connect**.
+2. Paste the Apps Script URL and your PIN → **Connect**. (Setting up a second phone? Skip the typing — from the first phone, go to ⚙︎ → General → **Share connection link** and send it over; opening it prefills this form.)
 3. Add to home screen:
    - iPhone: Share button → **Add to Home Screen**
    - Android: menu ⋮ → **Add to Home screen** (or "Install app")
@@ -65,5 +65,6 @@ A zero-cost, two-person finance app. The UI is a PWA hosted on GitHub Pages; the
 - **Your data is always just a spreadsheet.** Open the sheet anytime to inspect or export. Avoid editing rows by hand while the app is in use (the app treats the sheet as its database); if you do, keep the column structure intact.
 - **Latency**: Apps Script calls take ~1–2 s. The app hides this with a local cache and optimistic writes, so it never blocks you.
 - **Both phones, one PIN**: the PIN lives in the `settings` tab. If you change it, update it on both phones (⚙︎ → PIN, or reconnect).
+- **Updating the app on your Home Screen icon**: iOS/Android can be slow to notice new code has shipped for an installed icon. Reopening the app usually shows a small "Update ready" pill within moments — tap it to refresh. If you don't see it, ⚙︎ → **Check for updates** forces it immediately, without losing your connection or data.
 - **Backup**: in Google Sheets, File → Make a copy, occasionally. That's your whole backup story.
 - **Limits**: Apps Script allows vastly more requests per day than two people can produce; a decade of transactions is a few thousand rows — no problem.

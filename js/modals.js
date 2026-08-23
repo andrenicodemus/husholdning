@@ -240,6 +240,17 @@ function openSettingsModal() {
     await backgroundRefresh();
     toast('Up to date');
   };
+  document.getElementById('settings-check-update').onclick = async () => {
+    closeModal();
+    toast('Checking for updates…');
+    try {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg) await reg.update();
+    } catch (e) { /* fall through to reload regardless */ }
+    location.reload();
+  };
   document.getElementById('settings-disconnect').onclick = () => {
     if (!confirm('Disconnect this device? Your sheet data is untouched.')) return;
     store.del('hf_config');

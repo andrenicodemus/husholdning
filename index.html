@@ -27,27 +27,29 @@
         <div class="tag">Your joint finances, in your pocket</div>
         <div class="card">
           <h2>Connect to Google sheet</h2>
-          <form id="setup-form" autocomplete="on">
+          <form id="setup-form" autocomplete="off">
             <div class="field-label">Web app URL</div>
             <input
               class="text-input"
               id="setup-url"
-              name="username"
+              name="setup-url"
+              type="url"
               placeholder="https://script.google.com/macros/s/…/exec"
               autocapitalize="off"
               autocorrect="off"
-              autocomplete="username"
+              autocomplete="off"
               inputmode="url"
             />
             <div class="field-label">PIN</div>
             <input
               class="text-input"
               id="setup-pin"
-              name="password"
-              type="password"
+              name="setup-pin"
+              type="text"
               placeholder="1234"
               inputmode="numeric"
-              autocomplete="current-password"
+              pattern="[0-9]*"
+              autocomplete="off"
             />
             <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
             <div class="err" id="setup-err"></div>
@@ -62,6 +64,7 @@
         <h1 id="app-title">Husholdning</h1>
         <div class="header-actions">
           <span class="pill" id="sync-pill"></span>
+          <span class="pill" id="update-pill" style="cursor: pointer"></span>
           <button class="icon-btn" id="btn-settings" aria-label="Settings">
             <svg class="icon"><use href="icons/sprite.svg#settings"></use></svg>
           </button>
@@ -258,6 +261,7 @@
                 <input class="text-input" id="g-pin" inputmode="numeric" />
               </div>
             </div>
+            <button class="btn-ghost" id="g-share-link" style="margin-top: 12px">Share connection link</button>
             <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
           </div>
         </section>

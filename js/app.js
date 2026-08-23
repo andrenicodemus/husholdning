@@ -86,6 +86,16 @@ document.querySelectorAll('.subpage-back').forEach((b) => (b.onclick = () => his
 document.getElementById('btn-settings').onclick = openSettingsModal;
 document.getElementById('btn-add-account').onclick = () => openAccountModal(null);
 document.getElementById('btn-add-category').onclick = () => openCategoryModal(null);
+document.getElementById('g-share-link').onclick = async () => {
+  const link = location.origin + location.pathname + '#connect=' + encodeConnectPayload(config.url, config.pin);
+  if (navigator.share) {
+    try { await navigator.share({ title: 'Husholdning setup', url: link }); } catch (e) { /* user cancelled */ }
+  } else {
+    await navigator.clipboard.writeText(link).catch(() => {});
+    toast('Link copied — send it to the other phone');
+  }
+};
+
 document.getElementById('g-save').onclick = () => {
   const payload = {
     name_a: document.getElementById('g-na').value.trim() || 'A',
@@ -126,6 +136,28 @@ document.getElementById('btn-save').onclick = () => {
 };
 
 // ---------- setup flow
+function encodeConnectPayload(url, pin) {
+  return btoa(JSON.stringify({ u: url, p: pin })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+function decodeConnectPayload(encoded) {
+  const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
+  const json = atob(b64 + '==='.slice((b64.length + 3) % 4));
+  const { u, p } = JSON.parse(json);
+  return { url: u, pin: p };
+}
+// A "#connect=…" link (from Settings → General → Share connection link on
+// another device) prefills the setup form so the URL/PIN never need retyping.
+(() => {
+  const m = location.hash.match(/^#connect=(.+)$/);
+  if (!m) return;
+  history.replaceState(null, '', location.pathname + location.search);
+  try {
+    const { url, pin } = decodeConnectPayload(m[1]);
+    document.getElementById('setup-url').value = url;
+    document.getElementById('setup-pin').value = pin;
+  } catch (e) { /* malformed link — leave the form empty */ }
+})();
+
 document.getElementById('setup-form').onsubmit = async (e) => {
   e.preventDefault();
   const url = document.getElementById('setup-url').value.trim();
@@ -177,5 +209,26 @@ loadModalTemplates()
 
 // ---------- service worker
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js').catch(() => {});
+  const hadController = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register('sw.js').then((reg) => {
+    reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) reg.update().catch(() => {});
+    });
+    reg.addEventListener('updatefound', () => {
+      const worker = reg.installing;
+      if (!worker) return;
+      worker.addEventListener('statechange', () => {
+        // Only a genuinely new version landing on top of an already-running
+        // app counts as "update ready" — skip the very first install, where
+        // there's nothing to refresh (this load is already the latest).
+        if (worker.state === 'installed' && hadController) {
+          const pill = document.getElementById('update-pill');
+          pill.textContent = 'Update ready — tap to refresh';
+          pill.className = 'pill warn';
+          pill.onclick = () => location.reload();
+        }
+      });
+    });
+  }).catch(() => {});
 }

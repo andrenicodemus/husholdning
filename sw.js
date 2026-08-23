@@ -1,5 +1,5 @@
 /* Husholdning service worker — app shell cache */
-const CACHE = 'husholdning-v17';
+const CACHE = 'husholdning-v18';
 const SHELL = [
   './', './index.html', './manifest.json', './icon-192.png', './icon-512.png',
   './style.css', './icons/sprite.svg',

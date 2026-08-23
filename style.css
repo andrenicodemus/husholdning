@@ -62,12 +62,42 @@ select {
   color: inherit;
 }
 
+.icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 17px;
+}
+
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  vertical-align: -0.15em;
+  flex-shrink: 0;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
 /* Header */
 header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(14px + env(safe-area-inset-top)) 18px 12px;
+  padding: calc(12px + env(safe-area-inset-top)) 14px 10px 18px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background-color: var(--bg);
+  z-index: 21;
 }
 
 header h1 {
@@ -99,30 +129,6 @@ header h1 {
   color: #8a5a1e;
   display: inline-block;
 }
-.icon-btn {
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--muted);
-  background: var(--card);
-  border: 1px solid var(--line);
-  font-size: 17px;
-}
-.icon {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.15em;
-  flex-shrink: 0;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
 
 /* Subpages (e.g. All transactions) replace the header + bottom nav with their
    own back-arrow header, so they need to reclaim the safe-area top padding
@@ -138,8 +144,9 @@ body:has(#app.subpage) {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-top: calc(14px + env(safe-area-inset-top));
-  margin-bottom: 10px;
+  padding-top: calc(4px + env(safe-area-inset-top));
+  margin-bottom: 16px;
+  margin-left: -4px;
 }
 .subpage-head h1 {
   font-size: 20px;
@@ -151,6 +158,11 @@ main {
   padding: 8px 16px;
   max-width: 560px;
   margin: 0 auto;
+}
+/* The header is fixed, so pages that show it (not subpages, which hide it
+   for their own back-arrow header instead) need main pushed clear of it. */
+#app:not(.subpage) > main {
+  padding-top: 68px;
 }
 section.view {
   display: none;
@@ -723,6 +735,18 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-weight: 600;
   flex: 1;
   text-align: right;
+}
+
+/* Settings menu */
+.menu-item {
+  padding: 4px 0;
+}
+
+.menu-item-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 40px;
 }
 
 /* Bottom nav */
