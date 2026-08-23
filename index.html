@@ -17,12 +17,18 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
       rel="stylesheet"
     />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
     <script>
       // Set the theme before first paint so there's no flash of the wrong theme.
       (function () {
         try {
-          var t = localStorage.getItem('hf_theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          var t =
+            localStorage.getItem('hf_theme') ||
+            (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', t);
         } catch (e) {}
       })();
@@ -273,7 +279,9 @@
                 <input class="text-input" id="g-pin" inputmode="numeric" />
               </div>
             </div>
-            <button class="btn-ghost" id="g-share-link" style="margin-top: 12px">Share connection link</button>
+            <button class="btn-ghost" id="g-share-link" style="margin-top: 12px">
+              Share connection link
+            </button>
             <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
           </div>
         </section>
