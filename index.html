@@ -80,10 +80,10 @@
         <div class="header-actions">
           <span class="pill" id="sync-pill"></span>
           <span class="pill" id="update-pill" style="cursor: pointer"></span>
-          <button class="icon-btn" id="btn-theme" aria-label="Toggle dark mode">
+          <button class="icon-btn btn-ghost" id="btn-theme" aria-label="Toggle dark mode">
             <svg class="icon"><use href="icons/sprite.svg#sun"></use></svg>
           </button>
-          <button class="icon-btn" id="btn-settings" aria-label="Settings">
+          <button class="icon-btn btn-ghost" id="btn-settings" aria-label="Settings">
             <svg class="icon"><use href="icons/sprite.svg#settings"></use></svg>
           </button>
         </div>
@@ -227,7 +227,7 @@
         <!-- ALL TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
         <section class="view" id="view-all">
           <div class="subpage-head">
-            <button class="icon-btn subpage-back" aria-label="Back">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>All transactions</h1>
@@ -250,72 +250,70 @@
           </div>
         </section>
 
-        <!-- SETTINGS: GENERAL (reached from the Settings menu, not a nav tab) -->
+        <!-- SETTINGS: GENERAL -->
         <section class="view" id="view-general">
           <div class="subpage-head">
-            <button class="icon-btn subpage-back" aria-label="Back">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>General</h1>
           </div>
-          <div class="card">
-            <div class="row2">
-              <div>
-                <div class="field-label" style="margin-top: 0">Name A</div>
-                <input class="text-input" id="g-na" />
-              </div>
-              <div>
-                <div class="field-label" style="margin-top: 0">Name B</div>
-                <input class="text-input" id="g-nb" />
-              </div>
+          <div class="form-group">
+            <div>
+              <div class="field-label">User 1</div>
+              <input class="text-input" id="g-na" />
             </div>
-            <div class="row2" style="margin-top: 4px">
-              <div>
-                <div class="field-label">Currency</div>
-                <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
-              </div>
-              <div>
-                <div class="field-label">PIN</div>
-                <input class="text-input" id="g-pin" inputmode="numeric" />
-              </div>
+            <div>
+              <div class="field-label">User 2</div>
+              <input class="text-input" id="g-nb" />
             </div>
-            <button class="btn-ghost" id="g-share-link" style="margin-top: 12px">
-              Share connection link
-            </button>
-            <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
+
+            <div>
+              <div class="field-label">Currency</div>
+              <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
+            </div>
+            <div>
+              <div class="field-label">PIN</div>
+              <input class="text-input" id="g-pin" inputmode="numeric" />
+            </div>
           </div>
+
+          <button class="btn-tertiary" id="g-share-link" style="margin-top: 12px">
+            Share connection link
+          </button>
+          <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
         </section>
 
-        <!-- SETTINGS: ACCOUNTS (reached from the Settings menu, not a nav tab) -->
+        <!-- SETTINGS: ACCOUNTS -->
         <section class="view" id="view-config-accounts">
           <div class="subpage-head">
-            <button class="icon-btn subpage-back" aria-label="Back">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>Accounts</h1>
           </div>
-          <div class="card">
+          <div class="form-group">
             <div id="config-accounts-list"></div>
-            <button class="btn-ghost" id="btn-add-account">
-              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
-            </button>
           </div>
+          <button class="btn-tertiary" id="btn-add-account">
+            <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
+          </button>
         </section>
 
-        <!-- SETTINGS: CATEGORIES (reached from the Settings menu, not a nav tab) -->
+        <!-- SETTINGS: CATEGORIES -->
         <section class="view" id="view-config-categories">
           <div class="subpage-head">
-            <button class="icon-btn subpage-back" aria-label="Back">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>Categories</h1>
           </div>
-          <div class="card">
+          <div class="form-group">
             <div id="categories-list"></div>
-            <button class="btn-ghost" id="btn-add-category">
-              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
-            </button>
           </div>
+          <button class="btn-tertiary" id="btn-add-category">
+            <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
+          </button>
         </section>
       </main>
 

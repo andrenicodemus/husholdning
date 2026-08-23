@@ -16,17 +16,19 @@ else window.addEventListener('resize', syncAppVh);
 
 function openModal(title, bodyHtml) {
   if (!bodyHtml) {
-    console.error('openModal: no template content for "' + title + '" — modalTemplates not loaded?');
+    console.error(
+      'openModal: no template content for "' + title + '" — modalTemplates not loaded?',
+    );
     toast('Could not open this dialog — try reloading the page');
     return;
   }
   modalContent.innerHTML =
-    '<div class="modal-head"><h3></h3><button class="modal-close" aria-label="Close">' +
+    '<div class="modal-head"><h3></h3><button class="icon-btn btn-ghost" aria-label="Close">' +
     '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>' +
     '</button></div><div class="modal-body"></div>';
   modalContent.querySelector('.modal-head h3').textContent = title;
   modalContent.querySelector('.modal-body').innerHTML = bodyHtml;
-  modalContent.querySelector('.modal-close').onclick = closeModal;
+  modalContent.querySelector('.icon-btn.btn-ghost').onclick = closeModal;
   modalBg.classList.add('open');
   modalScrollY = window.scrollY;
   document.body.style.top = -modalScrollY + 'px';
@@ -176,7 +178,9 @@ function openTransactionModal(t) {
     to: t.to_account || null,
   };
   openModal('Edit transaction', modalTemplates.transaction);
-  document.getElementById('m-amount-cur').textContent = (data.settings.currency || 'DKK').toUpperCase();
+  document.getElementById('m-amount-cur').textContent = (
+    data.settings.currency || 'DKK'
+  ).toUpperCase();
   setupAmountInput(document.getElementById('m-amount'), Number(t.amount));
   document.getElementById('m-date').value = t.date;
   document.getElementById('m-note').value = t.note || '';
@@ -248,7 +252,9 @@ function openSettingsModal() {
       await Promise.all(keys.map((k) => caches.delete(k)));
       const reg = await navigator.serviceWorker.getRegistration();
       if (reg) await reg.update();
-    } catch (e) { /* fall through to reload regardless */ }
+    } catch (e) {
+      /* fall through to reload regardless */
+    }
     location.reload();
   };
   document.getElementById('settings-disconnect').onclick = () => {

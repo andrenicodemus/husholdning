@@ -6,6 +6,7 @@
 
 :root[data-theme='light'] {
   --bg: #f3f5f2;
+  --input-bg: #fafafa;
   --card: #ffffff;
   --ink: #1a241f;
   --muted: #6b776f;
@@ -21,15 +22,17 @@
   --warn: #8a5a1e;
   --warn-soft: #f6ebdd;
   --warn-fill: #c98a2b;
+  --blanket: #0000004d;
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --bg: #0f130f;
-  --card: #1a201b;
+  --bg: #111111;
+  --input-bg: #161616;
+  --card: #191919;
   --ink: #e9ece7;
   --muted: #8b9690;
-  --line: #2a322b;
+  --line: #282828;
   --brand: #5fbf94;
   --brand-soft: #1c3329;
   --income: #4fbf85;
@@ -41,6 +44,7 @@
   --warn: #e2b262;
   --warn-soft: #3a2c17;
   --warn-fill: #d9a54c;
+  --blanket: #0000008c;
   color-scheme: dark;
 }
 
@@ -101,6 +105,16 @@ select {
   justify-content: center;
   color: var(--muted);
   font-size: 17px;
+}
+
+.btn-secondary {
+  background-color: var(--card);
+  border: 1px solid var(--line);
+}
+
+.btn-ghost {
+  background: none;
+  border: none;
 }
 
 .icon {
@@ -172,14 +186,13 @@ body:has(#app.subpage) {
 }
 .subpage-head {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
   padding-top: calc(4px + env(safe-area-inset-top));
   margin-bottom: 16px;
-  margin-left: -4px;
 }
 .subpage-head h1 {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -376,7 +389,7 @@ section.view.active {
   padding: 11px 12px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background-color: var(--bg);
+  background-color: var(--input-bg);
   outline: none;
   line-height: 1.45;
 }
@@ -390,7 +403,7 @@ section.view.active {
   padding: 11px 34px 11px 12px;
   border-radius: 10px;
   border: 1px solid var(--line);
-  background-color: var(--bg);
+  background-color: var(--input-bg);
   outline: none;
   line-height: 1.45;
   font: inherit;
@@ -476,7 +489,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tint-transfer .btn-primary {
   background: var(--transfer);
 }
-.btn-ghost {
+.btn-tertiary {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -778,6 +791,13 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 
 /* Settings menu */
+
+.menu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
 .menu-item {
   padding: 4px 0;
 }
@@ -787,6 +807,13 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: space-between;
   min-height: 40px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 32px;
 }
 
 /* Bottom nav */
@@ -829,7 +856,7 @@ nav button.on {
   left: 0;
   right: 0;
   height: var(--app-vh, 100dvh);
-  background: rgba(20, 30, 25, 0.45);
+  background: var(--blanket);
   display: none;
   align-items: flex-end;
   justify-content: center;
@@ -859,7 +886,7 @@ nav button.on {
   border-bottom: 1px solid var(--line);
 }
 .modal-head h3 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
 }
 .modal-close {
