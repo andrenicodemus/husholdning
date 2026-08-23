@@ -18,6 +18,15 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
+    <script>
+      // Set the theme before first paint so there's no flash of the wrong theme.
+      (function () {
+        try {
+          var t = localStorage.getItem('hf_theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <!-- ======================= SETUP SCREEN ======================= -->
@@ -65,6 +74,9 @@
         <div class="header-actions">
           <span class="pill" id="sync-pill"></span>
           <span class="pill" id="update-pill" style="cursor: pointer"></span>
+          <button class="icon-btn" id="btn-theme" aria-label="Toggle dark mode">
+            <svg class="icon"><use href="icons/sprite.svg#sun"></use></svg>
+          </button>
           <button class="icon-btn" id="btn-settings" aria-label="Settings">
             <svg class="icon"><use href="icons/sprite.svg#settings"></use></svg>
           </button>

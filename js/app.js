@@ -84,6 +84,21 @@ document.getElementById('all-filter-category').onchange = (e) => { allFilter.cat
 document.getElementById('btn-view-all').onclick = () => openAllTx({});
 document.querySelectorAll('.subpage-back').forEach((b) => (b.onclick = () => history.back()));
 document.getElementById('btn-settings').onclick = openSettingsModal;
+
+// ---------- theme
+function applyThemeIcon(theme) {
+  document.querySelector('#btn-theme use').setAttribute('href', 'icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
+}
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('hf_theme', theme); } catch (e) {}
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0f130f' : '#204b3c');
+  applyThemeIcon(theme);
+}
+applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
+document.getElementById('btn-theme').onclick = () => {
+  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+};
 document.getElementById('btn-add-account').onclick = () => openAccountModal(null);
 document.getElementById('btn-add-category').onclick = () => openCategoryModal(null);
 document.getElementById('g-share-link').onclick = async () => {
