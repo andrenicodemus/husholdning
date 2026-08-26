@@ -1,13 +1,15 @@
 :root {
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'Space Grotesk', ui-monospace, 'SF Mono', monospace;
-  --radius: 14px;
+  --radius: 16px;
 }
 
 :root[data-theme='light'] {
-  --bg: #f3f5f2;
+  --bg: #ffffff;
+  --modal-bg: #fefefe;
   --input-bg: #fafafa;
-  --card: #ffffff;
+  --input-placeholder: #c1c9c0;
+  --card: #f1f1ed;
   --ink: #1a241f;
   --muted: #6b776f;
   --line: #dfe5de;
@@ -28,7 +30,9 @@
 
 :root[data-theme='dark'] {
   --bg: #111111;
+  --modal-bg: #191919;
   --input-bg: #161616;
+  --input-placeholder: #333333;
   --card: #191919;
   --ink: #e9ece7;
   --muted: #8b9690;
@@ -66,6 +70,7 @@ body {
   min-height: 100%;
   font-size: 16px;
   line-height: 1.45;
+  font-variant-numeric: tabular-nums;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
@@ -135,7 +140,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(12px + env(safe-area-inset-top)) 14px 10px 18px;
+  padding: calc(20px + env(safe-area-inset-top)) 14px 18px 18px;
   position: fixed;
   top: 0;
   right: 0;
@@ -188,13 +193,18 @@ body:has(#app.subpage) {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding-top: calc(4px + env(safe-area-inset-top));
-  margin-bottom: 16px;
+  padding-top: calc(12px + env(safe-area-inset-top));
 }
 .subpage-head h1 {
-  font-size: 24px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
 }
 
 main {
@@ -205,15 +215,21 @@ main {
 /* The header is fixed, so pages that show it (not subpages, which hide it
    for their own back-arrow header instead) need main pushed clear of it. */
 #app:not(.subpage) > main {
-  padding-top: 68px;
+  padding-top: 84px;
 }
 section.view {
   display: none;
 }
 section.view.active {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
   animation: fadein 0.15s ease;
 }
+section.view .view-title {
+  margin-bottom: 32px;
+}
+
 @keyframes fadein {
   from {
     opacity: 0;
@@ -226,7 +242,6 @@ section.view.active {
 
 .card {
   background: var(--card);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 20px 16px;
   margin-bottom: 14px;
@@ -242,27 +257,17 @@ section.view.active {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 .card-head h2 {
   margin-bottom: 0;
 }
 .link-btn {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--brand);
-}
-
-#entry-card {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-#entry-card .field-label {
-  margin-top: 0;
-}
-#entry-card #btn-save {
-  margin-top: 18px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* Entry view */
@@ -271,10 +276,8 @@ section.view.active {
   grid-template-columns: 1fr 1fr 1fr;
   gap: 6px;
   background: var(--card);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 6px;
-  margin-bottom: 14px;
 }
 .type-seg button {
   display: flex;
@@ -282,7 +285,7 @@ section.view.active {
   justify-content: center;
   gap: 6px;
   padding: 10px 0;
-  border-radius: 9px;
+  border-radius: 10px;
   font-weight: 600;
   font-size: 15px;
   color: var(--muted);
@@ -306,8 +309,6 @@ section.view.active {
   padding: 18px 0 10px;
 }
 .amount-input {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
   font-size: 52px;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -320,7 +321,7 @@ section.view.active {
   caret-color: var(--brand);
 }
 .amount-input::placeholder {
-  color: var(--line);
+  color: var(--input-placeholder);
 }
 .amount-currency {
   font-size: 14px;
@@ -341,7 +342,7 @@ section.view.active {
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
-  margin: 14px 0 8px;
+  margin: 0 0 8px;
 }
 .chips {
   display: flex;
@@ -472,7 +473,6 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-weight: 600;
   font-size: 16px;
   letter-spacing: 0.01em;
-  margin-top: 32px;
 }
 .btn-primary:active {
   transform: scale(0.99);
@@ -509,11 +509,16 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 
 /* Lists */
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 16px 0;
+}
 .tx-row {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 0;
 }
 .tx-row:last-child {
   border-bottom: none;
@@ -549,11 +554,10 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   color: var(--muted);
 }
 .tx-amount {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 700;
+  font-weight: 600;
   font-size: 15px;
   white-space: nowrap;
+  letter-spacing: -0.03em;
 }
 .tx-amount.income {
   color: var(--income);
@@ -588,12 +592,8 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   padding-bottom: 6px;
   margin-bottom: 4px;
 }
-.month-group + .month-group {
-  margin-top: 20px;
-}
-#upcoming-wrap {
-  padding-bottom: 8px;
-  margin-bottom: 16px;
+.transactions-group + .transactions-group {
+  margin-top: 32px;
 }
 
 /* Accounts */
@@ -602,8 +602,6 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   padding: 8px 0 14px;
 }
 .balance-hero .big {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
   font-size: 40px;
   font-weight: 700;
   letter-spacing: -0.03em;
@@ -613,11 +611,16 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-size: 14px;
   color: var(--muted);
 }
+
+.accounts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
 .acct-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 0;
 }
 .acct-row:last-child {
   border-bottom: none;
@@ -635,8 +638,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   padding: 6px;
 }
 .acct-bal {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
   font-weight: 700;
   font-size: 17px;
 }
@@ -648,7 +650,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   text-align: right;
 }
 .projected {
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
   font-size: 12px;
   font-weight: 400;
   color: var(--muted);
@@ -663,33 +665,50 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 
 /* Budgets */
-.budget-row {
-  padding: 12px 0;
+
+.budgets-list {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
 }
-.budget-row:last-child {
-  border-bottom: none;
+
+.budget-top-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 12px;
 }
 .budget-top {
   display: flex;
   justify-content: space-between;
-  font-size: 14.5px;
-  margin-bottom: 6px;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
 }
-.budget-top .nums {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
-  font-size: 13.5px;
-  color: var(--muted);
+.budget-top .recorded {
+  letter-spacing: -0.03em;
+  flex-grow: 1;
+  text-align: right;
+}
+.budget-row .upcoming-note {
+  font-size: 12px;
+  font-weight: 500;
+  font-style: italic;
+  color: var(--warn);
+  text-align: right;
+  margin-top: 0;
 }
 .bar {
   height: 8px;
   border-radius: 999px;
-  background: var(--bg);
+  background: var(--card);
   overflow: hidden;
+  display: flex;
 }
 .bar-fill {
   height: 100%;
-  border-radius: 999px;
   background: var(--brand);
   transition: width 0.3s ease;
 }
@@ -699,11 +718,26 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .bar-fill.close {
   background: var(--warn-fill);
 }
+/* Still-pending spending in this category — shown toned down and patterned
+   (not a solid fill) so it reads as forecasted, not already spent. */
+.bar-fill-upcoming {
+  height: 100%;
+  background-image: repeating-linear-gradient(45deg, var(--warn-fill) 0 4px, transparent 4px 8px);
+  opacity: 0.6;
+  transition: width 0.3s ease;
+}
+.bar-fill-upcoming.over {
+  background-image: repeating-linear-gradient(45deg, var(--expense) 0 4px, transparent 4px 8px);
+}
+.budget-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 8px;
+}
 .budget-remaining {
-  margin-top: 6px;
   font-size: 13px;
   font-weight: 600;
-  text-align: right;
 }
 .budget-remaining.left {
   color: var(--income);
@@ -711,13 +745,17 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .budget-remaining.over {
   color: var(--expense);
 }
+.budget-total {
+  letter-spacing: -0.03em;
+  font-size: 13px;
+  color: var(--muted);
+}
 
 /* Summary */
 .month-nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
 }
 .month-nav .label {
   font-weight: 600;
@@ -736,9 +774,8 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .stat {
   background: var(--card);
-  border: 1px solid var(--line);
   border-radius: var(--radius);
-  padding: 13px;
+  padding: 18px 16px 22px;
 }
 .stat .k {
   font-size: 12px;
@@ -746,11 +783,10 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-weight: 500;
 }
 .stat .v {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
   font-weight: 700;
-  font-size: 19px;
-  margin-top: 2px;
+  font-size: 22px;
+  margin-top: 8px;
 }
 .stat .t {
   font-size: 12px;
@@ -766,11 +802,17 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .trend-flat {
   color: var(--muted);
 }
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 40px;
+}
 .cat-row {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 0;
+  padding: 10px 0;
   font-size: 14px;
 }
 .cat-row .name {
@@ -783,8 +825,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   text-align: right;
 }
 .cat-row .amt {
-  font-family: var(--mono);
-  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
   font-weight: 600;
   flex: 1;
   text-align: right;
@@ -809,11 +850,25 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   min-height: 40px;
 }
 
+/* Settings pages */
+
+.settings-list {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 32px;
+  gap: 20px;
+}
+
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 32px;
 }
 
 /* Bottom nav */
@@ -822,7 +877,7 @@ nav {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--card);
+  background: var(--bg);
   border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -866,7 +921,7 @@ nav button.on {
   display: flex;
 }
 .modal {
-  background: var(--card);
+  background: var(--modal-bg);
   width: 100%;
   max-width: 560px;
   border-radius: 20px 20px 0 0;
@@ -903,6 +958,12 @@ nav button.on {
 .modal-body {
   overflow-y: auto;
   padding: 16px 18px calc(20px + env(safe-area-inset-bottom));
+}
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 32px;
 }
 
 /* Setup screen */

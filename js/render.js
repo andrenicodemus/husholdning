@@ -248,12 +248,13 @@ function renderAllTransactions() {
     if (mk !== currentMonth) {
       currentMonth = mk;
       const group = document.createElement('div');
-      group.className = 'month-group';
+      group.className = 'transactions-group';
       const header = document.createElement('div');
       header.className = 'list-sub';
       header.textContent = monthLabel(mk);
       group.appendChild(header);
       groupBody = document.createElement('div');
+      groupBody.className = 'transactions-list';
       group.appendChild(groupBody);
       el.appendChild(group);
     }
@@ -338,7 +339,8 @@ function renderConfigAccounts() {
 function renderBudgets() {
   const key = monthKey(todayISO());
   document.getElementById('budgets-title').textContent = 'Budgets · ' + monthLabel(key);
-  const { by } = sumBy(monthTx(key), 'expense');
+  const recordedBy = sumBy(monthTxRecorded(key), 'expense').by;
+  const upcomingBy = sumBy(monthTxUpcoming(key), 'expense').by;
   const el = document.getElementById('budgets-list');
   el.innerHTML = '';
   const budgeted = data.categories.filter(
@@ -347,31 +349,54 @@ function renderBudgets() {
   if (!budgeted.length)
     el.innerHTML = '<div class="empty">Set a monthly budget from Settings › Categories</div>';
   for (const c of budgeted) {
-    const spent = by[c.name] || 0;
+    const recorded = recordedBy[c.name] || 0;
+    const upcoming = upcomingBy[c.name] || 0;
     const budget = Number(c.monthly_budget);
-    const over = spent > budget;
-    const pct = Math.min(100, (spent / budget) * 100);
-    const cls = over ? ' over' : pct >= 85 ? ' close' : '';
+    const forecast = recorded + upcoming;
+    // The solid bar segment reflects recorded spending only; the row's
+    // over/close warning looks ahead to the forecast (recorded + upcoming),
+    // since that's the number that actually tells you if you're in trouble.
+    const recordedOver = recorded > budget;
+    const recordedCls = recordedOver ? ' over' : recorded / budget >= 0.85 ? ' close' : '';
+    const forecastOver = forecast > budget;
+    const pctRecorded = Math.min(100, (recorded / budget) * 100);
+    const pctUpcoming = Math.max(0, Math.min(100 - pctRecorded, (upcoming / budget) * 100));
+
     const row = document.createElement('div');
     row.className = 'budget-row';
     row.innerHTML =
-      '<div class="budget-top"><span></span><span class="nums">' +
-      fmt(spent) +
-      ' / ' +
-      fmt(budget) +
-      '</span></div>' +
-      '<div class="bar"><div class="bar-fill' +
-      cls +
+      '<div class="budget-top-wrapper">' +
+      '<div class="budget-top"><span class="name"></span><span class="recorded"></span><div class="upcoming-note" style="display:none"></div></div>' +
+      '</div>' +
+      '<div class="bar">' +
+      '<div class="bar-fill' +
+      recordedCls +
       '" style="width:' +
-      pct +
-      '%"></div></div>' +
-      '<div class="budget-remaining ' +
-      (over ? 'over' : 'left') +
-      '"></div>';
-    row.querySelector('.budget-top span').textContent = c.name;
-    row.querySelector('.budget-remaining').textContent = over
-      ? fmt(spent - budget) + ' over budget'
-      : fmt(budget - spent) + ' left';
+      pctRecorded +
+      '%"></div>' +
+      '<div class="bar-fill-upcoming' +
+      (forecastOver ? ' over' : '') +
+      '" style="width:' +
+      pctUpcoming +
+      '%"></div>' +
+      '</div>' +
+      '<div class="budget-bottom">' +
+      '<span class="budget-remaining ' +
+      (forecastOver ? 'over' : 'left') +
+      '"></span>' +
+      '<span class="budget-total"></span>' +
+      '</div>';
+    row.querySelector('.budget-top .name').textContent = c.name;
+    row.querySelector('.budget-top .recorded').textContent = fmt(recorded);
+    if (upcoming > 0) {
+      const note = row.querySelector('.upcoming-note');
+      note.style.display = '';
+      note.textContent = '+' + fmtDecimals(upcoming) + ' upcoming';
+    }
+    row.querySelector('.budget-remaining').textContent = forecastOver
+      ? fmt(forecast - budget) + ' over budget'
+      : fmt(budget - forecast) + ' left';
+    row.querySelector('.budget-total').textContent = 'of ' + fmt(budget);
     row.style.cursor = 'pointer';
     row.onclick = () => openAllTx({ category: c.id });
     el.appendChild(row);
@@ -416,8 +441,16 @@ function renderSummary() {
   const key = summaryMonth,
     prev = shiftMonth(key, -1);
   document.getElementById('month-label').textContent = monthLabel(key);
-  const cur = { spend: sumBy(monthTx(key), 'expense'), inc: sumBy(monthTx(key), 'income') };
-  const old = { spend: sumBy(monthTx(prev), 'expense'), inc: sumBy(monthTx(prev), 'income') };
+  // Recorded-only — still-pending transactions this month are deliberately
+  // excluded so the cards read as "what's actually happened."
+  const cur = {
+    spend: sumBy(monthTxRecorded(key), 'expense'),
+    inc: sumBy(monthTxRecorded(key), 'income'),
+  };
+  const old = {
+    spend: sumBy(monthTxRecorded(prev), 'expense'),
+    inc: sumBy(monthTxRecorded(prev), 'income'),
+  };
 
   document.getElementById('sum-spent').textContent = fmt(cur.spend.total);
   trendEl('sum-spent-t', cur.spend.total, old.spend.total, true);
@@ -429,8 +462,9 @@ function renderSummary() {
   document.getElementById('sum-net').textContent = fmtSigned(netCur);
   trendEl('sum-net-t', netCur, netOld, false);
 
-  document.getElementById('sum-balance').textContent = fmt(totalBalanceUpto(key));
-  trendEl('sum-balance-t', totalBalanceUpto(key), totalBalanceUpto(prev), false);
+  const balCur = totalBalanceUptoRecorded(key);
+  document.getElementById('sum-balance').textContent = fmt(balCur);
+  trendEl('sum-balance-t', balCur, totalBalanceUptoRecorded(prev), false);
 
   // per-account net change
   const ael = document.getElementById('sum-accounts');

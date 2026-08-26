@@ -136,7 +136,7 @@ let editSel = { type: null, category: null, from: null, to: null };
 
 function renderTxModalBody() {
   const type = editSel.type;
-  document.getElementById('m-card').className = 'card tint-' + type;
+  document.getElementById('m-card').className = 'tint-' + type;
 
   const cats = data.categories.filter((c) => c.type === (type === 'income' ? 'income' : 'expense'));
   document.getElementById('m-wrap-category').style.display = type === 'transfer' ? 'none' : '';

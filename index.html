@@ -43,30 +43,38 @@
         <div class="card">
           <h2>Connect to Google sheet</h2>
           <form id="setup-form" autocomplete="off">
-            <div class="field-label">Web app URL</div>
-            <input
-              class="text-input"
-              id="setup-url"
-              name="setup-url"
-              type="url"
-              placeholder="https://script.google.com/macros/s/…/exec"
-              autocapitalize="off"
-              autocorrect="off"
-              autocomplete="off"
-              inputmode="url"
-            />
-            <div class="field-label">PIN</div>
-            <input
-              class="text-input"
-              id="setup-pin"
-              name="setup-pin"
-              type="text"
-              placeholder="1234"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              autocomplete="off"
-            />
-            <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
+            <div class="form-group">
+              <div>
+                <div class="field-label">Web app URL</div>
+                <input
+                  class="text-input"
+                  id="setup-url"
+                  name="setup-url"
+                  type="url"
+                  placeholder="https://script.google.com/macros/s/…/exec"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  autocomplete="off"
+                  inputmode="url"
+                />
+              </div>
+              <div>
+                <div class="field-label">PIN</div>
+                <input
+                  class="text-input"
+                  id="setup-pin"
+                  name="setup-pin"
+                  type="text"
+                  placeholder="1234"
+                  inputmode="numeric"
+                  pattern="[0-9]*"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
+            </div>
             <div class="err" id="setup-err"></div>
           </form>
         </div>
@@ -105,52 +113,58 @@
               <svg class="icon"><use href="icons/sprite.svg#transfer"></use></svg>Transfer
             </button>
           </div>
-          <div class="card tint-expense" id="entry-card">
-            <div class="amount-wrap">
-              <input
-                class="amount-input"
-                id="in-amount"
-                inputmode="numeric"
-                placeholder="0,00"
-                autocomplete="off"
-              />
-              <div class="amount-currency" id="amount-cur">DKK</div>
-            </div>
-            <div id="wrap-category">
-              <div class="field-label">Category</div>
-              <div class="chips" id="chips-category"></div>
-            </div>
-            <div id="wrap-from">
-              <div class="field-label" id="label-from">From account</div>
-              <div class="chips" id="chips-from"></div>
-            </div>
-            <div id="wrap-to" style="display: none">
-              <div class="field-label" id="label-to">To account</div>
-              <div class="chips" id="chips-to"></div>
-            </div>
-            <div class="row2">
-              <div>
-                <div class="field-label">Date</div>
-                <input class="text-input" type="date" id="in-date" />
+          <div id="entry-card">
+            <div class="form-group">
+              <div class="amount-wrap">
+                <input
+                  class="amount-input"
+                  id="in-amount"
+                  inputmode="numeric"
+                  placeholder="0,00"
+                  autocomplete="off"
+                />
+                <div class="amount-currency" id="amount-cur">DKK</div>
               </div>
-              <div>
-                <div class="field-label">Note</div>
-                <input class="text-input" id="in-note" placeholder="Optional" />
+              <div id="wrap-category">
+                <div class="field-label">Category</div>
+                <div class="chips" id="chips-category"></div>
+              </div>
+              <div id="wrap-from">
+                <div class="field-label" id="label-from">From account</div>
+                <div class="chips" id="chips-from"></div>
+              </div>
+              <div id="wrap-to" style="display: none">
+                <div class="field-label" id="label-to">To account</div>
+                <div class="chips" id="chips-to"></div>
+              </div>
+              <div class="row2">
+                <div>
+                  <div class="field-label">Date</div>
+                  <input class="text-input" type="date" id="in-date" />
+                </div>
+                <div>
+                  <div class="field-label">Note</div>
+                  <input class="text-input" id="in-note" placeholder="Optional" />
+                </div>
               </div>
             </div>
-            <button class="btn-primary" id="btn-save">Save expense</button>
+            <div class="form-actions">
+              <button class="btn-primary" id="btn-save">Save expense</button>
+            </div>
           </div>
-          <div class="card">
+          <div class="view-section">
             <div class="card-head">
               <h2>Recent</h2>
               <button class="link-btn" id="btn-view-all">View all</button>
             </div>
-            <div id="upcoming-wrap" style="display: none">
+            <div class="transactions-group" id="upcoming-wrap" style="display: none">
               <div class="list-sub">Upcoming</div>
-              <div id="upcoming-list"></div>
+              <div class="transactions-list" id="upcoming-list"></div>
             </div>
-            <div class="list-sub" id="recorded-label" style="display: none">Recorded</div>
-            <div id="recent-list"></div>
+            <div class="transactions-group">
+              <div class="list-sub" id="recorded-label" style="display: none">Recorded</div>
+              <div class="transactions-list" id="recent-list"></div>
+            </div>
           </div>
         </section>
 
@@ -163,17 +177,17 @@
               <div class="projected" id="total-projected" style="display: none"></div>
             </div>
           </div>
-          <div class="card">
-            <h2>Accounts</h2>
-            <div id="accounts-list"></div>
+          <div class="view-section">
+            <h2 class="view-title">Accounts</h2>
+            <div class="accounts-list" id="accounts-list"></div>
           </div>
         </section>
 
         <!-- BUDGETS -->
         <section class="view" id="view-budgets">
-          <div class="card">
-            <h2 id="budgets-title">Budgets this month</h2>
-            <div id="budgets-list"></div>
+          <div class="view-section">
+            <h2 class="view-title" id="budgets-title">Budgets this month</h2>
+            <div class="budgets-list" id="budgets-list"></div>
           </div>
         </section>
 
@@ -210,17 +224,22 @@
               <div class="t" id="sum-balance-t"></div>
             </div>
           </div>
-          <div class="card">
-            <h2>Accounts change</h2>
-            <div id="sum-accounts"></div>
-          </div>
-          <div class="card">
-            <h2>Spending by category</h2>
-            <div id="sum-spend-cats"></div>
-          </div>
-          <div class="card">
-            <h2>Income by category</h2>
-            <div id="sum-income-cats"></div>
+          <div class="view-section">
+            <div class="card-head">
+              <h2>Month movement</h2>
+            </div>
+            <div class="summary-section">
+              <div class="list-sub">Accounts change</div>
+              <div id="sum-accounts"></div>
+            </div>
+            <div class="summary-section">
+              <div class="list-sub">Spending by category</div>
+              <div id="sum-spend-cats"></div>
+            </div>
+            <div class="summary-section">
+              <div class="list-sub">Income by category</div>
+              <div id="sum-income-cats"></div>
+            </div>
           </div>
         </section>
 
@@ -245,7 +264,7 @@
               </div>
             </div>
           </div>
-          <div class="card">
+          <div class="view-section">
             <div id="all-tx-list"></div>
           </div>
         </section>
@@ -258,30 +277,31 @@
             </button>
             <h1>General</h1>
           </div>
-          <div class="form-group">
-            <div>
-              <div class="field-label">User 1</div>
-              <input class="text-input" id="g-na" />
-            </div>
-            <div>
-              <div class="field-label">User 2</div>
-              <input class="text-input" id="g-nb" />
-            </div>
+          <div>
+            <div class="form-group">
+              <div>
+                <div class="field-label">User 1</div>
+                <input class="text-input" id="g-na" />
+              </div>
+              <div>
+                <div class="field-label">User 2</div>
+                <input class="text-input" id="g-nb" />
+              </div>
 
-            <div>
-              <div class="field-label">Currency</div>
-              <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
+              <div>
+                <div class="field-label">Currency</div>
+                <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
+              </div>
+              <div>
+                <div class="field-label">PIN</div>
+                <input class="text-input" id="g-pin" inputmode="numeric" />
+              </div>
             </div>
-            <div>
-              <div class="field-label">PIN</div>
-              <input class="text-input" id="g-pin" inputmode="numeric" />
+            <div class="form-actions">
+              <button class="btn-tertiary" id="g-share-link">Share connection link</button>
+              <button class="btn-primary" id="g-save">Save changes</button>
             </div>
           </div>
-
-          <button class="btn-tertiary" id="g-share-link" style="margin-top: 12px">
-            Share connection link
-          </button>
-          <button class="btn-primary" id="g-save" style="margin-top: 16px">Save changes</button>
         </section>
 
         <!-- SETTINGS: ACCOUNTS -->
@@ -293,7 +313,7 @@
             <h1>Accounts</h1>
           </div>
           <div class="form-group">
-            <div id="config-accounts-list"></div>
+            <div class="settings-list" id="config-accounts-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-account">
             <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
@@ -309,7 +329,7 @@
             <h1>Categories</h1>
           </div>
           <div class="form-group">
-            <div id="categories-list"></div>
+            <div class="settings-list" id="categories-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-category">
             <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
