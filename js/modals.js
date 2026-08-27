@@ -183,7 +183,7 @@ function openTransactionModal(t) {
   ).toUpperCase();
   setupAmountInput(document.getElementById('m-amount'), Number(t.amount));
   document.getElementById('m-date').value = t.date;
-  document.getElementById('m-note').value = t.note || '';
+  document.getElementById('m-description').value = t.description || '';
   renderTxModalBody();
 
   document.getElementById('m-save').onclick = () => {
@@ -201,7 +201,7 @@ function openTransactionModal(t) {
           : (data.categories.find((c) => c.id === editSel.category) || {}).name || '',
       from_account: type === 'income' ? '' : editSel.from,
       to_account: type === 'expense' ? '' : editSel.to,
-      note: document.getElementById('m-note').value.trim(),
+      description: document.getElementById('m-description').value.trim(),
       created_at: t.created_at || new Date().toISOString(),
     };
     if (type !== 'transfer' && !updated.category) return toast('Pick a category');

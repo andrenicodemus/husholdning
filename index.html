@@ -125,6 +125,10 @@
                 />
                 <div class="amount-currency" id="amount-cur">DKK</div>
               </div>
+              <div>
+                <div class="field-label">Description</div>
+                <input class="text-input" id="in-description" placeholder="Optional" />
+              </div>
               <div id="wrap-category">
                 <div class="field-label">Category</div>
                 <div class="chips" id="chips-category"></div>
@@ -137,15 +141,9 @@
                 <div class="field-label" id="label-to">To account</div>
                 <div class="chips" id="chips-to"></div>
               </div>
-              <div class="row2">
-                <div>
-                  <div class="field-label">Date</div>
-                  <input class="text-input" type="date" id="in-date" />
-                </div>
-                <div>
-                  <div class="field-label">Note</div>
-                  <input class="text-input" id="in-note" placeholder="Optional" />
-                </div>
+              <div>
+                <div class="field-label">Date</div>
+                <input class="text-input" type="date" id="in-date" />
               </div>
             </div>
             <div class="form-actions">
@@ -252,16 +250,15 @@
           </div>
         </section>
 
-        <!-- ALL TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
+        <!-- TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
         <section class="view" id="view-all">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
               <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
             </button>
-            <h1>All transactions</h1>
+            <h1>Transactions</h1>
           </div>
-          <div class="card">
-            <h2>Filter</h2>
+          <div class="list-filter">
             <div class="row2">
               <div>
                 <div class="field-label" style="margin-top: 0">Account</div>

@@ -122,9 +122,11 @@ function setupAmountInput(input, initial) {
   };
 }
 
+// Transfers keep their fixed "Account A → Account B" title — a transfer's
+// note (if any) surfaces in the sub line instead, since it isn't the title.
 function txTitle(t) {
   if (t.type === 'transfer') return accName(t.from_account) + ' → ' + accName(t.to_account);
-  return t.category || '—';
+  return t.description || 'No description';
 }
 function txSub(t, pending) {
   const acc =
@@ -134,21 +136,32 @@ function txSub(t, pending) {
         ? accName(t.from_account)
         : '';
   // Pending rows carry the date in their "due" badge, so don't repeat it here.
-  return [pending ? '' : txDateLabel(t.date), acc, t.note].filter(Boolean).join(' · ');
+  const parts = [pending ? '' : txDateLabel(t.date), acc];
+  if (t.type === 'transfer') parts.push(t.description);
+  return parts.filter(Boolean).join(' · ');
 }
+// Always shown as a tag now — "Transfer" for transfers (they have no real
+// category), the category name otherwise.
+const txCategoryTag = (t) => (t.type === 'transfer' ? 'Transfer' : t.category || '—');
 
 function txRowEl(t) {
   const pending = isPending(t);
   const row = document.createElement('div');
   row.className = 'tx-row' + (pending ? ' pending' : '');
   const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
+  const untitled = t.type !== 'transfer' && !t.description;
   row.innerHTML =
     '<div class="tx-dot ' +
     t.type +
     '"></div>' +
-    '<div class="tx-main"><div class="tx-title"></div><div class="tx-sub">' +
+    '<div class="tx-main"><div class="tx-title' +
+    (untitled ? ' untitled' : '') +
+    '"></div><div class="tx-sub"><div class="tx-tags">' +
     (pending ? '<span class="due-badge"></span>' : '') +
-    '<span></span></div></div>' +
+    '<span class="category-tag ' +
+    t.type +
+    '"></span>' +
+    '</div><span class="tx-sub-text"></span></div></div>' +
     '<div class="tx-amount ' +
     t.type +
     '">' +
@@ -156,7 +169,8 @@ function txRowEl(t) {
     fmtAligned(Number(t.amount)) +
     '</div>';
   row.querySelector('.tx-title').textContent = txTitle(t);
-  row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);
+  row.querySelector('.category-tag').textContent = txCategoryTag(t);
+  row.querySelector('.tx-sub-text').textContent = txSub(t, pending);
   if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
   row.style.cursor = 'pointer';
   row.onclick = () => openTransactionModal(t);
@@ -292,7 +306,7 @@ function renderAccounts() {
     row.style.cursor = 'pointer';
     // Accounts with nothing pending keep the plain single-line right column.
     row.innerHTML =
-      '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      '<div class="acct-info"><div class="acct-name"></div><div class="acct-meta"></div></div>' +
       (pend
         ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>'
         : balHtml);
@@ -328,7 +342,7 @@ function renderConfigAccounts() {
     row.className = 'acct-row';
     row.style.cursor = 'pointer';
     row.innerHTML =
-      '<div><div class="acct-name"></div><div class="acct-meta"></div></div>' +
+      '<div class="acct-info"><div class="acct-name"></div><div class="acct-meta"></div></div>' +
       '<div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;

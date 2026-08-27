@@ -175,6 +175,6 @@ function sumBy(txs, type) {
   return { by, total };
 }
 function accountNetChange(id, key) {
-  return monthTx(key).reduce((net, t) => net + txEffect(t, id), 0);
+  return monthTxRecorded(key).reduce((net, t) => net + txEffect(t, id), 0);
 }
 const accName = (id) => (data.accounts.find((a) => a.id === id) || {}).name || '?';

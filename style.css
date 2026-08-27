@@ -26,18 +26,19 @@
   --warn-fill: #eaab4b;
   --chart-track: #edede8;
   --blanket: #0000004d;
+  --menu-shadow: #00000011;
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
   --bg: #111111;
-  --modal-bg: #191919;
-  --input-bg: #161616;
-  --input-placeholder: #333333;
-  --card: #191919;
+  --modal-bg: #222222;
+  --input-bg: #191919;
+  --input-placeholder: #444444;
+  --card: #222222;
   --ink: #e9ece7;
   --muted: #8b9690;
-  --line: #282828;
+  --line: #333333;
   --brand: #5fbf94;
   --brand-soft: #1c3329;
   --income: #4fbf85;
@@ -51,6 +52,7 @@
   --warn-fill: #d9a54c;
   --chart-track: #222222;
   --blanket: #0000008c;
+  --menu-shadow: #000000cc;
   color-scheme: dark;
 }
 
@@ -182,7 +184,7 @@ header h1 {
   display: inline-block;
 }
 
-/* Subpages (e.g. All transactions) replace the header + bottom nav with their
+/* Subpages (e.g. Transactions) replace the header + bottom nav with their
    own back-arrow header, so they need to reclaim the safe-area top padding
    the header would otherwise provide. */
 #app.subpage > header,
@@ -202,6 +204,9 @@ body:has(#app.subpage) {
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+.list-filter {
+  margin-bottom: 8px;
 }
 
 h2 {
@@ -526,6 +531,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   display: flex;
   align-items: center;
   gap: 12px;
+  align-items: start;
 }
 .tx-row:last-child {
   border-bottom: none;
@@ -533,6 +539,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tx-dot {
   width: 8px;
   height: 8px;
+  margin-top: 6px;
   border-radius: 50%;
   flex-shrink: 0;
 }
@@ -548,7 +555,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tx-main {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
   flex: 1;
   min-width: 0;
 }
@@ -559,9 +566,17 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.tx-title.untitled {
+  font-weight: 500;
+  font-style: italic;
+  color: var(--muted);
+}
 .tx-sub {
   font-size: 12.5px;
   color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .tx-amount {
   font-weight: 600;
@@ -583,16 +598,41 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tx-row.pending .tx-dot {
   opacity: 0.4;
 }
+.tx-tags {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+}
 .due-badge {
   display: inline-block;
-  margin-right: 6px;
   padding: 0 7px;
   border-radius: 999px;
   background: var(--brand-soft);
   color: var(--brand);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.01em;
+}
+.category-tag {
+  display: inline-block;
+  padding: 0 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.category-tag.expense {
+  background: var(--expense-soft);
+  color: var(--expense);
+}
+.category-tag.income {
+  background: var(--income-soft);
+  color: var(--income);
+}
+.category-tag.transfer {
+  background: var(--transfer-soft);
+  color: var(--transfer);
 }
 .list-sub {
   font-size: 14px;
@@ -908,6 +948,7 @@ nav {
   grid-template-columns: repeat(4, 1fr);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
   z-index: 20;
+  box-shadow: 0px -8px 48px 0px var(--menu-shadow);
 }
 nav button {
   display: flex;

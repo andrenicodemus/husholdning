@@ -8,7 +8,7 @@ function toast(msg) {
   toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
-// ---------- subpages (e.g. "All transactions", the Settings config pages —
+// ---------- subpages (e.g. "Transactions", the Settings config pages —
 // reached via a link/tap rather than a nav tab, so each gets its own back
 // arrow instead of the bottom nav, and "back" really means back to wherever
 // it was opened from, via the browser's history rather than a hardcoded view)
@@ -70,32 +70,73 @@ function openConfigCategories() {
 
 // ---------- events
 const entryAmountInput = setupAmountInput(document.getElementById('in-amount'));
-document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
-  document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
-  document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
-  if (b.dataset.view === 'summary') { summaryMonth = monthKey(todayISO()); renderSummary(); }
-  if (b.dataset.view === 'budgets') { budgetsMonth = monthKey(todayISO()); renderBudgets(); }
-  window.scrollTo(0, 0);
-});
-document.querySelectorAll('#type-seg button').forEach(b => b.onclick = () => { entryType = b.dataset.type; renderEntryForm(); });
-document.getElementById('month-prev').onclick = () => { summaryMonth = shiftMonth(summaryMonth, -1); renderSummary(); };
-document.getElementById('month-next').onclick = () => { summaryMonth = shiftMonth(summaryMonth, 1); renderSummary(); };
-document.getElementById('budgets-month-prev').onclick = () => { budgetsMonth = shiftMonth(budgetsMonth, -1); renderBudgets(); };
-document.getElementById('budgets-month-next').onclick = () => { budgetsMonth = shiftMonth(budgetsMonth, 1); renderBudgets(); };
-document.getElementById('all-filter-account').onchange = (e) => { allFilter.account = e.target.value; renderAllTransactions(); };
-document.getElementById('all-filter-category').onchange = (e) => { allFilter.category = e.target.value; renderAllTransactions(); };
+document.querySelectorAll('nav button').forEach(
+  (b) =>
+    (b.onclick = () => {
+      document.querySelectorAll('nav button').forEach((x) => x.classList.toggle('on', x === b));
+      document
+        .querySelectorAll('section.view')
+        .forEach((v) => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+      if (b.dataset.view === 'summary') {
+        summaryMonth = monthKey(todayISO());
+        renderSummary();
+      }
+      if (b.dataset.view === 'budgets') {
+        budgetsMonth = monthKey(todayISO());
+        renderBudgets();
+      }
+      window.scrollTo(0, 0);
+    }),
+);
+document.querySelectorAll('#type-seg button').forEach(
+  (b) =>
+    (b.onclick = () => {
+      entryType = b.dataset.type;
+      renderEntryForm();
+    }),
+);
+document.getElementById('month-prev').onclick = () => {
+  summaryMonth = shiftMonth(summaryMonth, -1);
+  renderSummary();
+};
+document.getElementById('month-next').onclick = () => {
+  summaryMonth = shiftMonth(summaryMonth, 1);
+  renderSummary();
+};
+document.getElementById('budgets-month-prev').onclick = () => {
+  budgetsMonth = shiftMonth(budgetsMonth, -1);
+  renderBudgets();
+};
+document.getElementById('budgets-month-next').onclick = () => {
+  budgetsMonth = shiftMonth(budgetsMonth, 1);
+  renderBudgets();
+};
+document.getElementById('all-filter-account').onchange = (e) => {
+  allFilter.account = e.target.value;
+  renderAllTransactions();
+};
+document.getElementById('all-filter-category').onchange = (e) => {
+  allFilter.category = e.target.value;
+  renderAllTransactions();
+};
 document.getElementById('btn-view-all').onclick = () => openAllTx({});
 document.querySelectorAll('.subpage-back').forEach((b) => (b.onclick = () => history.back()));
 document.getElementById('btn-settings').onclick = openSettingsModal;
 
 // ---------- theme
 function applyThemeIcon(theme) {
-  document.querySelector('#btn-theme use').setAttribute('href', 'icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
+  document
+    .querySelector('#btn-theme use')
+    .setAttribute('href', 'icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
 }
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
-  try { localStorage.setItem('hf_theme', theme); } catch (e) {}
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', theme === 'dark' ? '#0f130f' : '#204b3c');
+  try {
+    localStorage.setItem('hf_theme', theme);
+  } catch (e) {}
+  document
+    .querySelector('meta[name="theme-color"]')
+    .setAttribute('content', theme === 'dark' ? '#0f130f' : '#204b3c');
   applyThemeIcon(theme);
 }
 applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
@@ -105,9 +146,17 @@ document.getElementById('btn-theme').onclick = () => {
 document.getElementById('btn-add-account').onclick = () => openAccountModal(null);
 document.getElementById('btn-add-category').onclick = () => openCategoryModal(null);
 document.getElementById('g-share-link').onclick = async () => {
-  const link = location.origin + location.pathname + '#connect=' + encodeConnectPayload(config.url, config.pin);
+  const link =
+    location.origin +
+    location.pathname +
+    '#connect=' +
+    encodeConnectPayload(config.url, config.pin);
   if (navigator.share) {
-    try { await navigator.share({ title: 'Husholdning setup', url: link }); } catch (e) { /* user cancelled */ }
+    try {
+      await navigator.share({ title: 'Husholdning setup', url: link });
+    } catch (e) {
+      /* user cancelled */
+    }
   } else {
     await navigator.clipboard.writeText(link).catch(() => {});
     toast('Link copied — send it to the other phone');
@@ -137,25 +186,32 @@ document.getElementById('btn-save').onclick = () => {
     date: document.getElementById('in-date').value || todayISO(),
     type: entryType,
     amount,
-    category: entryType === 'transfer' ? '' : (data.categories.find(c => c.id === sel.category) || {}).name || '',
+    category:
+      entryType === 'transfer'
+        ? ''
+        : (data.categories.find((c) => c.id === sel.category) || {}).name || '',
     from_account: entryType === 'income' ? '' : sel.from,
     to_account: entryType === 'expense' ? '' : sel.to,
-    note: document.getElementById('in-note').value.trim(),
-    created_at: new Date().toISOString()
+    description: document.getElementById('in-description').value.trim(),
+    created_at: new Date().toISOString(),
   };
   if (entryType !== 'transfer' && !t.category) return toast('Pick a category');
   if (entryType !== 'income' && !t.from_account) return toast('Pick an account');
   if (entryType !== 'expense' && !t.to_account) return toast('Pick an account');
-  if (entryType === 'transfer' && t.from_account === t.to_account) return toast('Pick two different accounts');
+  if (entryType === 'transfer' && t.from_account === t.to_account)
+    return toast('Pick two different accounts');
   submit('addTransaction', t);
   entryAmountInput.reset();
-  document.getElementById('in-note').value = '';
+  document.getElementById('in-description').value = '';
   toast('Saved ' + fmt(amount));
 };
 
 // ---------- setup flow
 function encodeConnectPayload(url, pin) {
-  return btoa(JSON.stringify({ u: url, p: pin })).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  return btoa(JSON.stringify({ u: url, p: pin }))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
 }
 function decodeConnectPayload(encoded) {
   const b64 = encoded.replace(/-/g, '+').replace(/_/g, '/');
@@ -173,7 +229,9 @@ function decodeConnectPayload(encoded) {
     const { url, pin } = decodeConnectPayload(m[1]);
     document.getElementById('setup-url').value = url;
     document.getElementById('setup-pin').value = pin;
-  } catch (e) { /* malformed link — leave the form empty */ }
+  } catch (e) {
+    /* malformed link — leave the form empty */
+  }
 })();
 
 document.getElementById('setup-form').onsubmit = async (e) => {
@@ -183,24 +241,32 @@ document.getElementById('setup-form').onsubmit = async (e) => {
   const err = document.getElementById('setup-err');
   err.style.display = 'none';
   if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) {
-    err.textContent = 'That does not look like an Apps Script URL (it should start with https://script.google.com/…)';
-    err.style.display = 'block'; return;
+    err.textContent =
+      'That does not look like an Apps Script URL (it should start with https://script.google.com/…)';
+    err.style.display = 'block';
+    return;
   }
   const btn = document.getElementById('setup-connect');
-  btn.disabled = true; btn.textContent = 'Connecting…';
+  btn.disabled = true;
+  btn.textContent = 'Connecting…';
   config = { url, pin };
   try {
     const fresh = await apiCall('getAll');
     store.set('hf_config', config);
-    data = fresh; store.set('hf_data', data);
+    data = fresh;
+    store.set('hf_data', data);
     boot();
   } catch (e) {
     config = null;
-    err.textContent = String(e.message).includes('bad_pin') ? 'Wrong PIN — check the Settings tab of your sheet.'
-      : 'Could not connect: ' + e.message + '. Check the URL, and that the deployment access is set to "Anyone".';
+    err.textContent = String(e.message).includes('bad_pin')
+      ? 'Wrong PIN — check the Settings tab of your sheet.'
+      : 'Could not connect: ' +
+        e.message +
+        '. Check the URL, and that the deployment access is set to "Anyone".';
     err.style.display = 'block';
   }
-  btn.disabled = false; btn.textContent = 'Connect';
+  btn.disabled = false;
+  btn.textContent = 'Connect';
 };
 
 function boot() {
@@ -217,7 +283,9 @@ function boot() {
 }
 
 window.addEventListener('online', flushQueue);
-document.addEventListener('visibilitychange', () => { if (!document.hidden) backgroundRefresh(); });
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) backgroundRefresh();
+});
 loadModalTemplates()
   .catch((err) => {
     console.error(err);
@@ -228,25 +296,28 @@ loadModalTemplates()
 // ---------- service worker
 if ('serviceWorker' in navigator) {
   const hadController = !!navigator.serviceWorker.controller;
-  navigator.serviceWorker.register('sw.js').then((reg) => {
-    reg.update().catch(() => {});
-    document.addEventListener('visibilitychange', () => {
-      if (!document.hidden) reg.update().catch(() => {});
-    });
-    reg.addEventListener('updatefound', () => {
-      const worker = reg.installing;
-      if (!worker) return;
-      worker.addEventListener('statechange', () => {
-        // Only a genuinely new version landing on top of an already-running
-        // app counts as "update ready" — skip the very first install, where
-        // there's nothing to refresh (this load is already the latest).
-        if (worker.state === 'installed' && hadController) {
-          const pill = document.getElementById('update-pill');
-          pill.textContent = 'Update ready — tap to refresh';
-          pill.className = 'pill warn';
-          pill.onclick = () => location.reload();
-        }
+  navigator.serviceWorker
+    .register('sw.js')
+    .then((reg) => {
+      reg.update().catch(() => {});
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) reg.update().catch(() => {});
       });
-    });
-  }).catch(() => {});
+      reg.addEventListener('updatefound', () => {
+        const worker = reg.installing;
+        if (!worker) return;
+        worker.addEventListener('statechange', () => {
+          // Only a genuinely new version landing on top of an already-running
+          // app counts as "update ready" — skip the very first install, where
+          // there's nothing to refresh (this load is already the latest).
+          if (worker.state === 'installed' && hadController) {
+            const pill = document.getElementById('update-pill');
+            pill.textContent = 'Update ready — tap to refresh';
+            pill.className = 'pill warn';
+            pill.onclick = () => location.reload();
+          }
+        });
+      });
+    })
+    .catch(() => {});
 }
