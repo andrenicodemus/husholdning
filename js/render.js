@@ -2,6 +2,7 @@
 let entryType = 'expense';
 let sel = { category: null, from: null, to: null };
 let summaryMonth = monthKey(todayISO());
+let budgetsMonth = monthKey(todayISO());
 let allFilter = { account: '', category: '' };
 
 function renderAll() {
@@ -337,8 +338,8 @@ function renderConfigAccounts() {
 }
 
 function renderBudgets() {
-  const key = monthKey(todayISO());
-  document.getElementById('budgets-title').textContent = 'Budgets · ' + monthLabel(key);
+  const key = budgetsMonth;
+  document.getElementById('budgets-month-label').textContent = monthLabel(key);
   const recordedBy = sumBy(monthTxRecorded(key), 'expense').by;
   const upcomingBy = sumBy(monthTxUpcoming(key), 'expense').by;
   const el = document.getElementById('budgets-list');

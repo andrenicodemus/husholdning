@@ -74,11 +74,14 @@ document.querySelectorAll('nav button').forEach(b => b.onclick = () => {
   document.querySelectorAll('nav button').forEach(x => x.classList.toggle('on', x === b));
   document.querySelectorAll('section.view').forEach(v => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
   if (b.dataset.view === 'summary') { summaryMonth = monthKey(todayISO()); renderSummary(); }
+  if (b.dataset.view === 'budgets') { budgetsMonth = monthKey(todayISO()); renderBudgets(); }
   window.scrollTo(0, 0);
 });
 document.querySelectorAll('#type-seg button').forEach(b => b.onclick = () => { entryType = b.dataset.type; renderEntryForm(); });
 document.getElementById('month-prev').onclick = () => { summaryMonth = shiftMonth(summaryMonth, -1); renderSummary(); };
 document.getElementById('month-next').onclick = () => { summaryMonth = shiftMonth(summaryMonth, 1); renderSummary(); };
+document.getElementById('budgets-month-prev').onclick = () => { budgetsMonth = shiftMonth(budgetsMonth, -1); renderBudgets(); };
+document.getElementById('budgets-month-next').onclick = () => { budgetsMonth = shiftMonth(budgetsMonth, 1); renderBudgets(); };
 document.getElementById('all-filter-account').onchange = (e) => { allFilter.account = e.target.value; renderAllTransactions(); };
 document.getElementById('all-filter-category').onchange = (e) => { allFilter.category = e.target.value; renderAllTransactions(); };
 document.getElementById('btn-view-all').onclick = () => openAllTx({});

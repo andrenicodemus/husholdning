@@ -63,6 +63,8 @@
 
 html {
   height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -544,6 +546,9 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   background: var(--transfer);
 }
 .tx-main {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   flex: 1;
   min-width: 0;
 }
@@ -630,6 +635,11 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .acct-row:last-child {
   border-bottom: none;
 }
+.acct-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
 .acct-name {
   font-weight: 600;
 }
@@ -652,6 +662,9 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 
 .acct-right {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   text-align: right;
 }
 .projected {
@@ -675,6 +688,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   gap: 32px;
+  padding-bottom: 16px;
 }
 
 .budget-top-wrapper {
@@ -811,7 +825,10 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 40px;
+  margin-bottom: 48px;
+}
+.summary-section:last-child {
+  margin-bottom: 16px;
 }
 .cat-row {
   display: flex;
@@ -819,6 +836,9 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   gap: 8px;
   padding: 10px 0;
   font-size: 14px;
+}
+.cat-row:last-child {
+  padding-bottom: 0;
 }
 .cat-row .name {
   font-size: 14.5px;
