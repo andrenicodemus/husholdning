@@ -40,7 +40,7 @@
       <main>
         <div class="logo">Husholdning</div>
         <div class="tag">Your joint finances, in your pocket</div>
-        <div class="card">
+        <div class="setup-card">
           <h2>Connect to Google sheet</h2>
           <form id="setup-form" autocomplete="off">
             <div class="form-group">
@@ -372,6 +372,9 @@
       <div class="modal" id="modal-content"></div>
     </div>
     <div id="toast"></div>
+    <!-- Local-only, gitignored: sets window.HF_DEV_URL to prefill the setup
+         screen during development. Safe to 404 if it doesn't exist. -->
+    <script src="js/dev-config.js"></script>
     <script src="js/format.js"></script>
     <script src="js/store.js"></script>
     <script src="js/templates.js"></script>

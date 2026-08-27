@@ -259,7 +259,7 @@ document.getElementById('setup-form').onsubmit = async (e) => {
   } catch (e) {
     config = null;
     err.textContent = String(e.message).includes('bad_pin')
-      ? 'Wrong PIN — check the Settings tab of your sheet.'
+      ? 'Wrong PIN. Check the Settings tab of your sheet.'
       : 'Could not connect: ' +
         e.message +
         '. Check the URL, and that the deployment access is set to "Anyone".';
@@ -271,6 +271,8 @@ document.getElementById('setup-form').onsubmit = async (e) => {
 
 function boot() {
   if (!config) {
+    const urlField = document.getElementById('setup-url');
+    if (!urlField.value && window.HF_DEV_URL) urlField.value = window.HF_DEV_URL;
     document.getElementById('setup').style.display = 'block';
     document.getElementById('app').style.display = 'none';
     return;

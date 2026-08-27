@@ -42,11 +42,11 @@
   --brand: #5fbf94;
   --brand-soft: #1c3329;
   --income: #4fbf85;
-  --income-soft: #16291f;
+  --income-soft: hsl(149deg 47% 53% / 15%);
   --expense: #e8785c;
-  --expense-soft: #34201a;
+  --expense-soft: hsl(12deg 65% 53% / 22%);
   --transfer: #6badee;
-  --transfer-soft: #1c2b3a;
+  --transfer-soft: hsl(210deg 79% 68% / 20%);
   --warn: #e2b262;
   --warn-soft: #3a2c17;
   --warn-fill: #d9a54c;
@@ -354,7 +354,7 @@ section.view .view-title {
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);
-  margin: 0 0 8px;
+  margin: 0 0 6px;
 }
 .chips {
   display: flex;
@@ -376,16 +376,19 @@ section.view .view-title {
   color: var(--bg);
 }
 .tint-expense .chip.on {
-  background: var(--expense);
+  background: var(--expense-soft);
   border-color: var(--expense);
+  color: var(--expense);
 }
 .tint-income .chip.on {
-  background: var(--income);
+  background: var(--income-soft);
   border-color: var(--income);
+  color: var(--income);
 }
 .tint-transfer .chip.on {
-  background: var(--transfer);
+  background: var(--transfer-soft);
   border-color: var(--transfer);
+  color: var(--transfer);
 }
 
 .row2 {
@@ -933,7 +936,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 32px;
+  margin-top: 40px;
 }
 
 /* Bottom nav */
@@ -1025,12 +1028,6 @@ nav button.on {
   overflow-y: auto;
   padding: 16px 18px calc(20px + env(safe-area-inset-bottom));
 }
-.modal-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 32px;
-}
 
 /* Setup screen */
 #setup {
@@ -1049,7 +1046,7 @@ nav button.on {
   text-align: center;
   color: var(--muted);
   font-size: 14px;
-  margin-bottom: 28px;
+  margin-bottom: 64px;
 }
 .setup-note {
   font-size: 13px;
@@ -1057,11 +1054,20 @@ nav button.on {
   margin-top: 10px;
   line-height: 1.5;
 }
+.setup-card {
+  flex-direction: column;
+  display: flex;
+  gap: 12px;
+}
+.setup-card h2 {
+  text-align: center;
+}
 .err {
   color: var(--expense);
-  font-size: 13.5px;
-  font-weight: 600;
-  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 40px;
   display: none;
 }
 
