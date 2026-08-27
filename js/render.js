@@ -38,7 +38,7 @@ function chipRow(container, items, selectedId, onPick, after) {
 
 function renderEntryForm() {
   const card = document.getElementById('entry-card');
-  card.className = 'card tint-' + entryType;
+  card.className = 'card bleed-grid tint-' + entryType;
   document.querySelectorAll('#type-seg button').forEach((b) => {
     b.className = b.dataset.type === entryType ? 'sel-' + entryType : '';
   });
@@ -133,7 +133,7 @@ function txSub(t, pending) {
         ? accName(t.from_account)
         : '';
   // Pending rows carry the date in their "due" badge, so don't repeat it here.
-  return [pending ? '' : t.date, acc, t.note].filter(Boolean).join(' · ');
+  return [pending ? '' : txDateLabel(t.date), acc, t.note].filter(Boolean).join(' · ');
 }
 
 function txRowEl(t) {
@@ -152,7 +152,7 @@ function txRowEl(t) {
     t.type +
     '">' +
     sign +
-    fmt(Number(t.amount)) +
+    fmtAligned(Number(t.amount)) +
     '</div>';
   row.querySelector('.tx-title').textContent = txTitle(t);
   row.querySelector('.tx-sub span:last-child').textContent = txSub(t, pending);

@@ -16,14 +16,15 @@
   --brand: #204b3c;
   --brand-soft: #e4eee8;
   --income: #1e7a4c;
-  --income-soft: #e3f1e9;
+  --income-soft: #cce5d7;
   --expense: #b4432c;
-  --expense-soft: #f7e8e3;
+  --expense-soft: #f0d5cb;
   --transfer: #2b5f8a;
-  --transfer-soft: #e4edf4;
-  --warn: #8a5a1e;
+  --transfer-soft: #ccddea;
+  --warn: #daa058;
   --warn-soft: #f6ebdd;
-  --warn-fill: #c98a2b;
+  --warn-fill: #eaab4b;
+  --chart-track: #edede8;
   --blanket: #0000004d;
   color-scheme: light;
 }
@@ -48,6 +49,7 @@
   --warn: #e2b262;
   --warn-soft: #3a2c17;
   --warn-fill: #d9a54c;
+  --chart-track: #222222;
   --blanket: #0000008c;
   color-scheme: dark;
 }
@@ -114,7 +116,6 @@ select {
 
 .btn-secondary {
   background-color: var(--card);
-  border: 1px solid var(--line);
 }
 
 .btn-ghost {
@@ -140,7 +141,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: calc(20px + env(safe-area-inset-top)) 14px 18px 18px;
+  padding: calc(20px + env(safe-area-inset-top)) 20px 18px 24px;
   position: fixed;
   top: 0;
   right: 0;
@@ -208,7 +209,7 @@ h2 {
 }
 
 main {
-  padding: 8px 16px;
+  padding: 8px 24px;
   max-width: 560px;
   margin: 0 auto;
 }
@@ -240,6 +241,10 @@ section.view .view-title {
   }
 }
 
+.bleed-grid {
+  margin-left: -8px;
+  margin-right: -8px;
+}
 .card {
   background: var(--card);
   border-radius: var(--radius);
@@ -354,7 +359,7 @@ section.view .view-title {
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  background: var(--bg);
+  background: var(--input-bg);
   border: 1px solid var(--line);
   color: var(--ink);
 }
@@ -703,13 +708,13 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .bar {
   height: 8px;
   border-radius: 999px;
-  background: var(--card);
+  background: var(--chart-track);
   overflow: hidden;
   display: flex;
 }
 .bar-fill {
   height: 100%;
-  background: var(--brand);
+  background: var(--income);
   transition: width 0.3s ease;
 }
 .bar-fill.over {
@@ -722,12 +727,12 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
    (not a solid fill) so it reads as forecasted, not already spent. */
 .bar-fill-upcoming {
   height: 100%;
-  background-image: repeating-linear-gradient(45deg, var(--warn-fill) 0 4px, transparent 4px 8px);
+  background-image: repeating-linear-gradient(45deg, var(--warn-fill) 2px 4px, var(--bg) 4px 6px);
   opacity: 0.6;
   transition: width 0.3s ease;
 }
 .bar-fill-upcoming.over {
-  background-image: repeating-linear-gradient(45deg, var(--expense) 0 4px, transparent 4px 8px);
+  background-image: repeating-linear-gradient(45deg, var(--expense) 2px 4px, var(--bg) 4px 6px);
 }
 .budget-bottom {
   display: flex;

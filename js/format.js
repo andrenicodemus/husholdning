@@ -101,6 +101,15 @@ function dueLabel(iso) {
     ? String(iso)
     : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
+// "26 Aug 2026" — same construction as dueLabel, plus the year, for showing a
+// transaction's date in lists.
+function txDateLabel(iso) {
+  const [y, m, d] = String(iso).split('-').map(Number);
+  const dt = new Date(y, (m || 1) - 1, d || 1);
+  return isNaN(dt)
+    ? String(iso)
+    : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 function shiftMonth(key, delta) {
   const [y, m] = key.split('-').map(Number);
   const d = new Date(y, m - 1 + delta, 1);
