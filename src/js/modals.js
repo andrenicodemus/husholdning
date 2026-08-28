@@ -3,16 +3,30 @@ const modalBg = document.getElementById('modal-bg');
 const modalContent = document.getElementById('modal-content');
 let modalScrollY = 0;
 
-// Keep --app-vh synced to the real, currently-visible viewport height so
-// .modal-bg (position:fixed) can size itself against it — see the comment
-// on .modal-bg in style.css for why this is needed on iOS.
+// Keep --app-vh/--app-vh-top synced to the real, currently-visible viewport
+// so .modal-bg (position:fixed) can size and position itself against it —
+// see the comment on .modal-bg in style.css for why this is needed on iOS.
+// Focusing an input can't scroll the page to reveal it (body.modal-open is
+// position:fixed while a modal is open), so iOS pans the *visual* viewport
+// instead — visualViewport.height shrinks for the keyboard, and
+// visualViewport.offsetTop grows by however far it panned. A fixed element
+// only tracks the first of those, so without offsetTop it stays anchored
+// above the pan and slides off the top of the screen.
 function syncAppVh() {
-  const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
-  document.documentElement.style.setProperty('--app-vh', h + 'px');
+  const vv = window.visualViewport;
+  document.documentElement.style.setProperty(
+    '--app-vh',
+    (vv ? vv.height : window.innerHeight) + 'px',
+  );
+  document.documentElement.style.setProperty('--app-vh-top', (vv ? vv.offsetTop : 0) + 'px');
 }
 syncAppVh();
-if (window.visualViewport) window.visualViewport.addEventListener('resize', syncAppVh);
-else window.addEventListener('resize', syncAppVh);
+if (window.visualViewport) {
+  window.visualViewport.addEventListener('resize', syncAppVh);
+  window.visualViewport.addEventListener('scroll', syncAppVh);
+} else {
+  window.addEventListener('resize', syncAppVh);
+}
 
 function openModal(title, bodyHtml) {
   if (!bodyHtml) {

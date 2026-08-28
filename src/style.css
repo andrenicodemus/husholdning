@@ -672,7 +672,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .acct-row {
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: space-between;
 }
 .acct-row:last-child {
@@ -693,7 +693,10 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .acct-chevron {
   color: var(--muted);
   font-size: 18px;
-  padding: 6px;
+  padding: 0 6px;
+}
+.acct-chevron .icon {
+  vertical-align: -0.05em;
 }
 .acct-bal {
   letter-spacing: -0.03em;
@@ -831,7 +834,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .stat-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 14px;
 }
 .stat {
@@ -976,7 +979,7 @@ nav button.on {
 /* Modal */
 .modal-bg {
   position: fixed;
-  top: 0;
+  top: var(--app-vh-top, 0px);
   left: 0;
   right: 0;
   height: var(--app-vh, 100dvh);
