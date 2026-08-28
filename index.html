@@ -98,56 +98,23 @@
       </header>
 
       <main>
-        <!-- ENTRY -->
-        <section class="view active" id="view-entry">
-          <div class="type-seg bleed-grid" id="type-seg">
-            <button data-type="expense" class="sel-expense">
-              <svg class="icon"><use href="src/icons/sprite.svg#minus"></use></svg>
-              Expense
-            </button>
-            <button data-type="income">
-              <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>
-              Income
-            </button>
-            <button data-type="transfer">
-              <svg class="icon"><use href="src/icons/sprite.svg#transfer"></use></svg>Transfer
-            </button>
-          </div>
-          <div id="entry-card">
-            <div class="form-group">
-              <div class="amount-wrap">
-                <input
-                  class="amount-input"
-                  id="in-amount"
-                  inputmode="numeric"
-                  placeholder="0,00"
-                  autocomplete="off"
-                />
-                <div class="amount-currency" id="amount-cur">DKK</div>
-              </div>
-              <div>
-                <div class="field-label">Description</div>
-                <input class="text-input" id="in-description" placeholder="Optional" />
-              </div>
-              <div id="wrap-category">
-                <div class="field-label">Category</div>
-                <div class="chips" id="chips-category"></div>
-              </div>
-              <div id="wrap-from">
-                <div class="field-label" id="label-from">From account</div>
-                <div class="chips" id="chips-from"></div>
-              </div>
-              <div id="wrap-to" style="display: none">
-                <div class="field-label" id="label-to">To account</div>
-                <div class="chips" id="chips-to"></div>
-              </div>
-              <div>
-                <div class="field-label">Date</div>
-                <input class="text-input" type="date" id="in-date" />
-              </div>
-            </div>
-            <div class="form-actions">
-              <button class="btn-primary" id="btn-save">Save expense</button>
+        <!-- HOME -->
+        <section class="view active" id="view-home">
+          <div class="add-tx-card" id="add-tx-card">
+            <h2>Add transaction</h2>
+            <div class="add-tx-actions" id="add-tx-actions">
+              <button data-type="expense">
+                <svg class="icon"><use href="src/icons/sprite.svg#minus"></use></svg>
+                Expense
+              </button>
+              <button data-type="income">
+                <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>
+                Income
+              </button>
+              <button data-type="transfer">
+                <svg class="icon"><use href="src/icons/sprite.svg#transfer"></use></svg>
+                Transfer
+              </button>
             </div>
           </div>
           <div class="view-section">
@@ -341,13 +308,194 @@
             <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>Add category
           </button>
         </section>
+
+        <!-- SETTINGS: MENU -->
+        <section class="view" id="view-settings">
+          <div class="subpage-head">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1>Settings</h1>
+          </div>
+          <div class="menu">
+            <div class="menu-item" id="settings-general" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name">General</div>
+                <div class="acct-chevron icon-btn btn-ghost">
+                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                </div>
+              </div>
+            </div>
+            <div class="menu-item" id="settings-accounts" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name">Accounts</div>
+                <div class="acct-chevron icon-btn btn-ghost">
+                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                </div>
+              </div>
+            </div>
+            <div class="menu-item" id="settings-categories" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name">Categories</div>
+                <div class="acct-chevron icon-btn btn-ghost">
+                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                </div>
+              </div>
+            </div>
+            <div class="menu-item" id="settings-resync" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name">Force full resync</div>
+              </div>
+            </div>
+            <div class="menu-item" id="settings-check-update" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name">Check for updates</div>
+              </div>
+            </div>
+            <div class="menu-item" id="settings-disconnect" style="cursor: pointer">
+              <div class="menu-item-content">
+                <div class="acct-name" style="color: var(--expense)">Disconnect from sheet</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACCOUNT: ADD/EDIT -->
+        <section class="view" id="view-account-edit">
+          <div class="subpage-head">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1 id="account-edit-title"></h1>
+          </div>
+          <div class="form-group">
+            <div>
+              <div class="field-label">Name</div>
+              <input class="text-input" id="account-name" />
+            </div>
+            <div class="row2" style="margin-top: 4px">
+              <div>
+                <div class="field-label">Type</div>
+                <select class="select-input" id="account-type">
+                  <option value="current">Current</option>
+                  <option value="savings">Savings</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">Owner</div>
+                <select class="select-input" id="account-owner">
+                  <option value="a"></option>
+                  <option value="b"></option>
+                  <option value="joint"></option>
+                </select>
+              </div>
+            </div>
+            <div>
+              <div class="field-label">Initial balance</div>
+              <input class="text-input" id="account-init" inputmode="decimal" type="number" />
+            </div>
+          </div>
+          <div class="settle-note">
+            The starting balance when you begin tracking. Current balance = initial + every
+            transaction dated today or earlier; upcoming ones only count from their date.
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" id="account-save"></button>
+            <button class="btn-danger" id="account-del" hidden>Delete account</button>
+          </div>
+        </section>
+
+        <!-- CATEGORY: ADD/EDIT -->
+        <section class="view" id="view-category-edit">
+          <div class="subpage-head">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1 id="category-edit-title"></h1>
+          </div>
+          <div class="form-group">
+            <div>
+              <div class="field-label">Name</div>
+              <input class="text-input" id="category-name" />
+            </div>
+            <div class="row2" style="margin-top: 4px">
+              <div>
+                <div class="field-label">Type</div>
+                <select class="select-input" id="category-type">
+                  <option value="expense">Expense</option>
+                  <option value="income">Income</option>
+                </select>
+              </div>
+              <div>
+                <div class="field-label">Monthly budget</div>
+                <input
+                  class="text-input"
+                  id="category-budget"
+                  inputmode="decimal"
+                  placeholder="0 = none"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-primary" id="category-save"></button>
+            <button class="btn-danger" id="category-del" hidden>Delete category</button>
+          </div>
+        </section>
+
+        <!-- TRANSACTION: ADD/EDIT -->
+        <section class="view" id="view-transaction-edit">
+          <div class="subpage-head">
+            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+            </button>
+            <h1 id="tx-edit-title"></h1>
+          </div>
+          <form id="tx-card">
+            <div class="form-group">
+              <div class="amount-wrap">
+                <input
+                  class="amount-input"
+                  id="tx-amount-input"
+                  inputmode="numeric"
+                  placeholder="0,00"
+                />
+                <div class="amount-currency" id="tx-amount-currency"></div>
+              </div>
+              <div>
+                <div class="field-label" style="margin-top: 0">Description</div>
+                <input class="text-input" id="tx-description" placeholder="Optional" />
+              </div>
+              <div id="tx-wrap-category">
+                <div class="field-label">Category</div>
+                <div class="chips" id="tx-chips-category"></div>
+              </div>
+              <div id="tx-wrap-from">
+                <div class="field-label" id="tx-label-from">From account</div>
+                <div class="chips" id="tx-chips-from"></div>
+              </div>
+              <div id="tx-wrap-to" style="display: none">
+                <div class="field-label" id="tx-label-to">To account</div>
+                <div class="chips" id="tx-chips-to"></div>
+              </div>
+              <div>
+                <div class="field-label" style="margin-top: 0">Date</div>
+                <input class="text-input" type="date" id="tx-date" />
+              </div>
+            </div>
+            <div class="form-actions">
+              <button class="btn-primary" id="tx-save">Save changes</button>
+              <button class="btn-danger" id="tx-del" hidden>Delete transaction</button>
+            </div>
+          </form>
+        </section>
       </main>
 
       <nav>
-        <button data-view="entry" class="on">
+        <button data-view="home" class="on">
           <span class="ic"
-            ><svg class="icon"><use href="src/icons/sprite.svg#nav-new"></use></svg></span
-          >New
+            ><svg class="icon"><use href="src/icons/sprite.svg#nav-home"></use></svg></span
+          >Home
         </button>
         <button data-view="accounts">
           <span class="ic"
@@ -367,10 +515,6 @@
       </nav>
     </div>
 
-    <!-- ======================= MODALS ======================= -->
-    <div class="modal-bg" id="modal-bg">
-      <div class="modal" id="modal-content"></div>
-    </div>
     <div id="toast"></div>
     <!-- Local-only, gitignored: sets window.HF_DEV_URL to prefill the setup
          screen during development. Safe to 404 if it doesn't exist. -->
@@ -379,7 +523,7 @@
     <script src="src/js/store.js"></script>
     <script src="src/js/templates.js"></script>
     <script src="src/js/render.js"></script>
-    <script src="src/js/modals.js"></script>
+    <script src="src/js/pages.js"></script>
     <script src="src/js/app.js"></script>
   </body>
 </html>

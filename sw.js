@@ -1,5 +1,5 @@
 /* Husholdning service worker — app shell cache */
-const CACHE = 'husholdning-v28';
+const CACHE = 'husholdning-v29';
 const SHELL = [
   './',
   './index.html',
@@ -12,12 +12,8 @@ const SHELL = [
   './src/js/store.js',
   './src/js/templates.js',
   './src/js/render.js',
-  './src/js/modals.js',
+  './src/js/pages.js',
   './src/js/app.js',
-  './src/modals/account.html',
-  './src/modals/category.html',
-  './src/modals/transaction.html',
-  './src/modals/settings.html',
   './src/components/empty.html',
   './src/components/tx-row.html',
   './src/components/tx-month-group.html',

@@ -37,7 +37,7 @@ A zero-cost, two-person finance app. The UI is a PWA hosted on GitHub Pages; the
 ## Part 2 — Frontend (~10 min)
 
 1. Create a GitHub account if you don't have one, then a **new public repository** (e.g. `husholdning`).
-2. Upload the app files, keeping the folder structure intact: `index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png` at the repository root, plus the whole `src/` folder (`style.css`, `js/`, `modals/`, `components/`, `icons/`) — (drag-and-drop works on github.com → *Add file → Upload files*). `index.html` and `sw.js` must stay at the root: `sw.js` can only control the scope of the folder it's served from. The `modals/` files are the dialog bodies and `components/` the repeated list rows — both are fetched at startup, so they all need to be present.
+2. Upload the app files, keeping the folder structure intact: `index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png` at the repository root, plus the whole `src/` folder (`style.css`, `js/`, `components/`, `icons/`) — (drag-and-drop works on github.com → *Add file → Upload files*). `index.html` and `sw.js` must stay at the root: `sw.js` can only control the scope of the folder it's served from. The `components/` files are the repeated list rows, fetched at startup, so they need to be present too.
 3. Repository **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder `/ (root)` → Save.
 4. After a minute your app is live at `https://YOURUSERNAME.github.io/husholdning/`.
 

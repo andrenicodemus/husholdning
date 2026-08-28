@@ -1,8 +1,7 @@
 // ---------- html templates
-// Markup lives in .html files rather than in string literals: modals/ holds
-// whole dialog bodies (injected as-is), components/ holds the small repeated
-// list rows that the render functions clone and fill in.
-const MODAL_NAMES = ['account', 'category', 'transaction', 'settings'];
+// Markup for the small repeated list rows (tx rows, account rows, etc.)
+// lives in components/*.html rather than in string literals — the render
+// functions clone a fetched <template> and fill it in.
 const COMPONENT_NAMES = [
   'empty',
   'tx-row',
@@ -14,7 +13,6 @@ const COMPONENT_NAMES = [
   'cat-breakdown-row',
 ];
 
-let modalTemplates = {};
 let componentTemplates = {};
 
 async function fetchTemplate(path) {
@@ -24,11 +22,9 @@ async function fetchTemplate(path) {
 }
 
 async function loadTemplates() {
-  const [modals, components] = await Promise.all([
-    Promise.all(MODAL_NAMES.map((n) => fetchTemplate('src/modals/' + n + '.html'))),
-    Promise.all(COMPONENT_NAMES.map((n) => fetchTemplate('src/components/' + n + '.html'))),
-  ]);
-  modalTemplates = Object.fromEntries(MODAL_NAMES.map((n, i) => [n, modals[i]]));
+  const components = await Promise.all(
+    COMPONENT_NAMES.map((n) => fetchTemplate('src/components/' + n + '.html')),
+  );
   componentTemplates = Object.fromEntries(
     COMPONENT_NAMES.map((n, i) => {
       const tpl = document.createElement('template');

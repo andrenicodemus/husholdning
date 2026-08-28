@@ -1,12 +1,9 @@
 // ---------- rendering
-let entryType = 'expense';
-let sel = { category: null, from: null, to: null };
 let summaryMonth = monthKey(todayISO());
 let budgetsMonth = monthKey(todayISO());
 let allFilter = { account: '', category: '' };
 
 function renderAll() {
-  renderEntryForm();
   renderRecent();
   renderAccounts();
   renderBudgets();
@@ -15,13 +12,9 @@ function renderAll() {
   renderConfigAccounts();
   renderConfigCategories();
   updateSyncPill();
-  document.getElementById('amount-cur').textContent = (
-    data.settings.currency || 'DKK'
-  ).toUpperCase();
 }
 
 function chipRow(container, items, selectedId, onPick, after) {
-  after = after || renderEntryForm;
   const el = document.getElementById(container);
   el.replaceChildren();
   for (const it of items) {
@@ -35,51 +28,6 @@ function chipRow(container, items, selectedId, onPick, after) {
     el.appendChild(b);
   }
   if (!items.length) renderEmpty(el, 'None yet');
-}
-
-function renderEntryForm() {
-  const card = document.getElementById('entry-card');
-  card.className = 'card bleed-grid tint-' + entryType;
-  document.querySelectorAll('#type-seg button').forEach((b) => {
-    b.className = b.dataset.type === entryType ? 'sel-' + entryType : '';
-  });
-
-  const cats = data.categories.filter(
-    (c) => c.type === (entryType === 'income' ? 'income' : 'expense'),
-  );
-  document.getElementById('wrap-category').style.display = entryType === 'transfer' ? 'none' : '';
-  if (entryType !== 'transfer') {
-    if (!cats.some((c) => c.id === sel.category)) sel.category = cats.length ? cats[0].id : null;
-    chipRow(
-      'chips-category',
-      cats.map((c) => ({ id: c.id, label: c.name })),
-      sel.category,
-      (id) => (sel.category = id),
-    );
-  }
-
-  const accs = data.accounts.map((a) => ({ id: a.id, label: a.name }));
-  const showFrom = entryType !== 'income';
-  const showTo = entryType !== 'expense';
-  document.getElementById('wrap-from').style.display = showFrom ? '' : 'none';
-  document.getElementById('wrap-to').style.display = showTo ? '' : 'none';
-  if (showFrom) {
-    if (!accs.some((a) => a.id === sel.from)) sel.from = accs.length ? accs[0].id : null;
-    chipRow('chips-from', accs, sel.from, (id) => (sel.from = id));
-  }
-  if (showTo) {
-    const toAccs = entryType === 'transfer' ? accs.filter((a) => a.id !== sel.from) : accs;
-    if (!toAccs.some((a) => a.id === sel.to)) sel.to = toAccs.length ? toAccs[0].id : null;
-    chipRow('chips-to', toAccs, sel.to, (id) => (sel.to = id));
-  }
-  document.getElementById('label-to').textContent =
-    entryType === 'income' ? 'Receiving account' : 'To account';
-  document.getElementById('btn-save').textContent =
-    entryType === 'expense'
-      ? 'Save expense'
-      : entryType === 'income'
-        ? 'Save income'
-        : 'Save transfer';
 }
 
 // Amount input mask: typed digits fill in from the decimals outward (like a
@@ -169,7 +117,7 @@ function txRowEl(t) {
   amount.textContent = sign + fmtAligned(Number(t.amount));
 
   row.style.cursor = 'pointer';
-  row.onclick = () => openTransactionModal(t);
+  row.onclick = () => openTransactionPage(t);
   return row;
 }
 function renderTxList(elId, txs, emptyText) {
@@ -329,7 +277,7 @@ function renderConfigAccounts() {
     row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
-    row.onclick = () => openAccountModal(a);
+    row.onclick = () => openAccountPage(a);
     el.appendChild(row);
   }
 }
@@ -400,7 +348,7 @@ function renderConfigCategories() {
     row.querySelector('.acct-name').textContent = c.name;
     row.querySelector('.acct-meta').textContent =
       c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
-    row.onclick = () => openCategoryModal(c);
+    row.onclick = () => openCategoryPage(c);
     cl.appendChild(row);
   }
 }
