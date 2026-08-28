@@ -21,7 +21,7 @@
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="src/style.css" />
     <script>
       // Set the theme before first paint so there's no flash of the wrong theme.
       (function () {
@@ -89,10 +89,10 @@
           <span class="pill" id="sync-pill"></span>
           <span class="pill" id="update-pill" style="cursor: pointer"></span>
           <button class="icon-btn btn-ghost" id="btn-theme" aria-label="Toggle dark mode">
-            <svg class="icon"><use href="icons/sprite.svg#sun"></use></svg>
+            <svg class="icon"><use href="src/icons/sprite.svg#sun"></use></svg>
           </button>
           <button class="icon-btn btn-ghost" id="btn-settings" aria-label="Settings">
-            <svg class="icon"><use href="icons/sprite.svg#settings"></use></svg>
+            <svg class="icon"><use href="src/icons/sprite.svg#settings"></use></svg>
           </button>
         </div>
       </header>
@@ -102,15 +102,15 @@
         <section class="view active" id="view-entry">
           <div class="type-seg bleed-grid" id="type-seg">
             <button data-type="expense" class="sel-expense">
-              <svg class="icon"><use href="icons/sprite.svg#minus"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#minus"></use></svg>
               Expense
             </button>
             <button data-type="income">
-              <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>
               Income
             </button>
             <button data-type="transfer">
-              <svg class="icon"><use href="icons/sprite.svg#transfer"></use></svg>Transfer
+              <svg class="icon"><use href="src/icons/sprite.svg#transfer"></use></svg>Transfer
             </button>
           </div>
           <div id="entry-card">
@@ -185,11 +185,11 @@
         <section class="view" id="view-budgets">
           <div class="month-nav">
             <button id="budgets-month-prev" aria-label="Previous month">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <div class="label" id="budgets-month-label"></div>
             <button id="budgets-month-next" aria-label="Next month">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
             </button>
           </div>
           <div class="view-section">
@@ -202,11 +202,11 @@
         <section class="view" id="view-summary">
           <div class="month-nav">
             <button id="month-prev" aria-label="Previous month">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <div class="label" id="month-label"></div>
             <button id="month-next" aria-label="Next month">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
             </button>
           </div>
           <div class="stat-grid bleed-grid">
@@ -254,7 +254,7 @@
         <section class="view" id="view-all">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>Transactions</h1>
           </div>
@@ -279,7 +279,7 @@
         <section class="view" id="view-general">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>General</h1>
           </div>
@@ -314,7 +314,7 @@
         <section class="view" id="view-config-accounts">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>Accounts</h1>
           </div>
@@ -322,7 +322,7 @@
             <div class="settings-list" id="config-accounts-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-account">
-            <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add account
+            <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>Add account
           </button>
         </section>
 
@@ -330,7 +330,7 @@
         <section class="view" id="view-config-categories">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
             </button>
             <h1>Categories</h1>
           </div>
@@ -338,7 +338,7 @@
             <div class="settings-list" id="categories-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-category">
-            <svg class="icon"><use href="icons/sprite.svg#plus"></use></svg>Add category
+            <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>Add category
           </button>
         </section>
       </main>
@@ -346,22 +346,22 @@
       <nav>
         <button data-view="entry" class="on">
           <span class="ic"
-            ><svg class="icon"><use href="icons/sprite.svg#nav-new"></use></svg></span
+            ><svg class="icon"><use href="src/icons/sprite.svg#nav-new"></use></svg></span
           >New
         </button>
         <button data-view="accounts">
           <span class="ic"
-            ><svg class="icon"><use href="icons/sprite.svg#nav-accounts"></use></svg></span
+            ><svg class="icon"><use href="src/icons/sprite.svg#nav-accounts"></use></svg></span
           >Accounts
         </button>
         <button data-view="budgets">
           <span class="ic"
-            ><svg class="icon"><use href="icons/sprite.svg#nav-budgets"></use></svg></span
+            ><svg class="icon"><use href="src/icons/sprite.svg#nav-budgets"></use></svg></span
           >Budgets
         </button>
         <button data-view="summary">
           <span class="ic"
-            ><svg class="icon"><use href="icons/sprite.svg#nav-summary"></use></svg></span
+            ><svg class="icon"><use href="src/icons/sprite.svg#nav-summary"></use></svg></span
           >Summary
         </button>
       </nav>
@@ -374,12 +374,12 @@
     <div id="toast"></div>
     <!-- Local-only, gitignored: sets window.HF_DEV_URL to prefill the setup
          screen during development. Safe to 404 if it doesn't exist. -->
-    <script src="js/dev-config.js"></script>
-    <script src="js/format.js"></script>
-    <script src="js/store.js"></script>
-    <script src="js/templates.js"></script>
-    <script src="js/render.js"></script>
-    <script src="js/modals.js"></script>
-    <script src="js/app.js"></script>
+    <script src="src/js/dev-config.js"></script>
+    <script src="src/js/format.js"></script>
+    <script src="src/js/store.js"></script>
+    <script src="src/js/templates.js"></script>
+    <script src="src/js/render.js"></script>
+    <script src="src/js/modals.js"></script>
+    <script src="src/js/app.js"></script>
   </body>
 </html>

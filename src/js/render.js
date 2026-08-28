@@ -23,7 +23,7 @@ function renderAll() {
 function chipRow(container, items, selectedId, onPick, after) {
   after = after || renderEntryForm;
   const el = document.getElementById(container);
-  el.innerHTML = '';
+  el.replaceChildren();
   for (const it of items) {
     const b = document.createElement('button');
     b.className = 'chip' + (it.id === selectedId ? ' on' : '');
@@ -34,7 +34,7 @@ function chipRow(container, items, selectedId, onPick, after) {
     };
     el.appendChild(b);
   }
-  if (!items.length) el.innerHTML = '<div class="empty">None yet</div>';
+  if (!items.length) renderEmpty(el, 'None yet');
 }
 
 function renderEntryForm() {
@@ -146,41 +146,37 @@ const txCategoryTag = (t) => (t.type === 'transfer' ? 'Transfer' : t.category ||
 
 function txRowEl(t) {
   const pending = isPending(t);
-  const row = document.createElement('div');
-  row.className = 'tx-row' + (pending ? ' pending' : '');
-  const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
-  const untitled = t.type !== 'transfer' && !t.description;
-  row.innerHTML =
-    '<div class="tx-dot ' +
-    t.type +
-    '"></div>' +
-    '<div class="tx-main"><div class="tx-title' +
-    (untitled ? ' untitled' : '') +
-    '"></div><div class="tx-sub"><div class="tx-tags">' +
-    (pending ? '<span class="due-badge"></span>' : '') +
-    '<span class="category-tag ' +
-    t.type +
-    '"></span>' +
-    '</div><span class="tx-sub-text"></span></div></div>' +
-    '<div class="tx-amount ' +
-    t.type +
-    '">' +
-    sign +
-    fmtAligned(Number(t.amount)) +
-    '</div>';
-  row.querySelector('.tx-title').textContent = txTitle(t);
-  row.querySelector('.category-tag').textContent = txCategoryTag(t);
+  const row = component('tx-row');
+  row.classList.toggle('pending', pending);
+  row.querySelector('.tx-dot').classList.add(t.type);
+
+  const title = row.querySelector('.tx-title');
+  title.textContent = txTitle(t);
+  title.classList.toggle('untitled', t.type !== 'transfer' && !t.description);
+
+  const badge = row.querySelector('.due-badge');
+  if (pending) badge.textContent = 'due ' + dueLabel(t.date);
+  else badge.remove();
+
+  const tag = row.querySelector('.category-tag');
+  tag.classList.add(t.type);
+  tag.textContent = txCategoryTag(t);
   row.querySelector('.tx-sub-text').textContent = txSub(t, pending);
-  if (pending) row.querySelector('.due-badge').textContent = 'due ' + dueLabel(t.date);
+
+  const sign = t.type === 'income' ? '+' : t.type === 'expense' ? '−' : '';
+  const amount = row.querySelector('.tx-amount');
+  amount.classList.add(t.type);
+  amount.textContent = sign + fmtAligned(Number(t.amount));
+
   row.style.cursor = 'pointer';
   row.onclick = () => openTransactionModal(t);
   return row;
 }
 function renderTxList(elId, txs, emptyText) {
   const el = document.getElementById(elId);
-  el.innerHTML = '';
+  el.replaceChildren();
   if (!txs.length) {
-    el.innerHTML = '<div class="empty">' + (emptyText || 'No transactions yet') + '</div>';
+    renderEmpty(el, emptyText || 'No transactions yet');
     return;
   }
   for (const t of txs) el.appendChild(txRowEl(t));
@@ -205,7 +201,7 @@ function renderRecent() {
 // Rebuilds a filter <select>'s options from scratch (accounts/categories can
 // change), keeping whichever value is still valid selected.
 function populateFilterSelect(selectEl, items, allLabel, currentValue) {
-  selectEl.innerHTML = '';
+  selectEl.replaceChildren();
   const allOpt = document.createElement('option');
   allOpt.value = '';
   allOpt.textContent = allLabel;
@@ -251,9 +247,9 @@ function renderAllTransactions() {
   );
 
   const el = document.getElementById('all-tx-list');
-  el.innerHTML = '';
+  el.replaceChildren();
   if (!txs.length) {
-    el.innerHTML = '<div class="empty">No transactions match this filter</div>';
+    renderEmpty(el, 'No transactions match this filter');
     return;
   }
   let currentMonth = null,
@@ -262,15 +258,9 @@ function renderAllTransactions() {
     const mk = monthKey(t.date);
     if (mk !== currentMonth) {
       currentMonth = mk;
-      const group = document.createElement('div');
-      group.className = 'transactions-group';
-      const header = document.createElement('div');
-      header.className = 'list-sub';
-      header.textContent = monthLabel(mk);
-      group.appendChild(header);
-      groupBody = document.createElement('div');
-      groupBody.className = 'transactions-list';
-      group.appendChild(groupBody);
+      const group = component('tx-month-group');
+      group.querySelector('.list-sub').textContent = monthLabel(mk);
+      groupBody = group.querySelector('.transactions-list');
       el.appendChild(group);
     }
     groupBody.appendChild(txRowEl(t));
@@ -293,31 +283,28 @@ function renderAccounts() {
   }
 
   const el = document.getElementById('accounts-list');
-  el.innerHTML = '';
-  if (!data.accounts.length)
-    el.innerHTML = '<div class="empty">Add your first account to get started</div>';
+  el.replaceChildren();
+  if (!data.accounts.length) renderEmpty(el, 'Add your first account to get started');
   for (const a of data.accounts) {
     const bal = accountBalance(a.id);
     const pend = pendingTxFor(a.id).length;
-    const balHtml =
-      '<div class="acct-bal' + (bal < 0 ? ' neg' : '') + '">' + fmtAligned(bal) + '</div>';
-    const row = document.createElement('div');
-    row.className = 'acct-row';
+    const row = component('account-row');
     row.style.cursor = 'pointer';
-    // Accounts with nothing pending keep the plain single-line right column.
-    row.innerHTML =
-      '<div class="acct-info"><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      (pend
-        ? '<div class="acct-right">' + balHtml + '<div class="projected"></div></div>'
-        : balHtml);
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
+
+    const balEl = row.querySelector('.acct-bal');
+    balEl.classList.toggle('neg', bal < 0);
+    balEl.textContent = fmtAligned(bal);
+
+    // Accounts with nothing pending keep the plain single-line right column.
+    const p = row.querySelector('.projected');
     if (pend) {
       const projected = accountProjected(a.id);
-      const p = row.querySelector('.projected');
-      p.className = 'projected' + (projected < 0 ? ' neg' : '');
+      p.classList.toggle('neg', projected < 0);
       p.textContent = projectedNote(projected, pend);
-    }
+    } else p.remove();
+
     row.onclick = () => openAllTx({ account: a.id });
     el.appendChild(row);
   }
@@ -332,18 +319,14 @@ function ownerName(o) {
 // happen from here instead of the main Accounts view now.
 function renderConfigAccounts() {
   const el = document.getElementById('config-accounts-list');
-  el.innerHTML = '';
+  el.replaceChildren();
   if (!data.accounts.length) {
-    el.innerHTML = '<div class="empty">Add your first account to get started</div>';
+    renderEmpty(el, 'Add your first account to get started');
     return;
   }
   for (const a of data.accounts) {
-    const row = document.createElement('div');
-    row.className = 'acct-row';
+    const row = component('config-row');
     row.style.cursor = 'pointer';
-    row.innerHTML =
-      '<div class="acct-info"><div class="acct-name"></div><div class="acct-meta"></div></div>' +
-      '<div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
     row.onclick = () => openAccountModal(a);
@@ -357,12 +340,11 @@ function renderBudgets() {
   const recordedBy = sumBy(monthTxRecorded(key), 'expense').by;
   const upcomingBy = sumBy(monthTxUpcoming(key), 'expense').by;
   const el = document.getElementById('budgets-list');
-  el.innerHTML = '';
+  el.replaceChildren();
   const budgeted = data.categories.filter(
     (c) => c.type === 'expense' && Number(c.monthly_budget) > 0,
   );
-  if (!budgeted.length)
-    el.innerHTML = '<div class="empty">Set a monthly budget from Settings › Categories</div>';
+  if (!budgeted.length) renderEmpty(el, 'Set a monthly budget from Settings › Categories');
   for (const c of budgeted) {
     const recorded = recordedBy[c.name] || 0;
     const upcoming = upcomingBy[c.name] || 0;
@@ -372,43 +354,30 @@ function renderBudgets() {
     // over/close warning looks ahead to the forecast (recorded + upcoming),
     // since that's the number that actually tells you if you're in trouble.
     const recordedOver = recorded > budget;
-    const recordedCls = recordedOver ? ' over' : recorded / budget >= 0.85 ? ' close' : '';
+    const recordedCls = recordedOver ? 'over' : recorded / budget >= 0.85 ? 'close' : '';
     const forecastOver = forecast > budget;
     const pctRecorded = Math.min(100, (recorded / budget) * 100);
     const pctUpcoming = Math.max(0, Math.min(100 - pctRecorded, (upcoming / budget) * 100));
 
-    const row = document.createElement('div');
-    row.className = 'budget-row';
-    row.innerHTML =
-      '<div class="budget-top-wrapper">' +
-      '<div class="budget-top"><span class="name"></span><span class="recorded"></span><div class="upcoming-note" style="display:none"></div></div>' +
-      '</div>' +
-      '<div class="bar">' +
-      '<div class="bar-fill' +
-      recordedCls +
-      '" style="width:' +
-      pctRecorded +
-      '%"></div>' +
-      '<div class="bar-fill-upcoming' +
-      (forecastOver ? ' over' : '') +
-      '" style="width:' +
-      pctUpcoming +
-      '%"></div>' +
-      '</div>' +
-      '<div class="budget-bottom">' +
-      '<span class="budget-remaining ' +
-      (forecastOver ? 'over' : 'left') +
-      '"></span>' +
-      '<span class="budget-total"></span>' +
-      '</div>';
+    const row = component('budget-row');
     row.querySelector('.budget-top .name').textContent = c.name;
     row.querySelector('.budget-top .recorded').textContent = fmt(recorded);
-    if (upcoming > 0) {
-      const note = row.querySelector('.upcoming-note');
-      note.style.display = '';
-      note.textContent = '+' + fmtDecimals(upcoming) + ' upcoming';
-    }
-    row.querySelector('.budget-remaining').textContent = forecastOver
+
+    const note = row.querySelector('.upcoming-note');
+    if (upcoming > 0) note.textContent = '+' + fmtDecimals(upcoming) + ' upcoming';
+    else note.remove();
+
+    const fill = row.querySelector('.bar-fill');
+    if (recordedCls) fill.classList.add(recordedCls);
+    fill.style.width = pctRecorded + '%';
+
+    const fillUpcoming = row.querySelector('.bar-fill-upcoming');
+    fillUpcoming.classList.toggle('over', forecastOver);
+    fillUpcoming.style.width = pctUpcoming + '%';
+
+    const remaining = row.querySelector('.budget-remaining');
+    remaining.classList.add(forecastOver ? 'over' : 'left');
+    remaining.textContent = forecastOver
       ? fmt(forecast - budget) + ' over budget'
       : fmt(budget - forecast) + ' left';
     row.querySelector('.budget-total').textContent = 'of ' + fmt(budget);
@@ -422,15 +391,12 @@ function renderBudgets() {
 // happen from here instead of the Budgets view now.
 function renderConfigCategories() {
   const cl = document.getElementById('categories-list');
-  cl.innerHTML = '';
+  cl.replaceChildren();
   for (const c of [...data.categories].sort((x, y) =>
     (x.type + x.name).localeCompare(y.type + y.name),
   )) {
-    const row = document.createElement('div');
-    row.className = 'acct-row';
+    const row = component('config-row');
     row.style.cursor = 'pointer';
-    row.innerHTML =
-      '<div><div class="acct-name"></div><div class="acct-meta"></div></div><div class="acct-chevron"><svg class="icon"><use href="icons/sprite.svg#chevron-right"></use></svg></div>';
     row.querySelector('.acct-name').textContent = c.name;
     row.querySelector('.acct-meta').textContent =
       c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
@@ -483,19 +449,15 @@ function renderSummary() {
 
   // per-account net change
   const ael = document.getElementById('sum-accounts');
-  ael.innerHTML = '';
-  if (!data.accounts.length) ael.innerHTML = '<div class="empty">No accounts</div>';
+  ael.replaceChildren();
+  if (!data.accounts.length) renderEmpty(ael, 'No accounts');
   for (const a of data.accounts) {
     const c = accountNetChange(a.id, key);
-    const row = document.createElement('div');
-    row.className = 'cat-row';
-    row.innerHTML =
-      '<span class="name"></span><span class="amt ' +
-      (c < 0 ? 'trend-down' : c > 0 ? 'trend-up' : '') +
-      '">' +
-      fmtSignedDecimals(c) +
-      '</span>';
+    const row = component('account-change-row');
     row.querySelector('.name').textContent = a.name;
+    const amt = row.querySelector('.amt');
+    if (c !== 0) amt.classList.add(c < 0 ? 'trend-down' : 'trend-up');
+    amt.textContent = fmtSignedDecimals(c);
     ael.appendChild(row);
   }
 
@@ -505,30 +467,24 @@ function renderSummary() {
 
 function renderCatBreakdown(elId, curBy, oldBy, invert) {
   const el = document.getElementById(elId);
-  el.innerHTML = '';
+  el.replaceChildren();
   const names = [...new Set([...Object.keys(curBy), ...Object.keys(oldBy)])].sort(
     (a, b) => (curBy[b] || 0) - (curBy[a] || 0),
   );
   if (!names.length) {
-    el.innerHTML = '<div class="empty">Nothing this month</div>';
+    renderEmpty(el, 'Nothing this month');
     return;
   }
   for (const n of names) {
     const c = curBy[n] || 0,
       p = oldBy[n] || 0,
       d = c - p;
-    const cls = d === 0 ? 'trend-flat' : (invert ? d < 0 : d > 0) ? 'trend-up' : 'trend-down';
-    const row = document.createElement('div');
-    row.className = 'cat-row';
-    row.innerHTML =
-      '<span class="name"></span><span class="tr ' +
-      cls +
-      '">' +
-      (d === 0 ? '=' : fmtSignedDecimals(d)) +
-      '</span><span class="amt">' +
-      fmtDecimals(c) +
-      '</span>';
+    const row = component('cat-breakdown-row');
     row.querySelector('.name').textContent = n;
+    const tr = row.querySelector('.tr');
+    tr.classList.add(d === 0 ? 'trend-flat' : (invert ? d < 0 : d > 0) ? 'trend-up' : 'trend-down');
+    tr.textContent = d === 0 ? '=' : fmtSignedDecimals(d);
+    row.querySelector('.amt').textContent = fmtDecimals(c);
     el.appendChild(row);
   }
 }

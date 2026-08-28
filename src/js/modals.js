@@ -24,7 +24,7 @@ function openModal(title, bodyHtml) {
   }
   modalContent.innerHTML =
     '<div class="modal-head"><h3></h3><button class="icon-btn btn-ghost" aria-label="Close">' +
-    '<svg class="icon"><use href="icons/sprite.svg#close"></use></svg>' +
+    '<svg class="icon"><use href="src/icons/sprite.svg#close"></use></svg>' +
     '</button></div><div class="modal-body"></div>';
   modalContent.querySelector('.modal-head h3').textContent = title;
   modalContent.querySelector('.modal-body').innerHTML = bodyHtml;

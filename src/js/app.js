@@ -127,7 +127,7 @@ document.getElementById('btn-settings').onclick = openSettingsModal;
 function applyThemeIcon(theme) {
   document
     .querySelector('#btn-theme use')
-    .setAttribute('href', 'icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
+    .setAttribute('href', 'src/icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
 }
 function setTheme(theme) {
   document.documentElement.setAttribute('data-theme', theme);
@@ -288,10 +288,10 @@ window.addEventListener('online', flushQueue);
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden) backgroundRefresh();
 });
-loadModalTemplates()
+loadTemplates()
   .catch((err) => {
     console.error(err);
-    toast('Could not load dialog templates — reload the page');
+    toast('Could not load templates — reload the page');
   })
   .then(boot);
 
