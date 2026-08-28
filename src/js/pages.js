@@ -99,11 +99,16 @@ function openCategoryPage(cat) {
     };
 }
 
+// #tx-form is a <form> so pressing Enter/Go in any of its fields submits
+// it — but Save/Delete already handle that via their own click handlers, so
+// suppress the browser's default submit (which would reload the page).
+document.getElementById('tx-form').onsubmit = (e) => e.preventDefault();
+
 let editSel = { type: null, category: null, from: null, to: null };
 
 function renderTxPageBody() {
   const type = editSel.type;
-  document.getElementById('tx-card').className = 'tint-' + type;
+  document.getElementById('tx-form').className = 'tint-' + type;
 
   const cats = data.categories.filter((c) => c.type === (type === 'income' ? 'income' : 'expense'));
   document.getElementById('tx-wrap-category').style.display = type === 'transfer' ? 'none' : '';

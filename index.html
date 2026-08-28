@@ -101,7 +101,7 @@
         <!-- HOME -->
         <section class="view active" id="view-home">
           <div class="add-tx-card" id="add-tx-card">
-            <h2>Add transaction</h2>
+            <h3>Add transaction</h3>
             <div class="add-tx-actions" id="add-tx-actions">
               <button data-type="expense">
                 <svg class="icon"><use href="src/icons/sprite.svg#minus"></use></svg>
@@ -273,6 +273,7 @@
             <div class="form-actions">
               <button class="btn-tertiary" id="g-share-link">Share connection link</button>
               <button class="btn-primary" id="g-save">Save changes</button>
+              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
             </div>
           </div>
         </section>
@@ -401,6 +402,7 @@
           </div>
           <div class="form-actions">
             <button class="btn-primary" id="account-save"></button>
+            <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
             <button class="btn-danger" id="account-del" hidden>Delete account</button>
           </div>
         </section>
@@ -439,6 +441,7 @@
           </div>
           <div class="form-actions">
             <button class="btn-primary" id="category-save"></button>
+            <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
             <button class="btn-danger" id="category-del" hidden>Delete category</button>
           </div>
         </section>
@@ -451,7 +454,7 @@
             </button>
             <h1 id="tx-edit-title"></h1>
           </div>
-          <form id="tx-card">
+          <form id="tx-form">
             <div class="form-group">
               <div class="amount-wrap">
                 <input
@@ -485,6 +488,7 @@
             </div>
             <div class="form-actions">
               <button class="btn-primary" id="tx-save">Save changes</button>
+              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
               <button class="btn-danger" id="tx-del" hidden>Delete transaction</button>
             </div>
           </form>

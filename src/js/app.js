@@ -110,7 +110,9 @@ document.getElementById('all-filter-category').onchange = (e) => {
   renderAllTransactions();
 };
 document.getElementById('btn-view-all').onclick = () => openAllTx({});
-document.querySelectorAll('.subpage-back').forEach((b) => (b.onclick = () => history.back()));
+document
+  .querySelectorAll('.subpage-back, .subpage-cancel')
+  .forEach((b) => (b.onclick = () => history.back()));
 document.getElementById('btn-settings').onclick = () => openSubpage('view-settings');
 document.getElementById('settings-general').onclick = openGeneralSubpage;
 document.getElementById('settings-accounts').onclick = openConfigAccounts;
