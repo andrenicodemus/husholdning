@@ -5,31 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Husholdning</title>
     <meta name="description" content="Joint household finance tracker" />
-    <meta name="theme-color" content="#204B3C" />
+    <meta name="theme-color" id="meta-theme-color" content="#ffffff" />
     <link rel="manifest" href="manifest.json" />
     <link rel="apple-touch-icon" href="icon-192.png" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Husholdning" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
     <link rel="stylesheet" href="src/style.css" />
     <script>
       // Set the theme before first paint so there's no flash of the wrong theme.
       (function () {
+        // Mirrors --bg in style.css (light/dark) — the surface the fixed
+        // header sits on, i.e. what the status bar visually continues from.
+        var COLORS = { light: '#ffffff', dark: '#111111' };
         try {
           var t =
             localStorage.getItem('hf_theme') ||
             (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
           document.documentElement.setAttribute('data-theme', t);
+          document.getElementById('meta-theme-color').setAttribute('content', COLORS[t]);
         } catch (e) {}
       })();
     </script>

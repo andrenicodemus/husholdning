@@ -148,20 +148,39 @@ function applyThemeIcon(theme) {
     .querySelector('#btn-theme use')
     .setAttribute('href', 'src/icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
 }
-function setTheme(theme) {
+// Mirrors --bg in style.css (light/dark) — kept in sync with the identical
+// COLORS map in index.html's inline pre-paint script (that one can't reach
+// this file yet, so the values are duplicated rather than shared).
+const THEME_COLORS = { light: '#ffffff', dark: '#111111' };
+// persist=true for an explicit user choice (the toggle button), false for the
+// OS-preference listener below — only an explicit choice should stick as an
+// override that the OS listener must then respect and stay out of.
+function applyTheme(theme, persist) {
   document.documentElement.setAttribute('data-theme', theme);
-  try {
-    localStorage.setItem('hf_theme', theme);
-  } catch (e) {}
-  document
-    .querySelector('meta[name="theme-color"]')
-    .setAttribute('content', theme === 'dark' ? '#0f130f' : '#204b3c');
+  if (persist) {
+    try {
+      localStorage.setItem('hf_theme', theme);
+    } catch (e) {}
+  }
+  document.getElementById('meta-theme-color').setAttribute('content', THEME_COLORS[theme]);
   applyThemeIcon(theme);
 }
 applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
 document.getElementById('btn-theme').onclick = () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
 };
+// No stored override → keep following the OS live, same as the pre-paint
+// script does on cold launch.
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  let stored;
+  try {
+    stored = localStorage.getItem('hf_theme');
+  } catch (err) {
+    stored = null;
+  }
+  if (stored) return;
+  applyTheme(e.matches ? 'dark' : 'light', false);
+});
 document.getElementById('btn-add-account').onclick = () => openAccountPage(null);
 document.getElementById('btn-add-category').onclick = () => openCategoryPage(null);
 document.getElementById('g-share-link').onclick = async () => {
