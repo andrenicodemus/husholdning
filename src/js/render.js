@@ -1,7 +1,28 @@
 // ---------- rendering
 let summaryMonth = monthKey(todayISO());
 let budgetsMonth = monthKey(todayISO());
-let allFilter = { account: '', category: '' };
+let allFilter = { account: '', category: '', search: '', from: '', to: '' };
+
+// A transaction's foldable search text (description, category, account
+// names), computed once per object and cached by identity. Every mutation
+// path (submit()'s optimistic update, or a fresh getAll() replacing `data`
+// wholesale) produces a new object for anything that changed, so a WeakMap
+// keyed on the transaction itself invalidates for free — no manual bust.
+const txHaystack = new WeakMap();
+function haystackFor(t) {
+  let h = txHaystack.get(t);
+  if (h === undefined) {
+    const parts = [
+      t.description,
+      t.category,
+      t.from_account && accName(t.from_account),
+      t.to_account && accName(t.to_account),
+    ];
+    h = foldDanish(parts.filter(Boolean).join(' '));
+    txHaystack.set(t, h);
+  }
+  return h;
+}
 
 function renderAll() {
   renderRecent();
@@ -193,14 +214,57 @@ function renderAllTransactions() {
     const catName = (data.categories.find((c) => c.id === allFilter.category) || {}).name;
     txs = txs.filter((t) => t.category === catName);
   }
+  // Inclusive both ends, plain string compare — same convention already
+  // used for pending/upcoming status, so a reversed range (from > to) just
+  // yields zero matches rather than needing special-case handling.
+  if (allFilter.from) txs = txs.filter((t) => t.date >= allFilter.from);
+  if (allFilter.to) txs = txs.filter((t) => t.date <= allFilter.to);
+  if (allFilter.search) {
+    const q = foldDanish(allFilter.search);
+    txs = txs.filter((t) => haystackFor(t).includes(q));
+  }
   txs = [...txs].sort((a, b) =>
     (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')),
   );
 
+  const anyFilterActive = !!(
+    allFilter.account ||
+    allFilter.category ||
+    allFilter.search ||
+    allFilter.from ||
+    allFilter.to
+  );
+  document
+    .getElementById('all-date-toggle')
+    .classList.toggle('on', !!(allFilter.from || allFilter.to));
+  const resultLine = document.getElementById('all-result-line');
+  resultLine.hidden = !anyFilterActive;
+  if (anyFilterActive) {
+    document.getElementById('all-result-count').textContent =
+      txs.length + (txs.length === 1 ? ' result' : ' results');
+  }
+
   const el = document.getElementById('all-tx-list');
   el.replaceChildren();
   if (!txs.length) {
-    renderEmpty(el, 'No transactions match this filter');
+    const empty = component('empty');
+    if (anyFilterActive) {
+      empty.replaceChildren();
+      const title = document.createElement('div');
+      title.className = 'empty-title';
+      title.textContent = 'No transactions match';
+      const sub = document.createElement('div');
+      sub.textContent = 'Try a different search, or clear the filters.';
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'link-btn';
+      clearBtn.textContent = 'Clear filters';
+      clearBtn.onclick = clearAllFilters;
+      empty.append(title, sub, clearBtn);
+    } else {
+      empty.textContent = 'No transactions yet';
+    }
+    el.appendChild(empty);
     return;
   }
   let currentMonth = null,

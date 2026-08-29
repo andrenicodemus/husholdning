@@ -242,6 +242,20 @@
             </button>
             <h1 tabindex="-1">Transactions</h1>
           </div>
+          <div class="list-search">
+            <label class="field-label sr-only" for="all-search">Search transactions</label>
+            <input
+              class="text-input"
+              id="all-search"
+              type="search"
+              inputmode="search"
+              enterkeyhint="search"
+              placeholder="Search transactions"
+              autocapitalize="off"
+              autocorrect="off"
+              autocomplete="off"
+            />
+          </div>
           <div class="list-filter">
             <div class="row2">
               <div>
@@ -257,6 +271,34 @@
                 <select class="select-input" id="all-filter-category"></select>
               </div>
             </div>
+          </div>
+          <div class="list-daterange">
+            <button
+              type="button"
+              class="list-daterange-toggle"
+              id="all-date-toggle"
+              aria-expanded="false"
+              aria-controls="all-date-fields"
+            >
+              Date range
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-down"></use>
+              </svg>
+            </button>
+            <div class="row2 list-daterange-fields" id="all-date-fields" hidden>
+              <div>
+                <label class="field-label" for="all-from">From</label>
+                <input class="text-input" type="date" id="all-from" />
+              </div>
+              <div>
+                <label class="field-label" for="all-to">To</label>
+                <input class="text-input" type="date" id="all-to" />
+              </div>
+            </div>
+          </div>
+          <div class="list-result-line" id="all-result-line" aria-live="polite" hidden>
+            <span id="all-result-count"></span>
+            <button type="button" class="link-btn" id="all-clear-filters">Clear filters</button>
           </div>
           <div class="view-section">
             <div id="all-tx-list"></div>

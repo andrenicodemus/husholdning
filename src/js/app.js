@@ -58,10 +58,39 @@ function closeSubpage() {
 
 window.addEventListener('popstate', closeSubpage);
 
+function setDateRangeExpanded(expanded) {
+  document.getElementById('all-date-toggle').setAttribute('aria-expanded', String(expanded));
+  document.getElementById('all-date-fields').hidden = !expanded;
+}
+
+// Every entry into #view-all resets search and the date range — a stale
+// query silently hiding results is worse than retyping a few characters —
+// then applies whatever account/category the entry point pre-selects.
 function openAllTx(filter, trigger) {
-  allFilter = { account: filter.account || '', category: filter.category || '' };
+  allFilter = {
+    account: filter.account || '',
+    category: filter.category || '',
+    search: '',
+    from: '',
+    to: '',
+  };
+  document.getElementById('all-search').value = '';
+  document.getElementById('all-from').value = '';
+  document.getElementById('all-to').value = '';
+  setDateRangeExpanded(false);
   renderAllTransactions();
   openSubpage('view-all', trigger);
+}
+
+// Resets all four filters without navigating anywhere — used by both the
+// result line's "Clear filters" link and the empty state's own button.
+function clearAllFilters() {
+  allFilter = { account: '', category: '', search: '', from: '', to: '' };
+  document.getElementById('all-search').value = '';
+  document.getElementById('all-from').value = '';
+  document.getElementById('all-to').value = '';
+  setDateRangeExpanded(false);
+  renderAllTransactions();
 }
 
 function openGeneralSubpage(trigger) {
@@ -135,6 +164,27 @@ document.getElementById('all-filter-category').onchange = (e) => {
   allFilter.category = e.target.value;
   renderAllTransactions();
 };
+let searchDebounceTimer;
+document.getElementById('all-search').oninput = (e) => {
+  const value = e.target.value;
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    allFilter.search = value;
+    renderAllTransactions();
+  }, 150);
+};
+document.getElementById('all-from').onchange = (e) => {
+  allFilter.from = e.target.value;
+  renderAllTransactions();
+};
+document.getElementById('all-to').onchange = (e) => {
+  allFilter.to = e.target.value;
+  renderAllTransactions();
+};
+document.getElementById('all-date-toggle').onclick = (e) => {
+  setDateRangeExpanded(e.currentTarget.getAttribute('aria-expanded') !== 'true');
+};
+document.getElementById('all-clear-filters').onclick = clearAllFilters;
 document.getElementById('btn-view-all').onclick = (e) => openAllTx({}, e.currentTarget);
 document
   .querySelectorAll('.subpage-back, .subpage-cancel')

@@ -261,7 +261,46 @@ body:has(#app.subpage) {
   font-size: 24px;
   padding-right: 2px;
 }
-.list-filter {
+.list-search,
+.list-filter,
+.list-daterange {
+  margin-bottom: 8px;
+}
+.list-daterange-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background-color: var(--input-bg);
+  color: var(--ink);
+  font-weight: 500;
+}
+.list-daterange-toggle.on {
+  background: var(--brand-soft);
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.list-daterange-toggle .icon {
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+.list-daterange-toggle[aria-expanded='true'] .icon {
+  transform: rotate(180deg);
+}
+.list-daterange-fields {
+  margin-top: 8px;
+}
+.list-result-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
   margin-bottom: 8px;
 }
 
@@ -1131,6 +1170,15 @@ nav button.on {
   font-size: 14px;
   text-align: center;
   padding: 14px 0;
+}
+.empty-title {
+  color: var(--ink);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.empty .link-btn {
+  display: inline-block;
+  margin-top: 10px;
 }
 .settle-note {
   font-size: 12.5px;

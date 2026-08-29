@@ -246,3 +246,17 @@ function accountNetChange(id, key) {
   return monthTxRecorded(key).reduce((net, t) => net + txEffect(t, id), 0);
 }
 const accName = (id) => (data.accounts.find((a) => a.id === id) || {}).name || '?';
+
+// Lowercases and strips diacritics so transaction search is Danish-safe:
+// "soren" matches "Søren", "aben" matches "Åben", "rodgrod" matches
+// "Rødgrød". æ/ø have no NFD decomposition so they're mapped explicitly;
+// everything else (é, ü, …) goes through NFD + stripping the combining marks.
+function foldDanish(str) {
+  return String(str)
+    .toLowerCase()
+    .replace(/å/g, 'a')
+    .replace(/æ/g, 'ae')
+    .replace(/ø/g, 'o')
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '');
+}
