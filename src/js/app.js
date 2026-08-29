@@ -17,60 +17,85 @@ function toast(msg) {
 // swipe-back gesture, or a hardware back button — always unwinds exactly one
 // level via popstate, landing on whatever was actually showing before it,
 // never a hardcoded view.
-let subpageStack = [];
+let subpageStack = []; // { view, trigger } — trigger is the element that opened this subpage
 
-function openSubpage(viewId) {
-  subpageStack.push(document.querySelector('section.view.active').id);
+// A view's one "title" heading — h1 on subpages, h2.view-title or the
+// .card-head h2 on tab views (see index.html) — always comes first among
+// these in document order, so a single selector finds the right one.
+function focusViewHeading(viewEl) {
+  const heading = viewEl.querySelector('h1, h2.view-title, .card-head h2');
+  if (heading) heading.focus({ preventScroll: true });
+}
+
+function openSubpage(viewId, trigger) {
+  subpageStack.push({
+    view: document.querySelector('section.view.active').id,
+    trigger: trigger || null,
+  });
   document.querySelectorAll('section.view').forEach((v) => v.classList.remove('active'));
-  document.getElementById(viewId).classList.add('active');
+  const view = document.getElementById(viewId);
+  view.classList.add('active');
   document.getElementById('app').classList.add('subpage');
   window.scrollTo(0, 0);
   history.pushState({ page: 'subpage', view: viewId }, '');
+  focusViewHeading(view);
 }
 
 function closeSubpage() {
   if (!subpageStack.length) return;
   document.querySelector('section.view.active').classList.remove('active');
-  document.getElementById(subpageStack.pop()).classList.add('active');
+  const { view: viewId, trigger } = subpageStack.pop();
+  const view = document.getElementById(viewId);
+  view.classList.add('active');
   document.getElementById('app').classList.toggle('subpage', subpageStack.length > 0);
   window.scrollTo(0, 0);
+  // Focus goes back to whatever row/button opened this subpage — falling
+  // back to the parent view's heading if it's gone (e.g. the account backing
+  // that row was just deleted).
+  if (trigger && document.contains(trigger)) trigger.focus({ preventScroll: true });
+  else focusViewHeading(view);
 }
 
 window.addEventListener('popstate', closeSubpage);
 
-function openAllTx(filter) {
+function openAllTx(filter, trigger) {
   allFilter = { account: filter.account || '', category: filter.category || '' };
   renderAllTransactions();
-  openSubpage('view-all');
+  openSubpage('view-all', trigger);
 }
 
-function openGeneralSubpage() {
+function openGeneralSubpage(trigger) {
   const s = data.settings;
   document.getElementById('g-na').value = s.name_a || 'A';
   document.getElementById('g-nb').value = s.name_b || 'B';
   document.getElementById('g-cur').value = s.currency || 'DKK';
   document.getElementById('g-pin').value = s.pin || '';
-  openSubpage('view-general');
+  openSubpage('view-general', trigger);
 }
 
-function openConfigAccounts() {
+function openConfigAccounts(trigger) {
   renderConfigAccounts();
-  openSubpage('view-config-accounts');
+  openSubpage('view-config-accounts', trigger);
 }
 
-function openConfigCategories() {
+function openConfigCategories(trigger) {
   renderConfigCategories();
-  openSubpage('view-config-categories');
+  openSubpage('view-config-categories', trigger);
 }
 
 // ---------- events
 document.querySelectorAll('nav button').forEach(
   (b) =>
     (b.onclick = () => {
-      document.querySelectorAll('nav button').forEach((x) => x.classList.toggle('on', x === b));
+      document.querySelectorAll('nav button').forEach((x) => {
+        x.classList.toggle('on', x === b);
+        if (x === b) x.setAttribute('aria-current', 'page');
+        else x.removeAttribute('aria-current');
+      });
+      const view = document.getElementById('view-' + b.dataset.view);
       document
         .querySelectorAll('section.view')
-        .forEach((v) => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+        .forEach((v) => v.classList.toggle('active', v === view));
       if (b.dataset.view === 'summary') {
         summaryMonth = monthKey(todayISO());
         renderSummary();
@@ -80,11 +105,12 @@ document.querySelectorAll('nav button').forEach(
         renderBudgets();
       }
       window.scrollTo(0, 0);
+      focusViewHeading(view);
     }),
 );
 document
   .querySelectorAll('#add-tx-actions button')
-  .forEach((b) => (b.onclick = () => openTransactionPage(null, b.dataset.type)));
+  .forEach((b) => (b.onclick = () => openTransactionPage(null, b.dataset.type, b)));
 document.getElementById('month-prev').onclick = () => {
   summaryMonth = shiftMonth(summaryMonth, -1);
   renderSummary();
@@ -109,14 +135,16 @@ document.getElementById('all-filter-category').onchange = (e) => {
   allFilter.category = e.target.value;
   renderAllTransactions();
 };
-document.getElementById('btn-view-all').onclick = () => openAllTx({});
+document.getElementById('btn-view-all').onclick = (e) => openAllTx({}, e.currentTarget);
 document
   .querySelectorAll('.subpage-back, .subpage-cancel')
   .forEach((b) => (b.onclick = () => history.back()));
-document.getElementById('btn-settings').onclick = () => openSubpage('view-settings');
-document.getElementById('settings-general').onclick = openGeneralSubpage;
-document.getElementById('settings-accounts').onclick = openConfigAccounts;
-document.getElementById('settings-categories').onclick = openConfigCategories;
+document.getElementById('btn-settings').onclick = (e) =>
+  openSubpage('view-settings', e.currentTarget);
+document.getElementById('settings-general').onclick = (e) => openGeneralSubpage(e.currentTarget);
+document.getElementById('settings-accounts').onclick = (e) => openConfigAccounts(e.currentTarget);
+document.getElementById('settings-categories').onclick = (e) =>
+  openConfigCategories(e.currentTarget);
 document.getElementById('settings-resync').onclick = async () => {
   toast('Syncing…');
   await backgroundRefresh();
@@ -167,7 +195,10 @@ function applyTheme(theme, persist) {
 }
 applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
 document.getElementById('btn-theme').onclick = () => {
-  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+  applyTheme(
+    document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark',
+    true,
+  );
 };
 // No stored override → keep following the OS live, same as the pre-paint
 // script does on cold launch.
@@ -181,8 +212,9 @@ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
   if (stored) return;
   applyTheme(e.matches ? 'dark' : 'light', false);
 });
-document.getElementById('btn-add-account').onclick = () => openAccountPage(null);
-document.getElementById('btn-add-category').onclick = () => openCategoryPage(null);
+document.getElementById('btn-add-account').onclick = (e) => openAccountPage(null, e.currentTarget);
+document.getElementById('btn-add-category').onclick = (e) =>
+  openCategoryPage(null, e.currentTarget);
 document.getElementById('g-share-link').onclick = async () => {
   const link =
     location.origin +

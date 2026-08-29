@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Inter';
+  src: url('fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('fonts/SpaceGrotesk[wght].woff2') format('woff2');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --mono: 'Space Grotesk', ui-monospace, 'SF Mono', monospace;
@@ -101,6 +117,46 @@ select {
   font-family: inherit;
   font-size: inherit;
   color: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Keyboard focus is visible everywhere; a plain (non-keyboard) focus never
+   paints a ring — this matters for headings that get focus({preventScroll})
+   moved to them programmatically on view change (see focusViewHeading in
+   app.js) and for list rows/menu items that are now real buttons. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+[tabindex='-1']:focus {
+  outline: none;
+}
+
+/* Former clickable <div>s (list rows, menu items) are now real <button>s —
+   these undo the browser's default centered, shrink-to-fit button box so
+   they still look like the block-level rows they replaced. */
+.tx-row,
+.acct-row,
+.budget-row,
+.menu-item {
+  width: 100%;
+  text-align: left;
 }
 
 .icon-btn {
@@ -363,6 +419,7 @@ section.view .view-title {
 }
 
 .field-label {
+  display: block;
   font-size: 14px;
   font-weight: 500;
   color: var(--muted);

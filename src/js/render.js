@@ -19,7 +19,10 @@ function chipRow(container, items, selectedId, onPick, after) {
   el.replaceChildren();
   for (const it of items) {
     const b = document.createElement('button');
-    b.className = 'chip' + (it.id === selectedId ? ' on' : '');
+    b.type = 'button';
+    const on = it.id === selectedId;
+    b.className = 'chip' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', String(on));
     b.textContent = it.label;
     b.onclick = () => {
       onPick(it.id);
@@ -116,8 +119,7 @@ function txRowEl(t) {
   amount.classList.add(t.type);
   amount.textContent = sign + fmtAligned(Number(t.amount));
 
-  row.style.cursor = 'pointer';
-  row.onclick = () => openTransactionPage(t);
+  row.onclick = () => openTransactionPage(t, undefined, row);
   return row;
 }
 function renderTxList(elId, txs, emptyText) {
@@ -237,7 +239,6 @@ function renderAccounts() {
     const bal = accountBalance(a.id);
     const pend = pendingTxFor(a.id).length;
     const row = component('account-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
 
@@ -253,7 +254,7 @@ function renderAccounts() {
       p.textContent = projectedNote(projected, pend);
     } else p.remove();
 
-    row.onclick = () => openAllTx({ account: a.id });
+    row.onclick = () => openAllTx({ account: a.id }, row);
     el.appendChild(row);
   }
 }
@@ -274,10 +275,9 @@ function renderConfigAccounts() {
   }
   for (const a of data.accounts) {
     const row = component('config-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
-    row.onclick = () => openAccountPage(a);
+    row.onclick = () => openAccountPage(a, row);
     el.appendChild(row);
   }
 }
@@ -329,8 +329,7 @@ function renderBudgets() {
       ? fmt(forecast - budget) + ' over budget'
       : fmt(budget - forecast) + ' left';
     row.querySelector('.budget-total').textContent = 'of ' + fmt(budget);
-    row.style.cursor = 'pointer';
-    row.onclick = () => openAllTx({ category: c.id });
+    row.onclick = () => openAllTx({ category: c.id }, row);
     el.appendChild(row);
   }
 }
@@ -344,11 +343,10 @@ function renderConfigCategories() {
     (x.type + x.name).localeCompare(y.type + y.name),
   )) {
     const row = component('config-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = c.name;
     row.querySelector('.acct-meta').textContent =
       c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
-    row.onclick = () => openCategoryPage(c);
+    row.onclick = () => openCategoryPage(c, row);
     cl.appendChild(row);
   }
 }

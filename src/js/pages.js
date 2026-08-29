@@ -16,7 +16,7 @@ function focusSoon(el) {
   el.focus();
 }
 
-function openAccountPage(acc) {
+function openAccountPage(acc, trigger) {
   const isNew = !acc;
   acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
   document.getElementById('account-edit-title').textContent = isNew
@@ -28,7 +28,7 @@ function openAccountPage(acc) {
   document.getElementById('account-init').value = acc.initial_balance;
   document.getElementById('account-save').textContent = isNew ? 'Add account' : 'Save changes';
   document.getElementById('account-del').hidden = isNew;
-  openSubpage('view-account-edit');
+  openSubpage('view-account-edit', trigger);
   if (isNew) focusSoon(document.getElementById('account-name'));
 
   document.getElementById('account-save').onclick = () => {
@@ -60,7 +60,7 @@ function openAccountPage(acc) {
     };
 }
 
-function openCategoryPage(cat) {
+function openCategoryPage(cat, trigger) {
   const isNew = !cat;
   cat = cat || { name: '', type: 'expense', monthly_budget: 0 };
   document.getElementById('category-edit-title').textContent = isNew
@@ -72,7 +72,7 @@ function openCategoryPage(cat) {
   document.getElementById('category-budget').value = cat.monthly_budget || '';
   document.getElementById('category-save').textContent = isNew ? 'Add category' : 'Save changes';
   document.getElementById('category-del').hidden = isNew;
-  openSubpage('view-category-edit');
+  openSubpage('view-category-edit', trigger);
   if (isNew) focusSoon(document.getElementById('category-name'));
 
   document.getElementById('category-save').onclick = () => {
@@ -146,7 +146,7 @@ function renderTxPageBody() {
 // Expense/Income/Transfer buttons); otherwise this edits the given
 // transaction — its type is fixed for the life of the page either way, only
 // amount/description/category/account/date are editable.
-function openTransactionPage(t, newType) {
+function openTransactionPage(t, newType, trigger) {
   const isNew = !t;
   t = t || {
     type: newType,
@@ -177,7 +177,7 @@ function openTransactionPage(t, newType) {
   renderTxPageBody();
   document.getElementById('tx-save').textContent = isNew ? 'Save ' + t.type : 'Save changes';
   document.getElementById('tx-del').hidden = isNew;
-  openSubpage('view-transaction-edit');
+  openSubpage('view-transaction-edit', trigger);
   // Lets the user start typing the amount immediately — must stay a plain,
   // synchronous call within the click handler (see focusSoon above).
   if (isNew) focusSoon(document.getElementById('tx-amount-input'));

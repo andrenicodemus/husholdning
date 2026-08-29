@@ -39,7 +39,7 @@
           <form id="setup-form" autocomplete="off">
             <div class="form-group">
               <div>
-                <div class="field-label">Web app URL</div>
+                <label class="field-label" for="setup-url">Web app URL</label>
                 <input
                   class="text-input"
                   id="setup-url"
@@ -53,7 +53,7 @@
                 />
               </div>
               <div>
-                <div class="field-label">PIN</div>
+                <label class="field-label" for="setup-pin">PIN</label>
                 <input
                   class="text-input"
                   id="setup-pin"
@@ -81,12 +81,16 @@
         <h1 id="app-title">Husholdning</h1>
         <div class="header-actions">
           <span class="pill" id="sync-pill"></span>
-          <span class="pill" id="update-pill" style="cursor: pointer"></span>
+          <button type="button" class="pill" id="update-pill"></button>
           <button class="icon-btn btn-ghost" id="btn-theme" aria-label="Toggle dark mode">
-            <svg class="icon"><use href="src/icons/sprite.svg#sun"></use></svg>
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#sun"></use>
+            </svg>
           </button>
           <button class="icon-btn btn-ghost" id="btn-settings" aria-label="Settings">
-            <svg class="icon"><use href="src/icons/sprite.svg#settings"></use></svg>
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#settings"></use>
+            </svg>
           </button>
         </div>
       </header>
@@ -94,19 +98,26 @@
       <main>
         <!-- HOME -->
         <section class="view active" id="view-home">
+          <h1 class="sr-only" tabindex="-1">Home</h1>
           <div class="add-tx-card" id="add-tx-card">
             <h3>Add transaction</h3>
             <div class="add-tx-actions" id="add-tx-actions">
               <button data-type="expense">
-                <svg class="icon"><use href="src/icons/sprite.svg#minus"></use></svg>
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use href="src/icons/sprite.svg#minus"></use>
+                </svg>
                 Expense
               </button>
               <button data-type="income">
-                <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use href="src/icons/sprite.svg#plus"></use>
+                </svg>
                 Income
               </button>
               <button data-type="transfer">
-                <svg class="icon"><use href="src/icons/sprite.svg#transfer"></use></svg>
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use href="src/icons/sprite.svg#transfer"></use>
+                </svg>
                 Transfer
               </button>
             </div>
@@ -137,7 +148,7 @@
             </div>
           </div>
           <div class="view-section">
-            <h2 class="view-title">Accounts</h2>
+            <h2 class="view-title" tabindex="-1">Accounts</h2>
             <div class="accounts-list" id="accounts-list"></div>
           </div>
         </section>
@@ -146,15 +157,19 @@
         <section class="view" id="view-budgets">
           <div class="month-nav">
             <button id="budgets-month-prev" aria-label="Previous month">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
             <div class="label" id="budgets-month-label"></div>
             <button id="budgets-month-next" aria-label="Next month">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-right"></use>
+              </svg>
             </button>
           </div>
           <div class="view-section">
-            <h2 class="view-title">Budgets</h2>
+            <h2 class="view-title" tabindex="-1">Budgets</h2>
             <div class="budgets-list" id="budgets-list"></div>
           </div>
         </section>
@@ -163,11 +178,15 @@
         <section class="view" id="view-summary">
           <div class="month-nav">
             <button id="month-prev" aria-label="Previous month">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
             <div class="label" id="month-label"></div>
             <button id="month-next" aria-label="Next month">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-right"></use>
+              </svg>
             </button>
           </div>
           <div class="stat-grid bleed-grid">
@@ -194,7 +213,7 @@
           </div>
           <div class="view-section">
             <div class="card-head">
-              <h2>Month movement</h2>
+              <h2 tabindex="-1">Month movement</h2>
             </div>
             <div class="summary-section">
               <div class="list-sub">Accounts change</div>
@@ -215,18 +234,24 @@
         <section class="view" id="view-all">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1>Transactions</h1>
+            <h1 tabindex="-1">Transactions</h1>
           </div>
           <div class="list-filter">
             <div class="row2">
               <div>
-                <div class="field-label" style="margin-top: 0">Account</div>
+                <label class="field-label" style="margin-top: 0" for="all-filter-account"
+                  >Account</label
+                >
                 <select class="select-input" id="all-filter-account"></select>
               </div>
               <div>
-                <div class="field-label" style="margin-top: 0">Category</div>
+                <label class="field-label" style="margin-top: 0" for="all-filter-category"
+                  >Category</label
+                >
                 <select class="select-input" id="all-filter-category"></select>
               </div>
             </div>
@@ -240,27 +265,29 @@
         <section class="view" id="view-general">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1>General</h1>
+            <h1 tabindex="-1">General</h1>
           </div>
           <div>
             <div class="form-group">
               <div>
-                <div class="field-label">User 1</div>
+                <label class="field-label" for="g-na">User 1</label>
                 <input class="text-input" id="g-na" />
               </div>
               <div>
-                <div class="field-label">User 2</div>
+                <label class="field-label" for="g-nb">User 2</label>
                 <input class="text-input" id="g-nb" />
               </div>
 
               <div>
-                <div class="field-label">Currency</div>
+                <label class="field-label" for="g-cur">Currency</label>
                 <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
               </div>
               <div>
-                <div class="field-label">PIN</div>
+                <label class="field-label" for="g-pin">PIN</label>
                 <input class="text-input" id="g-pin" inputmode="numeric" />
               </div>
             </div>
@@ -276,15 +303,19 @@
         <section class="view" id="view-config-accounts">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1>Accounts</h1>
+            <h1 tabindex="-1">Accounts</h1>
           </div>
           <div class="form-group">
             <div class="settings-list" id="config-accounts-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-account">
-            <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>Add account
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#plus"></use></svg
+            >Add account
           </button>
         </section>
 
@@ -292,15 +323,19 @@
         <section class="view" id="view-config-categories">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1>Categories</h1>
+            <h1 tabindex="-1">Categories</h1>
           </div>
           <div class="form-group">
             <div class="settings-list" id="categories-list"></div>
           </div>
           <button class="btn-tertiary" id="btn-add-category">
-            <svg class="icon"><use href="src/icons/sprite.svg#plus"></use></svg>Add category
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#plus"></use></svg
+            >Add category
           </button>
         </section>
 
@@ -308,50 +343,63 @@
         <section class="view" id="view-settings">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1>Settings</h1>
+            <h1 tabindex="-1">Settings</h1>
           </div>
           <div class="menu">
-            <div class="menu-item" id="settings-general" style="cursor: pointer">
+            <button type="button" class="menu-item" id="settings-general">
               <div class="menu-item-content">
                 <div class="acct-name">General</div>
-                <div class="acct-chevron icon-btn btn-ghost">
-                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                <div class="acct-chevron icon-btn btn-ghost" aria-hidden="true">
+                  <svg class="icon" aria-hidden="true" focusable="false">
+                    <use href="src/icons/sprite.svg#chevron-right"></use>
+                  </svg>
                 </div>
               </div>
-            </div>
-            <div class="menu-item" id="settings-accounts" style="cursor: pointer">
+            </button>
+            <button type="button" class="menu-item" id="settings-accounts">
               <div class="menu-item-content">
                 <div class="acct-name">Accounts</div>
-                <div class="acct-chevron icon-btn btn-ghost">
-                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                <div class="acct-chevron icon-btn btn-ghost" aria-hidden="true">
+                  <svg class="icon" aria-hidden="true" focusable="false">
+                    <use href="src/icons/sprite.svg#chevron-right"></use>
+                  </svg>
                 </div>
               </div>
-            </div>
-            <div class="menu-item" id="settings-categories" style="cursor: pointer">
+            </button>
+            <button type="button" class="menu-item" id="settings-categories">
               <div class="menu-item-content">
                 <div class="acct-name">Categories</div>
-                <div class="acct-chevron icon-btn btn-ghost">
-                  <svg class="icon"><use href="src/icons/sprite.svg#chevron-right"></use></svg>
+                <div class="acct-chevron icon-btn btn-ghost" aria-hidden="true">
+                  <svg class="icon" aria-hidden="true" focusable="false">
+                    <use href="src/icons/sprite.svg#chevron-right"></use>
+                  </svg>
                 </div>
               </div>
-            </div>
-            <div class="menu-item" id="settings-resync" style="cursor: pointer">
+            </button>
+            <button type="button" class="menu-item" id="settings-resync">
               <div class="menu-item-content">
                 <div class="acct-name">Force full resync</div>
               </div>
-            </div>
-            <div class="menu-item" id="settings-check-update" style="cursor: pointer">
+            </button>
+            <button type="button" class="menu-item" id="settings-check-update">
               <div class="menu-item-content">
                 <div class="acct-name">Check for updates</div>
               </div>
-            </div>
-            <div class="menu-item" id="settings-disconnect" style="cursor: pointer">
+            </button>
+            <button
+              type="button"
+              class="menu-item"
+              id="settings-disconnect"
+              aria-label="Disconnect from sheet"
+            >
               <div class="menu-item-content">
                 <div class="acct-name" style="color: var(--expense)">Disconnect from sheet</div>
               </div>
-            </div>
+            </button>
           </div>
         </section>
 
@@ -359,25 +407,27 @@
         <section class="view" id="view-account-edit">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1 id="account-edit-title"></h1>
+            <h1 id="account-edit-title" tabindex="-1"></h1>
           </div>
           <div class="form-group">
             <div>
-              <div class="field-label">Name</div>
+              <label class="field-label" for="account-name">Name</label>
               <input class="text-input" id="account-name" />
             </div>
             <div class="row2" style="margin-top: 4px">
               <div>
-                <div class="field-label">Type</div>
+                <label class="field-label" for="account-type">Type</label>
                 <select class="select-input" id="account-type">
                   <option value="current">Current</option>
                   <option value="savings">Savings</option>
                 </select>
               </div>
               <div>
-                <div class="field-label">Owner</div>
+                <label class="field-label" for="account-owner">Owner</label>
                 <select class="select-input" id="account-owner">
                   <option value="a"></option>
                   <option value="b"></option>
@@ -386,7 +436,7 @@
               </div>
             </div>
             <div>
-              <div class="field-label">Initial balance</div>
+              <label class="field-label" for="account-init">Initial balance</label>
               <input class="text-input" id="account-init" inputmode="decimal" type="number" />
             </div>
           </div>
@@ -405,25 +455,27 @@
         <section class="view" id="view-category-edit">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1 id="category-edit-title"></h1>
+            <h1 id="category-edit-title" tabindex="-1"></h1>
           </div>
           <div class="form-group">
             <div>
-              <div class="field-label">Name</div>
+              <label class="field-label" for="category-name">Name</label>
               <input class="text-input" id="category-name" />
             </div>
             <div class="row2" style="margin-top: 4px">
               <div>
-                <div class="field-label">Type</div>
+                <label class="field-label" for="category-type">Type</label>
                 <select class="select-input" id="category-type">
                   <option value="expense">Expense</option>
                   <option value="income">Income</option>
                 </select>
               </div>
               <div>
-                <div class="field-label">Monthly budget</div>
+                <label class="field-label" for="category-budget">Monthly budget</label>
                 <input
                   class="text-input"
                   id="category-budget"
@@ -444,13 +496,16 @@
         <section class="view" id="view-transaction-edit">
           <div class="subpage-head">
             <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
-              <svg class="icon"><use href="src/icons/sprite.svg#chevron-left"></use></svg>
+              <svg class="icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#chevron-left"></use>
+              </svg>
             </button>
-            <h1 id="tx-edit-title"></h1>
+            <h1 id="tx-edit-title" tabindex="-1"></h1>
           </div>
           <form id="tx-form">
             <div class="form-group">
               <div class="amount-wrap">
+                <label class="sr-only" for="tx-amount-input">Amount</label>
                 <input
                   class="amount-input"
                   id="tx-amount-input"
@@ -460,23 +515,40 @@
                 <div class="amount-currency" id="tx-amount-currency"></div>
               </div>
               <div>
-                <div class="field-label" style="margin-top: 0">Description</div>
+                <label class="field-label" style="margin-top: 0" for="tx-description"
+                  >Description</label
+                >
                 <input class="text-input" id="tx-description" placeholder="Optional" />
               </div>
               <div id="tx-wrap-category">
-                <div class="field-label">Category</div>
-                <div class="chips" id="tx-chips-category"></div>
+                <div class="field-label" id="tx-label-category">Category</div>
+                <div
+                  class="chips"
+                  id="tx-chips-category"
+                  role="group"
+                  aria-labelledby="tx-label-category"
+                ></div>
               </div>
               <div id="tx-wrap-from">
                 <div class="field-label" id="tx-label-from">From account</div>
-                <div class="chips" id="tx-chips-from"></div>
+                <div
+                  class="chips"
+                  id="tx-chips-from"
+                  role="group"
+                  aria-labelledby="tx-label-from"
+                ></div>
               </div>
               <div id="tx-wrap-to" style="display: none">
                 <div class="field-label" id="tx-label-to">To account</div>
-                <div class="chips" id="tx-chips-to"></div>
+                <div
+                  class="chips"
+                  id="tx-chips-to"
+                  role="group"
+                  aria-labelledby="tx-label-to"
+                ></div>
               </div>
               <div>
-                <div class="field-label" style="margin-top: 0">Date</div>
+                <label class="field-label" style="margin-top: 0" for="tx-date">Date</label>
                 <input class="text-input" type="date" id="tx-date" />
               </div>
             </div>
@@ -490,30 +562,34 @@
       </main>
 
       <nav>
-        <button data-view="home" class="on">
+        <button data-view="home" class="on" aria-current="page">
           <span class="ic"
-            ><svg class="icon"><use href="src/icons/sprite.svg#nav-home"></use></svg></span
+            ><svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#nav-home"></use></svg></span
           >Home
         </button>
         <button data-view="accounts">
           <span class="ic"
-            ><svg class="icon"><use href="src/icons/sprite.svg#nav-accounts"></use></svg></span
+            ><svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#nav-accounts"></use></svg></span
           >Accounts
         </button>
         <button data-view="budgets">
           <span class="ic"
-            ><svg class="icon"><use href="src/icons/sprite.svg#nav-budgets"></use></svg></span
+            ><svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#nav-budgets"></use></svg></span
           >Budgets
         </button>
         <button data-view="summary">
           <span class="ic"
-            ><svg class="icon"><use href="src/icons/sprite.svg#nav-summary"></use></svg></span
+            ><svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#nav-summary"></use></svg></span
           >Summary
         </button>
       </nav>
     </div>
 
-    <div id="toast"></div>
+    <div id="toast" role="status" aria-live="polite"></div>
     <!-- Local-only, gitignored: sets window.HF_DEV_URL to prefill the setup
          screen during development. Safe to 404 if it doesn't exist. -->
     <script src="src/js/dev-config.js"></script>
