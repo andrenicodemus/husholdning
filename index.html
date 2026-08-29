@@ -36,7 +36,7 @@
         <div class="tag">Your joint finances, in your pocket</div>
         <div class="setup-card">
           <h2>Connect to Google sheet</h2>
-          <form id="setup-form" autocomplete="off">
+          <form id="setup-form" autocomplete="off" novalidate>
             <div class="form-group">
               <div>
                 <label class="field-label" for="setup-url">Web app URL</label>
@@ -50,6 +50,7 @@
                   autocorrect="off"
                   autocomplete="off"
                   inputmode="url"
+                  enterkeyhint="next"
                 />
               </div>
               <div>
@@ -63,6 +64,7 @@
                   inputmode="numeric"
                   pattern="[0-9]*"
                   autocomplete="off"
+                  enterkeyhint="done"
                 />
               </div>
             </div>
@@ -271,32 +273,46 @@
             </button>
             <h1 tabindex="-1">General</h1>
           </div>
-          <div>
+          <form id="general-form" novalidate>
             <div class="form-group">
               <div>
                 <label class="field-label" for="g-na">User 1</label>
-                <input class="text-input" id="g-na" />
+                <input class="text-input" id="g-na" enterkeyhint="next" />
               </div>
               <div>
                 <label class="field-label" for="g-nb">User 2</label>
-                <input class="text-input" id="g-nb" />
+                <input class="text-input" id="g-nb" enterkeyhint="next" />
               </div>
 
               <div>
                 <label class="field-label" for="g-cur">Currency</label>
-                <input class="text-input" id="g-cur" maxlength="3" autocapitalize="characters" />
+                <input
+                  class="text-input"
+                  id="g-cur"
+                  maxlength="3"
+                  autocapitalize="characters"
+                  enterkeyhint="next"
+                />
               </div>
               <div>
                 <label class="field-label" for="g-pin">PIN</label>
-                <input class="text-input" id="g-pin" inputmode="numeric" />
+                <input
+                  class="text-input"
+                  id="g-pin"
+                  inputmode="numeric"
+                  autocomplete="off"
+                  enterkeyhint="done"
+                />
               </div>
             </div>
             <div class="form-actions">
-              <button class="btn-tertiary" id="g-share-link">Share connection link</button>
-              <button class="btn-primary" id="g-save">Save changes</button>
+              <button type="button" class="btn-tertiary" id="g-share-link">
+                Share connection link
+              </button>
+              <button type="submit" class="btn-primary" id="g-save">Save changes</button>
               <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
             </div>
-          </div>
+          </form>
         </section>
 
         <!-- SETTINGS: ACCOUNTS -->
@@ -413,49 +429,53 @@
             </button>
             <h1 id="account-edit-title" tabindex="-1"></h1>
           </div>
-          <div class="form-group">
-            <div>
-              <label class="field-label" for="account-name">Name</label>
-              <input class="text-input" id="account-name" />
-            </div>
-            <div class="row2" style="margin-top: 4px">
+          <form id="account-form" novalidate>
+            <div class="form-group">
               <div>
-                <label class="field-label" for="account-type">Type</label>
-                <select class="select-input" id="account-type">
-                  <option value="current">Current</option>
-                  <option value="savings">Savings</option>
-                </select>
+                <label class="field-label" for="account-name">Name</label>
+                <input class="text-input" id="account-name" enterkeyhint="next" />
+              </div>
+              <div class="row2" style="margin-top: 4px">
+                <div>
+                  <label class="field-label" for="account-type">Type</label>
+                  <select class="select-input" id="account-type">
+                    <option value="current">Current</option>
+                    <option value="savings">Savings</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="account-owner">Owner</label>
+                  <select class="select-input" id="account-owner">
+                    <option value="a"></option>
+                    <option value="b"></option>
+                    <option value="joint"></option>
+                  </select>
+                </div>
               </div>
               <div>
-                <label class="field-label" for="account-owner">Owner</label>
-                <select class="select-input" id="account-owner">
-                  <option value="a"></option>
-                  <option value="b"></option>
-                  <option value="joint"></option>
-                </select>
+                <label class="field-label" for="account-init">Initial balance</label>
+                <input
+                  class="text-input"
+                  id="account-init"
+                  inputmode="decimal"
+                  enterkeyhint="done"
+                  aria-describedby="account-init-note account-init-error"
+                />
+                <div class="field-error" id="account-init-error" hidden></div>
               </div>
             </div>
-            <div>
-              <label class="field-label" for="account-init">Initial balance</label>
-              <input
-                class="text-input"
-                id="account-init"
-                inputmode="decimal"
-                enterkeyhint="done"
-                aria-describedby="account-init-note account-init-error"
-              />
-              <div class="field-error" id="account-init-error" hidden></div>
+            <div class="settle-note" id="account-init-note">
+              The starting balance when you begin tracking. Current balance = initial + every
+              transaction dated today or earlier; upcoming ones only count from their date.
             </div>
-          </div>
-          <div class="settle-note" id="account-init-note">
-            The starting balance when you begin tracking. Current balance = initial + every
-            transaction dated today or earlier; upcoming ones only count from their date.
-          </div>
-          <div class="form-actions">
-            <button class="btn-primary" id="account-save"></button>
-            <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-            <button class="btn-danger" id="account-del" hidden>Delete account</button>
-          </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="account-save"></button>
+              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
+              <button type="button" class="btn-danger" id="account-del" hidden>
+                Delete account
+              </button>
+            </div>
+          </form>
         </section>
 
         <!-- CATEGORY: ADD/EDIT -->
@@ -468,38 +488,44 @@
             </button>
             <h1 id="category-edit-title" tabindex="-1"></h1>
           </div>
-          <div class="form-group">
-            <div>
-              <label class="field-label" for="category-name">Name</label>
-              <input class="text-input" id="category-name" />
-            </div>
-            <div class="row2" style="margin-top: 4px">
+          <form id="category-form" novalidate>
+            <div class="form-group">
               <div>
-                <label class="field-label" for="category-type">Type</label>
-                <select class="select-input" id="category-type">
-                  <option value="expense">Expense</option>
-                  <option value="income">Income</option>
-                </select>
+                <label class="field-label" for="category-name">Name</label>
+                <input class="text-input" id="category-name" enterkeyhint="next" />
               </div>
-              <div>
-                <label class="field-label" for="category-budget">Monthly budget</label>
-                <input
-                  class="text-input"
-                  id="category-budget"
-                  inputmode="decimal"
-                  enterkeyhint="done"
-                  aria-describedby="category-budget-note category-budget-error"
-                />
-                <div class="settle-note" id="category-budget-note">Leave empty for no budget.</div>
-                <div class="field-error" id="category-budget-error" hidden></div>
+              <div class="row2" style="margin-top: 4px">
+                <div>
+                  <label class="field-label" for="category-type">Type</label>
+                  <select class="select-input" id="category-type">
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="field-label" for="category-budget">Monthly budget</label>
+                  <input
+                    class="text-input"
+                    id="category-budget"
+                    inputmode="decimal"
+                    enterkeyhint="done"
+                    aria-describedby="category-budget-note category-budget-error"
+                  />
+                  <div class="settle-note" id="category-budget-note">
+                    Leave empty for no budget.
+                  </div>
+                  <div class="field-error" id="category-budget-error" hidden></div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="form-actions">
-            <button class="btn-primary" id="category-save"></button>
-            <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-            <button class="btn-danger" id="category-del" hidden>Delete category</button>
-          </div>
+            <div class="form-actions">
+              <button type="submit" class="btn-primary" id="category-save"></button>
+              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
+              <button type="button" class="btn-danger" id="category-del" hidden>
+                Delete category
+              </button>
+            </div>
+          </form>
         </section>
 
         <!-- TRANSACTION: ADD/EDIT -->
@@ -512,7 +538,7 @@
             </button>
             <h1 id="tx-edit-title" tabindex="-1"></h1>
           </div>
-          <form id="tx-form">
+          <form id="tx-form" novalidate>
             <div class="form-group">
               <div class="amount-wrap">
                 <label class="sr-only" for="tx-amount-input">Amount</label>
@@ -522,6 +548,7 @@
                   inputmode="numeric"
                   placeholder="0,00"
                   aria-describedby="tx-amount-input-error"
+                  enterkeyhint="next"
                 />
                 <div class="amount-currency" id="tx-amount-currency"></div>
                 <div class="field-error" id="tx-amount-input-error" hidden></div>
@@ -530,7 +557,12 @@
                 <label class="field-label" style="margin-top: 0" for="tx-description"
                   >Description</label
                 >
-                <input class="text-input" id="tx-description" placeholder="Optional" />
+                <input
+                  class="text-input"
+                  id="tx-description"
+                  placeholder="Optional"
+                  enterkeyhint="next"
+                />
               </div>
               <div id="tx-wrap-category">
                 <div class="field-label" id="tx-label-category">Category</div>
@@ -561,13 +593,15 @@
               </div>
               <div>
                 <label class="field-label" style="margin-top: 0" for="tx-date">Date</label>
-                <input class="text-input" type="date" id="tx-date" />
+                <input class="text-input" type="date" id="tx-date" enterkeyhint="done" />
               </div>
             </div>
             <div class="form-actions">
-              <button class="btn-primary" id="tx-save">Save changes</button>
+              <button type="submit" class="btn-primary" id="tx-save">Save changes</button>
               <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-              <button class="btn-danger" id="tx-del" hidden>Delete transaction</button>
+              <button type="button" class="btn-danger" id="tx-del" hidden>
+                Delete transaction
+              </button>
             </div>
           </form>
         </section>

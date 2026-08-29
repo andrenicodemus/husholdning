@@ -55,7 +55,8 @@ function openAccountPage(acc, trigger) {
   openSubpage('view-account-edit', trigger);
   if (isNew) focusSoon(document.getElementById('account-name'));
 
-  document.getElementById('account-save').onclick = () => {
+  document.getElementById('account-form').onsubmit = (e) => {
+    e.preventDefault();
     const name = document.getElementById('account-name').value.trim();
     const init = parseAmount(initInput.value || '0');
     if (!name) return toast('Give the account a name');
@@ -102,7 +103,8 @@ function openCategoryPage(cat, trigger) {
   openSubpage('view-category-edit', trigger);
   if (isNew) focusSoon(document.getElementById('category-name'));
 
-  document.getElementById('category-save').onclick = () => {
+  document.getElementById('category-form').onsubmit = (e) => {
+    e.preventDefault();
     const name = document.getElementById('category-name').value.trim();
     const raw = budgetInput.value.trim();
     const budget = raw ? parseAmount(raw) : 0;
@@ -127,11 +129,6 @@ function openCategoryPage(cat, trigger) {
       }
     };
 }
-
-// #tx-form is a <form> so pressing Enter/Go in any of its fields submits
-// it — but Save/Delete already handle that via their own click handlers, so
-// suppress the browser's default submit (which would reload the page).
-document.getElementById('tx-form').onsubmit = (e) => e.preventDefault();
 
 let editSel = { type: null, category: null, from: null, to: null };
 
@@ -213,7 +210,8 @@ function openTransactionPage(t, newType, trigger) {
   // synchronous call within the click handler (see focusSoon above).
   if (isNew) focusSoon(document.getElementById('tx-amount-input'));
 
-  document.getElementById('tx-save').onclick = () => {
+  document.getElementById('tx-form').onsubmit = (e) => {
+    e.preventDefault();
     const amount = parseAmount(amountInput.value);
     if (amount === null) return setFieldError(amountInput, BAD_AMOUNT_MSG);
     if (!(amount > 0)) return toast('Enter an amount');

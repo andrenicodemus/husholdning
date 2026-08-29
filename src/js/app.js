@@ -233,7 +233,8 @@ document.getElementById('g-share-link').onclick = async () => {
   }
 };
 
-document.getElementById('g-save').onclick = () => {
+document.getElementById('general-form').onsubmit = (e) => {
+  e.preventDefault();
   const payload = {
     name_a: document.getElementById('g-na').value.trim() || 'A',
     name_b: document.getElementById('g-nb').value.trim() || 'B',
