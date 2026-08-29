@@ -67,14 +67,82 @@ function formatRawAmount(raw, decimals) {
 function fmtSigned(n) {
   return (n > 0 ? '+' : '') + fmt(n);
 }
-function parseAmount(s) {
-  const n = Number(
-    String(s)
-      .trim()
-      .replace(/\./g, (m) => (s.includes(',') ? '' : m))
-      .replace(',', '.'),
-  );
-  return isNaN(n) ? NaN : n;
+// Danish-style plain number, no currency symbol — for text fields (initial
+// balance, monthly budget) that round-trip through parseAmount: editing an
+// existing value and saving it unchanged must be a no-op.
+function fmtPlain(n) {
+  try {
+    return new Intl.NumberFormat('da-DK', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n);
+  } catch (e) {
+    return Number(n).toFixed(2);
+  }
+}
+// Parses a human-typed amount in either Danish (1.234,56) or plain (1234.56)
+// style, deciding which separator is the decimal point from what's actually
+// in the string rather than assuming one locale — see spec item 3b. Returns
+// a Number rounded to 2dp, or null (never NaN) if the string isn't a number.
+function parseAmount(str) {
+  let s = String(str)
+    .trim()
+    .replace(/[\u00A0\u202F\s]/g, '') // incl. non-breaking/narrow-no-break space
+    .replace(/kr\.?/gi, '')
+    .replace(/[^\d.,\-\u2212]/g, ''); // strip any remaining currency symbol etc.
+  if (!s) return null;
+
+  let negative = false;
+  if (s[0] === '-' || s[0] === '\u2212') {
+    negative = true;
+    s = s.slice(1);
+  }
+  if (/[-\u2212]/.test(s)) return null; // a second sign anywhere means this wasn't a number
+
+  if (s.includes(',')) {
+    // Last comma is the decimal separator; every '.' before it is a
+    // thousands separator and is stripped: "1.234,56" -> "1234.56".
+    const i = s.lastIndexOf(',');
+    s = s.slice(0, i).replace(/\./g, '') + '.' + s.slice(i + 1);
+  } else if ((s.match(/\./g) || []).length > 1) {
+    // No comma, two or more '.': they're thousands separators.
+    // "1.234.567" -> "1234567". (A single '.' with no comma is left as a
+    // decimal point — forgiving of a US-keyboard "1234.56".)
+    s = s.replace(/\./g, '');
+  }
+
+  if (!/\d/.test(s) || !/^\d*\.?\d*$/.test(s)) return null;
+  return Math.round(Number(s) * (negative ? -1 : 1) * 100) / 100;
+}
+
+// Dev-only self-check for parseAmount — runs on localhost only, never in the
+// deployed app. `node --check`/tests aren't wired up for this vanilla-JS,
+// no-build project, so this is the lightweight stand-in the spec calls for.
+if (typeof location !== 'undefined' && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) {
+  const cases = [
+    ['1234,50', 1234.5],
+    ['1.234,50', 1234.5],
+    ['1234.50', 1234.5],
+    ['1234', 1234],
+    ['-500', -500],
+    ['1.000', 1],
+    ['0,05', 0.05],
+    [',5', 0.5],
+    ['abc', null],
+    ['', null],
+    ['1.2.3,45', 123.45],
+    ['1 234,50', 1234.5],
+    ['1234,50 kr.', 1234.5],
+  ];
+  for (const [input, expected] of cases) {
+    console.assert(
+      parseAmount(input) === expected,
+      'parseAmount(%o) = %o, expected %o',
+      input,
+      parseAmount(input),
+      expected,
+    );
+  }
 }
 // Local calendar date, not UTC: transaction dates are plain YYYY-MM-DD strings
 // the user picked in their own timezone, so "today" has to be local too — else

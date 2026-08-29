@@ -16,6 +16,27 @@ function focusSoon(el) {
   el.focus();
 }
 
+// Shared error UI for the three money inputs (item 3e): a .field-error
+// sibling (id="<input-id>-error") wired via aria-describedby, plus
+// aria-invalid on the input itself. Called with a falsy message to clear.
+function setFieldError(input, message) {
+  const err = document.getElementById(input.id + '-error');
+  if (message) {
+    if (err) {
+      err.textContent = message;
+      err.hidden = false;
+    }
+    input.setAttribute('aria-invalid', 'true');
+  } else {
+    if (err) {
+      err.textContent = '';
+      err.hidden = true;
+    }
+    input.removeAttribute('aria-invalid');
+  }
+}
+const BAD_AMOUNT_MSG = 'Enter an amount, like 1.250,00.';
+
 function openAccountPage(acc, trigger) {
   const isNew = !acc;
   acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
@@ -25,7 +46,10 @@ function openAccountPage(acc, trigger) {
   document.getElementById('account-name').value = acc.name;
   document.getElementById('account-type').value = acc.type;
   fillOwnerOptions(document.getElementById('account-owner'), acc.owner);
-  document.getElementById('account-init').value = acc.initial_balance;
+  const initInput = document.getElementById('account-init');
+  initInput.value = fmtPlain(Number(acc.initial_balance) || 0);
+  setFieldError(initInput, null);
+  initInput.oninput = () => setFieldError(initInput, null);
   document.getElementById('account-save').textContent = isNew ? 'Add account' : 'Save changes';
   document.getElementById('account-del').hidden = isNew;
   openSubpage('view-account-edit', trigger);
@@ -33,9 +57,9 @@ function openAccountPage(acc, trigger) {
 
   document.getElementById('account-save').onclick = () => {
     const name = document.getElementById('account-name').value.trim();
-    const init = parseAmount(document.getElementById('account-init').value || '0');
+    const init = parseAmount(initInput.value || '0');
     if (!name) return toast('Give the account a name');
-    if (isNaN(init)) return toast('Initial balance is not a number');
+    if (init === null) return setFieldError(initInput, BAD_AMOUNT_MSG);
     const payload = {
       id: acc.id || uuid(),
       name,
@@ -69,7 +93,10 @@ function openCategoryPage(cat, trigger) {
   document.getElementById('category-name').value = cat.name;
   document.getElementById('category-type').value = cat.type;
   document.getElementById('category-type').disabled = !isNew;
-  document.getElementById('category-budget').value = cat.monthly_budget || '';
+  const budgetInput = document.getElementById('category-budget');
+  budgetInput.value = cat.monthly_budget ? fmtPlain(Number(cat.monthly_budget)) : '';
+  setFieldError(budgetInput, null);
+  budgetInput.oninput = () => setFieldError(budgetInput, null);
   document.getElementById('category-save').textContent = isNew ? 'Add category' : 'Save changes';
   document.getElementById('category-del').hidden = isNew;
   openSubpage('view-category-edit', trigger);
@@ -77,9 +104,11 @@ function openCategoryPage(cat, trigger) {
 
   document.getElementById('category-save').onclick = () => {
     const name = document.getElementById('category-name').value.trim();
-    const budget = parseAmount(document.getElementById('category-budget').value || '0');
+    const raw = budgetInput.value.trim();
+    const budget = raw ? parseAmount(raw) : 0;
     if (!name) return toast('Give the category a name');
-    if (isNaN(budget)) return toast('Budget is not a number');
+    if (budget === null) return setFieldError(budgetInput, BAD_AMOUNT_MSG);
+    if (budget < 0) return setFieldError(budgetInput, "Budget can't be negative.");
     submit(isNew ? 'addCategory' : 'updateCategory', {
       id: cat.id || uuid(),
       name,
@@ -171,7 +200,9 @@ function openTransactionPage(t, newType, trigger) {
   document.getElementById('tx-amount-currency').textContent = (
     data.settings.currency || 'DKK'
   ).toUpperCase();
-  setupAmountInput(document.getElementById('tx-amount-input'), Number(t.amount));
+  const amountInput = document.getElementById('tx-amount-input');
+  setupAmountInput(amountInput, Number(t.amount));
+  setFieldError(amountInput, null);
   document.getElementById('tx-date').value = t.date;
   document.getElementById('tx-description').value = t.description || '';
   renderTxPageBody();
@@ -183,7 +214,8 @@ function openTransactionPage(t, newType, trigger) {
   if (isNew) focusSoon(document.getElementById('tx-amount-input'));
 
   document.getElementById('tx-save').onclick = () => {
-    const amount = parseAmount(document.getElementById('tx-amount-input').value);
+    const amount = parseAmount(amountInput.value);
+    if (amount === null) return setFieldError(amountInput, BAD_AMOUNT_MSG);
     if (!(amount > 0)) return toast('Enter an amount');
     if (isNew && !data.accounts.length) return toast('Add an account first (Accounts tab)');
     const type = editSel.type;

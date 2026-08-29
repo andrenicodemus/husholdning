@@ -437,10 +437,17 @@
             </div>
             <div>
               <label class="field-label" for="account-init">Initial balance</label>
-              <input class="text-input" id="account-init" inputmode="decimal" type="number" />
+              <input
+                class="text-input"
+                id="account-init"
+                inputmode="decimal"
+                enterkeyhint="done"
+                aria-describedby="account-init-note account-init-error"
+              />
+              <div class="field-error" id="account-init-error" hidden></div>
             </div>
           </div>
-          <div class="settle-note">
+          <div class="settle-note" id="account-init-note">
             The starting balance when you begin tracking. Current balance = initial + every
             transaction dated today or earlier; upcoming ones only count from their date.
           </div>
@@ -480,8 +487,11 @@
                   class="text-input"
                   id="category-budget"
                   inputmode="decimal"
-                  placeholder="0 = none"
+                  enterkeyhint="done"
+                  aria-describedby="category-budget-note category-budget-error"
                 />
+                <div class="settle-note" id="category-budget-note">Leave empty for no budget.</div>
+                <div class="field-error" id="category-budget-error" hidden></div>
               </div>
             </div>
           </div>
@@ -511,8 +521,10 @@
                   id="tx-amount-input"
                   inputmode="numeric"
                   placeholder="0,00"
+                  aria-describedby="tx-amount-input-error"
                 />
                 <div class="amount-currency" id="tx-amount-currency"></div>
+                <div class="field-error" id="tx-amount-input-error" hidden></div>
               </div>
               <div>
                 <label class="field-label" style="margin-top: 0" for="tx-description"

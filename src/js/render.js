@@ -58,6 +58,7 @@ function setupAmountInput(input, initial) {
     raw = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '') || '0';
     render();
     caretToEnd();
+    setFieldError(input, null);
   };
   input.onblur = () => {
     if (!raw || Number(raw) === 0) raw = '';
