@@ -1,13 +1,16 @@
 /* Husholdning service worker — app shell cache */
-const CACHE = 'husholdning-v29';
+const CACHE = 'husholdning-v32';
 const SHELL = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './src/tokens.css',
   './src/style.css',
   './src/icons/sprite.svg',
+  './src/fonts/InterVariable.woff2',
+  './src/fonts/SpaceGrotesk[wght].woff2',
   './src/js/format.js',
   './src/js/store.js',
   './src/js/templates.js',
@@ -22,6 +25,7 @@ const SHELL = [
   './src/components/budget-row.html',
   './src/components/account-change-row.html',
   './src/components/cat-breakdown-row.html',
+  './src/components/filter-tag.html',
 ];
 
 self.addEventListener('install', (e) => {
@@ -51,24 +55,6 @@ self.addEventListener('fetch', (e) => {
     url.hostname.endsWith('script.googleusercontent.com')
   )
     return;
-
-  // Fonts: cache-first with runtime fill
-  if (url.hostname.endsWith('fonts.googleapis.com') || url.hostname.endsWith('fonts.gstatic.com')) {
-    e.respondWith(
-      caches.match(e.request).then(
-        (hit) =>
-          hit ||
-          fetch(e.request)
-            .then((res) => {
-              const copy = res.clone();
-              caches.open(CACHE).then((c) => c.put(e.request, copy));
-              return res;
-            })
-            .catch(() => hit),
-      ),
-    );
-    return;
-  }
 
   // App shell: network-first so updates land, cache fallback for offline
   if (e.request.method === 'GET' && url.origin === self.location.origin) {

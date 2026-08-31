@@ -11,6 +11,7 @@ const COMPONENT_NAMES = [
   'budget-row',
   'account-change-row',
   'cat-breakdown-row',
+  'filter-tag',
 ];
 
 let componentTemplates = {};

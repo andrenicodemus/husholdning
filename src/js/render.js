@@ -1,7 +1,34 @@
 // ---------- rendering
 let summaryMonth = monthKey(todayISO());
 let budgetsMonth = monthKey(todayISO());
-let allFilter = { account: '', category: '' };
+// `applied` drives the rendered list and the tag row; `searchQuery` is kept
+// separate (per spec) since it applies live and is never shown as a tag.
+// `draft` is the filter panel's working copy — see app.js for the open/
+// apply/discard choreography.
+let applied = { account: '', category: '', from: '', to: '' };
+let draft = { account: '', category: '', from: '', to: '' };
+let searchQuery = '';
+
+// A transaction's foldable search text (description, category, account
+// names), computed once per object and cached by identity. Every mutation
+// path (submit()'s optimistic update, or a fresh getAll() replacing `data`
+// wholesale) produces a new object for anything that changed, so a WeakMap
+// keyed on the transaction itself invalidates for free — no manual bust.
+const txHaystack = new WeakMap();
+function haystackFor(t) {
+  let h = txHaystack.get(t);
+  if (h === undefined) {
+    const parts = [
+      t.description,
+      t.category,
+      t.from_account && accName(t.from_account),
+      t.to_account && accName(t.to_account),
+    ];
+    h = foldDanish(parts.filter(Boolean).join(' '));
+    txHaystack.set(t, h);
+  }
+  return h;
+}
 
 function renderAll() {
   renderRecent();
@@ -19,7 +46,10 @@ function chipRow(container, items, selectedId, onPick, after) {
   el.replaceChildren();
   for (const it of items) {
     const b = document.createElement('button');
-    b.className = 'chip' + (it.id === selectedId ? ' on' : '');
+    b.type = 'button';
+    const on = it.id === selectedId;
+    b.className = 'chip' + (on ? ' on' : '');
+    b.setAttribute('aria-pressed', String(on));
     b.textContent = it.label;
     b.onclick = () => {
       onPick(it.id);
@@ -55,6 +85,7 @@ function setupAmountInput(input, initial) {
     raw = input.value.replace(/\D/g, '').replace(/^0+(?=\d)/, '') || '0';
     render();
     caretToEnd();
+    setFieldError(input, null);
   };
   input.onblur = () => {
     if (!raw || Number(raw) === 0) raw = '';
@@ -116,8 +147,7 @@ function txRowEl(t) {
   amount.classList.add(t.type);
   amount.textContent = sign + fmtAligned(Number(t.amount));
 
-  row.style.cursor = 'pointer';
-  row.onclick = () => openTransactionPage(t);
+  row.onclick = () => openTransactionPage(t, undefined, row);
   return row;
 }
 function renderTxList(elId, txs, emptyText) {
@@ -163,41 +193,99 @@ function populateFilterSelect(selectEl, items, allLabel, currentValue) {
   selectEl.value = items.some((it) => it.id === currentValue) ? currentValue : '';
 }
 
-function renderAllTransactions() {
-  const accSel = document.getElementById('all-filter-account');
-  const catSel = document.getElementById('all-filter-category');
-  populateFilterSelect(
-    accSel,
-    data.accounts.map((a) => ({ id: a.id, label: a.name })),
-    'All accounts',
-    allFilter.account,
-  );
-  const cats = [...data.categories].sort((x, y) =>
-    (x.type + x.name).localeCompare(y.type + y.name),
-  );
-  populateFilterSelect(
-    catSel,
-    cats.map((c) => ({ id: c.id, label: c.name })),
-    'All categories',
-    allFilter.category,
-  );
-  allFilter.account = accSel.value;
-  allFilter.category = catSel.value;
+// One tag per active `applied` filter, account/category/date order, date
+// range collapsed into a single tag. Removed from the DOM (not just hidden)
+// when nothing is applied, so it contributes no spacing.
+function tagDateRangeLabel() {
+  if (applied.from && applied.to)
+    return formatDateShort(applied.from) + ' – ' + formatDateShort(applied.to);
+  if (applied.from) return 'From ' + formatDateShort(applied.from);
+  return 'Until ' + formatDateShort(applied.to);
+}
+function renderFilterTags() {
+  const row = document.getElementById('all-filter-tags');
+  const tags = [];
+  if (applied.account) {
+    const acc = data.accounts.find((a) => a.id === applied.account);
+    if (acc) tags.push({ kind: 'account', label: acc.name });
+  }
+  if (applied.category) {
+    const cat = data.categories.find((c) => c.id === applied.category);
+    if (cat) tags.push({ kind: 'category', label: cat.name });
+  }
+  if (applied.from || applied.to) tags.push({ kind: 'date', label: tagDateRangeLabel() });
 
+  if (!tags.length) {
+    row.replaceChildren();
+    row.hidden = true;
+    return;
+  }
+  row.hidden = false;
+  row.replaceChildren();
+  for (const t of tags) {
+    const tag = component('filter-tag');
+    tag.dataset.filter = t.kind;
+    tag.querySelector('.filter-tag-label').textContent = t.label;
+    const removeBtn = tag.querySelector('.filter-tag-remove');
+    removeBtn.setAttribute('aria-label', 'Remove filter: ' + t.label);
+    removeBtn.onclick = () => removeFilterTag(t.kind, removeBtn);
+    row.appendChild(tag);
+  }
+}
+
+function renderAllTransactions() {
   let txs = data.transactions;
-  if (allFilter.account) txs = txs.filter((t) => txTouches(t, allFilter.account));
-  if (allFilter.category) {
-    const catName = (data.categories.find((c) => c.id === allFilter.category) || {}).name;
+  if (applied.account) txs = txs.filter((t) => txTouches(t, applied.account));
+  if (applied.category) {
+    const catName = (data.categories.find((c) => c.id === applied.category) || {}).name;
     txs = txs.filter((t) => t.category === catName);
+  }
+  // Inclusive both ends, plain string compare — same convention already
+  // used for pending/upcoming status, so a reversed range (from > to) just
+  // yields zero matches rather than needing special-case handling.
+  if (applied.from) txs = txs.filter((t) => t.date >= applied.from);
+  if (applied.to) txs = txs.filter((t) => t.date <= applied.to);
+  if (searchQuery) {
+    const q = foldDanish(searchQuery);
+    txs = txs.filter((t) => haystackFor(t).includes(q));
   }
   txs = [...txs].sort((a, b) =>
     (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')),
   );
 
+  renderFilterTags();
+
+  const anyActive = !!(applied.account || applied.category || applied.from || applied.to);
+  // Screen-reader-only — the design drops the visible count line, but
+  // keyboard/SR users still need to know the list changed. Called from the
+  // same (already-debounced) path as search, so this never fires per
+  // keystroke.
+  document.getElementById('all-result-count').textContent =
+    txs.length === 0 ? 'No results' : txs.length === 1 ? '1 result' : txs.length + ' results';
+
   const el = document.getElementById('all-tx-list');
   el.replaceChildren();
   if (!txs.length) {
-    renderEmpty(el, 'No transactions match this filter');
+    const empty = component('empty');
+    if (anyActive || searchQuery) {
+      empty.replaceChildren();
+      const title = document.createElement('div');
+      title.className = 'empty-title';
+      title.textContent = 'No transactions match';
+      const sub = document.createElement('div');
+      sub.textContent = 'Try a different search, or clear the filters.';
+      const clearBtn = document.createElement('button');
+      clearBtn.type = 'button';
+      clearBtn.className = 'link-btn';
+      clearBtn.textContent = 'Clear all filters';
+      // The one place search and filters are cleared together — from here
+      // there's no distinction, the screen is empty and they want out.
+      clearBtn.onclick = clearAllFiltersAndSearch;
+      empty.append(title, sub, clearBtn);
+    } else {
+      empty.textContent = 'No transactions yet';
+    }
+    el.appendChild(empty);
     return;
   }
   let currentMonth = null,
@@ -237,7 +325,6 @@ function renderAccounts() {
     const bal = accountBalance(a.id);
     const pend = pendingTxFor(a.id).length;
     const row = component('account-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
 
@@ -253,7 +340,7 @@ function renderAccounts() {
       p.textContent = projectedNote(projected, pend);
     } else p.remove();
 
-    row.onclick = () => openAllTx({ account: a.id });
+    row.onclick = () => openAllTx({ account: a.id }, row);
     el.appendChild(row);
   }
 }
@@ -274,10 +361,9 @@ function renderConfigAccounts() {
   }
   for (const a of data.accounts) {
     const row = component('config-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = a.name;
     row.querySelector('.acct-meta').textContent = ownerName(a.owner) + ' · ' + a.type;
-    row.onclick = () => openAccountPage(a);
+    row.onclick = () => openAccountPage(a, row);
     el.appendChild(row);
   }
 }
@@ -329,8 +415,7 @@ function renderBudgets() {
       ? fmt(forecast - budget) + ' over budget'
       : fmt(budget - forecast) + ' left';
     row.querySelector('.budget-total').textContent = 'of ' + fmt(budget);
-    row.style.cursor = 'pointer';
-    row.onclick = () => openAllTx({ category: c.id });
+    row.onclick = () => openAllTx({ category: c.id }, row);
     el.appendChild(row);
   }
 }
@@ -344,11 +429,10 @@ function renderConfigCategories() {
     (x.type + x.name).localeCompare(y.type + y.name),
   )) {
     const row = component('config-row');
-    row.style.cursor = 'pointer';
     row.querySelector('.acct-name').textContent = c.name;
     row.querySelector('.acct-meta').textContent =
       c.type + (Number(c.monthly_budget) > 0 ? ' · budget ' + fmt(Number(c.monthly_budget)) : '');
-    row.onclick = () => openCategoryPage(c);
+    row.onclick = () => openCategoryPage(c, row);
     cl.appendChild(row);
   }
 }

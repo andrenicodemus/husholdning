@@ -143,16 +143,28 @@ async function backgroundRefresh() {
   }
 }
 
+// Deliberately not a live region: a queue draining 3→2→1→0 would interrupt
+// screen reader users three times for information they didn't ask for. The
+// count is still readable on demand via aria-label; the one announcement
+// that matters (a real failure, or "back in sync") goes through toast().
 function updateSyncPill(offline) {
   const pill = document.getElementById('sync-pill');
   if (pending.length) {
     pill.className = 'pill warn';
     pill.textContent = syncing ? 'Syncing…' : pending.length + ' unsynced';
+    pill.setAttribute(
+      'aria-label',
+      syncing
+        ? 'Syncing changes'
+        : pending.length + (pending.length === 1 ? ' change' : ' changes') + ' not yet synced',
+    );
   } else if (offline) {
     pill.className = 'pill warn';
     pill.textContent = 'Offline';
+    pill.setAttribute('aria-label', 'Offline — changes will sync when back online');
   } else {
     pill.className = 'pill';
     pill.textContent = '';
+    pill.removeAttribute('aria-label');
   }
 }

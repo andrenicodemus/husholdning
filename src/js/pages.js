@@ -16,7 +16,28 @@ function focusSoon(el) {
   el.focus();
 }
 
-function openAccountPage(acc) {
+// Shared error UI for the three money inputs (item 3e): a .field-error
+// sibling (id="<input-id>-error") wired via aria-describedby, plus
+// aria-invalid on the input itself. Called with a falsy message to clear.
+function setFieldError(input, message) {
+  const err = document.getElementById(input.id + '-error');
+  if (message) {
+    if (err) {
+      err.textContent = message;
+      err.hidden = false;
+    }
+    input.setAttribute('aria-invalid', 'true');
+  } else {
+    if (err) {
+      err.textContent = '';
+      err.hidden = true;
+    }
+    input.removeAttribute('aria-invalid');
+  }
+}
+const BAD_AMOUNT_MSG = 'Enter an amount, like 1.250,00.';
+
+function openAccountPage(acc, trigger) {
   const isNew = !acc;
   acc = acc || { name: '', type: 'current', owner: 'joint', initial_balance: 0 };
   document.getElementById('account-edit-title').textContent = isNew
@@ -25,17 +46,21 @@ function openAccountPage(acc) {
   document.getElementById('account-name').value = acc.name;
   document.getElementById('account-type').value = acc.type;
   fillOwnerOptions(document.getElementById('account-owner'), acc.owner);
-  document.getElementById('account-init').value = acc.initial_balance;
+  const initInput = document.getElementById('account-init');
+  initInput.value = fmtPlain(Number(acc.initial_balance) || 0);
+  setFieldError(initInput, null);
+  initInput.oninput = () => setFieldError(initInput, null);
   document.getElementById('account-save').textContent = isNew ? 'Add account' : 'Save changes';
   document.getElementById('account-del').hidden = isNew;
-  openSubpage('view-account-edit');
+  openSubpage('view-account-edit', trigger);
   if (isNew) focusSoon(document.getElementById('account-name'));
 
-  document.getElementById('account-save').onclick = () => {
+  document.getElementById('account-form').onsubmit = (e) => {
+    e.preventDefault();
     const name = document.getElementById('account-name').value.trim();
-    const init = parseAmount(document.getElementById('account-init').value || '0');
+    const init = parseAmount(initInput.value || '0');
     if (!name) return toast('Give the account a name');
-    if (isNaN(init)) return toast('Initial balance is not a number');
+    if (init === null) return setFieldError(initInput, BAD_AMOUNT_MSG);
     const payload = {
       id: acc.id || uuid(),
       name,
@@ -60,7 +85,7 @@ function openAccountPage(acc) {
     };
 }
 
-function openCategoryPage(cat) {
+function openCategoryPage(cat, trigger) {
   const isNew = !cat;
   cat = cat || { name: '', type: 'expense', monthly_budget: 0 };
   document.getElementById('category-edit-title').textContent = isNew
@@ -69,17 +94,23 @@ function openCategoryPage(cat) {
   document.getElementById('category-name').value = cat.name;
   document.getElementById('category-type').value = cat.type;
   document.getElementById('category-type').disabled = !isNew;
-  document.getElementById('category-budget').value = cat.monthly_budget || '';
+  const budgetInput = document.getElementById('category-budget');
+  budgetInput.value = cat.monthly_budget ? fmtPlain(Number(cat.monthly_budget)) : '';
+  setFieldError(budgetInput, null);
+  budgetInput.oninput = () => setFieldError(budgetInput, null);
   document.getElementById('category-save').textContent = isNew ? 'Add category' : 'Save changes';
   document.getElementById('category-del').hidden = isNew;
-  openSubpage('view-category-edit');
+  openSubpage('view-category-edit', trigger);
   if (isNew) focusSoon(document.getElementById('category-name'));
 
-  document.getElementById('category-save').onclick = () => {
+  document.getElementById('category-form').onsubmit = (e) => {
+    e.preventDefault();
     const name = document.getElementById('category-name').value.trim();
-    const budget = parseAmount(document.getElementById('category-budget').value || '0');
+    const raw = budgetInput.value.trim();
+    const budget = raw ? parseAmount(raw) : 0;
     if (!name) return toast('Give the category a name');
-    if (isNaN(budget)) return toast('Budget is not a number');
+    if (budget === null) return setFieldError(budgetInput, BAD_AMOUNT_MSG);
+    if (budget < 0) return setFieldError(budgetInput, "Budget can't be negative.");
     submit(isNew ? 'addCategory' : 'updateCategory', {
       id: cat.id || uuid(),
       name,
@@ -98,11 +129,6 @@ function openCategoryPage(cat) {
       }
     };
 }
-
-// #tx-form is a <form> so pressing Enter/Go in any of its fields submits
-// it — but Save/Delete already handle that via their own click handlers, so
-// suppress the browser's default submit (which would reload the page).
-document.getElementById('tx-form').onsubmit = (e) => e.preventDefault();
 
 let editSel = { type: null, category: null, from: null, to: null };
 
@@ -146,7 +172,7 @@ function renderTxPageBody() {
 // Expense/Income/Transfer buttons); otherwise this edits the given
 // transaction — its type is fixed for the life of the page either way, only
 // amount/description/category/account/date are editable.
-function openTransactionPage(t, newType) {
+function openTransactionPage(t, newType, trigger) {
   const isNew = !t;
   t = t || {
     type: newType,
@@ -171,19 +197,23 @@ function openTransactionPage(t, newType) {
   document.getElementById('tx-amount-currency').textContent = (
     data.settings.currency || 'DKK'
   ).toUpperCase();
-  setupAmountInput(document.getElementById('tx-amount-input'), Number(t.amount));
+  const amountInput = document.getElementById('tx-amount-input');
+  setupAmountInput(amountInput, Number(t.amount));
+  setFieldError(amountInput, null);
   document.getElementById('tx-date').value = t.date;
   document.getElementById('tx-description').value = t.description || '';
   renderTxPageBody();
   document.getElementById('tx-save').textContent = isNew ? 'Save ' + t.type : 'Save changes';
   document.getElementById('tx-del').hidden = isNew;
-  openSubpage('view-transaction-edit');
+  openSubpage('view-transaction-edit', trigger);
   // Lets the user start typing the amount immediately — must stay a plain,
   // synchronous call within the click handler (see focusSoon above).
   if (isNew) focusSoon(document.getElementById('tx-amount-input'));
 
-  document.getElementById('tx-save').onclick = () => {
-    const amount = parseAmount(document.getElementById('tx-amount-input').value);
+  document.getElementById('tx-form').onsubmit = (e) => {
+    e.preventDefault();
+    const amount = parseAmount(amountInput.value);
+    if (amount === null) return setFieldError(amountInput, BAD_AMOUNT_MSG);
     if (!(amount > 0)) return toast('Enter an amount');
     if (isNew && !data.accounts.length) return toast('Add an account first (Accounts tab)');
     const type = editSel.type;

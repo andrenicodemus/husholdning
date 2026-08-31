@@ -1,0 +1,329 @@
+/* Color tokens — Figma Primitives + Semantic collections, and the app's
+   own active theme tokens (light/dark). Split out of style.css since this
+   grew to ~300 lines on its own; loaded before style.css in index.html so
+   its variables are available everywhere. */
+
+/* Figma "Primitives" collection (file "Husholdning") — Neutral Light /
+   Neutral Dark ramps, flat White/Black, and the solid brandGreen/green/
+   red/blue/orange ramps behind the semantic tokens below. Mirrors the
+   Figma variable names 1:1 and isn't wired into the UI yet; the app's own
+   tokens are still --bg/--ink/etc. */
+:root {
+  --neutral-light-0: #ffffff;
+  --neutral-light-100: #f6f8fa;
+  --neutral-light-150: #eff2f5;
+  --neutral-light-200: #e6eaef;
+  --neutral-light-250: #e0e6eb;
+  --neutral-light-300: #dae0e7;
+  --neutral-light-350: #d1d9e0;
+  --neutral-light-400: #c8d1da;
+  --neutral-light-500: #818b98;
+  --neutral-light-600: #59636e;
+  --neutral-light-700: #454c54;
+  --neutral-light-800: #393f46;
+  --neutral-light-900: #25292e;
+  --neutral-light-1000: #1f2328;
+
+  --neutral-dark-0: #010409;
+  --neutral-dark-100: #0d1117;
+  --neutral-dark-150: #151b23;
+  --neutral-dark-200: #212830;
+  --neutral-dark-250: #262c36;
+  --neutral-dark-300: #2a313c;
+  --neutral-dark-350: #2f3742;
+  --neutral-dark-400: #3d444d;
+  --neutral-dark-500: #656c76;
+  --neutral-dark-600: #9198a1;
+  --neutral-dark-700: #b7bdc8;
+  --neutral-dark-800: #d1d7e0;
+  --neutral-dark-900: #f0f6fc;
+  --neutral-dark-1000: #ffffff;
+
+  --white-0: #ffffff;
+  --black-0: #111111;
+
+  --brand-green-100: #e4eee8;
+  --brand-green-150: #c8dfd7;
+  --brand-green-200: #8dc4b1;
+  --brand-green-300: #5fbf94;
+  --brand-green-400: #44a282;
+  --brand-green-500: #37856a;
+  --brand-green-600: #2d6c56;
+  --brand-green-700: #204b3c;
+  --brand-green-800: #223f32;
+  --brand-green-900: #172b22;
+
+  --green-50: #d8fded;
+  --green-100: #b1f6d8;
+  --green-200: #87eec1;
+  --green-300: #50e2a3;
+  --green-400: #05d17f;
+  --green-500: #00c26e;
+  --green-600: #00a35c;
+  --green-700: #00854b;
+  --green-800: #007040;
+  --green-850: #005731;
+  --green-900: #164b34;
+  --green-950: #113626;
+  --green-1000: #11221b;
+
+  --red-50: #ffe0e0;
+  --red-100: #ffcccc;
+  --red-200: #ffb2b2;
+  --red-300: #ff9494;
+  --red-400: #ff6461;
+  --red-500: #ff4a47;
+  --red-600: #f43437;
+  --red-700: #d72327;
+  --red-800: #bb2a2a;
+  --red-850: #951d1d;
+  --red-900: #691717;
+  --red-950: #471f1f;
+  --red-1000: #2b1717;
+
+  --blue-50: #e6f1ff;
+  --blue-100: #c8e1fe;
+  --blue-200: #a4ceff;
+  --blue-300: #80baff;
+  --blue-400: #529ffa;
+  --blue-500: #2a89f4;
+  --blue-600: #167ef3;
+  --blue-700: #076cdf;
+  --blue-800: #065cbc;
+  --blue-850: #054994;
+  --blue-900: #063366;
+  --blue-950: #152c47;
+  --blue-1000: #122130;
+
+  --orange-50: #ffedd1;
+  --orange-100: #fad79e;
+  --orange-200: #f7c169;
+  --orange-300: #ffb238;
+  --orange-400: #f89f12;
+  --orange-500: #e59500;
+  --orange-600: #c7850a;
+  --orange-700: #ab7512;
+  --orange-800: #8c6112;
+  --orange-850: #6e4c0c;
+  --orange-900: #573b0f;
+  --orange-950: #392a14;
+  --orange-1000: #271f11;
+}
+
+:root[data-theme='light'] {
+  --bg: var(--neutral-light-0);
+  --input-bg: var(--neutral-light-100);
+  --input-placeholder: var(--neutral-light-300);
+  --card: var(--neutral-light-100);
+  --ink: var(--neutral-light-900);
+  --muted: var(--neutral-light-500);
+  --line: var(--neutral-light-300);
+  --line-strong: var(--neutral-light-400);
+  --brand: #204b3c;
+  --brand-soft: #e4eee8;
+  --income: #1e7a4c;
+  --income-hover: #1c6e43;
+  --income-soft: #cce5d7;
+  --expense: #b4432c;
+  --expense-hover: #9e3c25;
+  --expense-soft: #f0d5cb;
+  --transfer: #2b5f8a;
+  --transfer-hover: #264f6e;
+  --transfer-soft: #ccddea;
+  --warn: #daa058;
+  --warn-soft: #f6ebdd;
+  --warn-fill: #eaab4b;
+  --chart-track: var(--neutral-light-250);
+  --menu-shadow: #00000011;
+  color-scheme: light;
+
+  /* Figma "Semantic tokens" collection, Light mode — fetched but not yet
+     applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
+     resolved to the matching Primitives variable above. */
+  --background-default: var(--neutral-light-0);
+  --background-secondary: var(--neutral-light-200);
+  --badge-background-expense: var(--red-50);
+  --badge-background-income: var(--green-50);
+  --badge-background-transfer: var(--blue-50);
+  --badge-background-upcoming: var(--brand-green-100);
+  --badge-text-expense: var(--red-850);
+  --badge-text-income: var(--green-800);
+  --badge-text-transfer: var(--blue-800);
+  --badge-text-upcoming: var(--brand-green-600);
+  --border-medium: var(--neutral-light-400);
+  --border-strong: var(--neutral-light-500);
+  --brand-focus-ring: var(--brand-green-500);
+  --button-background-elevated: var(--neutral-light-200);
+  --button-background-elevated-active: var(--neutral-light-300);
+  --button-background-elevated-hover: var(--neutral-light-250);
+  --button-background-expense: var(--red-700);
+  --button-background-expense-active: var(--red-850);
+  --button-background-expense-hover: var(--red-800);
+  --button-background-ghost: var(--neutral-light-0);
+  --button-background-ghost-active: var(--neutral-light-200);
+  --button-background-ghost-hover: var(--neutral-light-150);
+  --button-background-income: var(--green-600);
+  --button-background-income-active: var(--green-800);
+  --button-background-income-hover: var(--green-700);
+  --button-background-primary: var(--brand-green-700);
+  --button-background-primary-active: var(--brand-green-900);
+  --button-background-primary-hover: var(--brand-green-800);
+  --button-background-secondary: var(--neutral-light-100);
+  --button-background-secondary-active: var(--neutral-light-200);
+  --button-background-secondary-hover: var(--neutral-light-150);
+  --button-background-transfer: var(--blue-600);
+  --button-background-transfer-active: var(--blue-800);
+  --button-background-transfer-hover: var(--blue-700);
+  --button-icon-elevated: var(--neutral-light-700);
+  --button-icon-expense: var(--red-50);
+  --button-icon-ghost: var(--neutral-light-700);
+  --button-icon-income: var(--green-50);
+  --button-icon-primary: var(--brand-green-150);
+  --button-icon-secondary: var(--neutral-light-700);
+  --button-icon-transfer: var(--blue-50);
+  --button-text-expense: var(--red-50);
+  --button-text-ghost: var(--neutral-light-900);
+  --button-text-income: var(--green-50);
+  --button-text-link: var(--brand-green-500);
+  --button-text-link-hover: var(--brand-green-300);
+  --button-text-primary: var(--brand-green-100);
+  --button-text-secondary: var(--neutral-light-900);
+  --button-text-transfer: var(--blue-50);
+  --chart-budget-fill-default: var(--brand-green-700);
+  --chart-budget-fill-upcoming: var(--orange-300);
+  --chart-budget-text-upcoming: var(--orange-600);
+  --chart-budget-track: var(--neutral-light-250);
+  --input-background-default: var(--neutral-light-100);
+  --input-background-default-active: var(--neutral-light-150);
+  --input-border-default: var(--neutral-light-400);
+  --input-border-default-focus: var(--brand-green-700);
+  --input-border-default-hover: var(--neutral-light-500);
+  --input-border-error: var(--red-600);
+  --input-icon-default: var(--neutral-light-700);
+  --input-icon-error: var(--red-600);
+  --input-icon-muted: var(--neutral-light-500);
+  --input-icon-success: var(--green-600);
+  --input-text-default: var(--neutral-light-1000);
+  --input-text-error: var(--red-700);
+  --input-text-placeholder: var(--neutral-light-600);
+  --input-text-success: var(--green-700);
+  --tag-background-active: var(--brand-green-100);
+  --tag-background-default: var(--neutral-light-100);
+  --tag-text-active: var(--brand-green-600);
+  --text-default: var(--neutral-light-1000);
+  --text-disabled: var(--neutral-light-500);
+  --text-expense: var(--red-700);
+  --text-income: var(--green-700);
+  --text-muted: var(--neutral-light-800);
+  --text-subdued: var(--neutral-light-600);
+  --text-transfer: var(--blue-700);
+}
+
+:root[data-theme='dark'] {
+  --bg: var(--neutral-dark-100);
+  --input-bg: var(--neutral-dark-150);
+  --input-placeholder: var(--neutral-dark-300);
+  --card: var(--neutral-dark-150);
+  --ink: var(--neutral-dark-900);
+  --muted: var(--neutral-dark-600);
+  --line: var(--neutral-dark-300);
+  --line-strong: var(--neutral-dark-400);
+  --brand: #5fbf94;
+  --brand-soft: #1c3329;
+  --income: #4fbf85;
+  --income-hover: #3fa36b;
+  --income-soft: hsl(149deg 47% 53% / 15%);
+  --expense: #e8785c;
+  --expense-hover: #d15f4a;
+  --expense-soft: hsl(12deg 65% 53% / 22%);
+  --transfer: #6badee;
+  --transfer-hover: #5a9ad6;
+  --transfer-soft: hsl(210deg 79% 68% / 20%);
+  --warn: #e2b262;
+  --warn-soft: #3a2c17;
+  --warn-fill: #d9a54c;
+  --chart-track: var(--neutral-dark-250);
+  --menu-shadow: #000000cc;
+  color-scheme: dark;
+
+  /* Figma "Semantic tokens" collection, Dark mode — fetched but not yet
+     applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
+     resolved to the matching Primitives variable above. */
+  --background-default: var(--neutral-dark-0);
+  --background-secondary: var(--neutral-dark-200);
+  --badge-background-expense: var(--red-950);
+  --badge-background-income: var(--green-950);
+  --badge-background-transfer: var(--blue-950);
+  --badge-background-upcoming: var(--brand-green-800);
+  --badge-text-expense: var(--red-400);
+  --badge-text-income: var(--green-400);
+  --badge-text-transfer: var(--blue-400);
+  --badge-text-upcoming: var(--brand-green-300);
+  --border-medium: var(--neutral-dark-400);
+  --border-strong: var(--neutral-dark-500);
+  --brand-focus-ring: var(--brand-green-300);
+  --button-background-elevated: var(--neutral-dark-200);
+  --button-background-elevated-active: var(--neutral-dark-300);
+  --button-background-elevated-hover: var(--neutral-dark-250);
+  --button-background-expense: var(--red-400);
+  --button-background-expense-active: var(--red-200);
+  --button-background-expense-hover: var(--red-300);
+  --button-background-ghost: var(--neutral-dark-0);
+  --button-background-ghost-active: var(--neutral-dark-150);
+  --button-background-ghost-hover: var(--neutral-dark-100);
+  --button-background-income: var(--green-400);
+  --button-background-income-active: var(--green-200);
+  --button-background-income-hover: var(--green-300);
+  --button-background-primary: var(--brand-green-300);
+  --button-background-primary-active: var(--brand-green-200);
+  --button-background-primary-hover: var(--brand-green-200);
+  --button-background-secondary: var(--neutral-dark-100);
+  --button-background-secondary-active: var(--neutral-dark-200);
+  --button-background-secondary-hover: var(--neutral-dark-150);
+  --button-background-transfer: var(--blue-400);
+  --button-background-transfer-active: var(--blue-200);
+  --button-background-transfer-hover: var(--blue-300);
+  --button-icon-elevated: var(--neutral-dark-700);
+  --button-icon-expense: var(--red-900);
+  --button-icon-ghost: var(--neutral-dark-700);
+  --button-icon-income: var(--green-900);
+  --button-icon-primary: var(--brand-green-800);
+  --button-icon-secondary: var(--neutral-dark-700);
+  --button-icon-transfer: var(--blue-900);
+  --button-text-expense: var(--red-900);
+  --button-text-ghost: var(--neutral-dark-900);
+  --button-text-income: var(--green-900);
+  --button-text-link: var(--brand-green-300);
+  --button-text-link-hover: var(--brand-green-200);
+  --button-text-primary: var(--brand-green-800);
+  --button-text-secondary: var(--neutral-dark-900);
+  --button-text-transfer: var(--blue-900);
+  --chart-budget-fill-default: var(--brand-green-300);
+  --chart-budget-fill-upcoming: var(--orange-800);
+  --chart-budget-text-upcoming: var(--orange-200);
+  --chart-budget-track: var(--neutral-dark-250);
+  --input-background-default: var(--neutral-dark-100);
+  --input-background-default-active: var(--neutral-dark-150);
+  --input-border-default: var(--neutral-dark-400);
+  --input-border-default-focus: var(--brand-green-300);
+  --input-border-default-hover: var(--neutral-dark-500);
+  --input-border-error: var(--red-400);
+  --input-icon-default: var(--neutral-dark-700);
+  --input-icon-error: var(--red-400);
+  --input-icon-muted: var(--neutral-dark-500);
+  --input-icon-success: var(--green-400);
+  --input-text-default: var(--neutral-dark-900);
+  --input-text-error: var(--red-400);
+  --input-text-placeholder: var(--neutral-dark-500);
+  --input-text-success: var(--green-400);
+  --tag-background-active: var(--brand-green-900);
+  --tag-background-default: var(--neutral-dark-100);
+  --tag-text-active: var(--brand-green-300);
+  --text-default: var(--neutral-dark-900);
+  --text-disabled: var(--neutral-dark-400);
+  --text-expense: var(--red-400);
+  --text-income: var(--green-400);
+  --text-muted: var(--neutral-dark-700);
+  --text-subdued: var(--neutral-dark-500);
+  --text-transfer: var(--blue-400);
+}

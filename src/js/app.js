@@ -17,60 +17,337 @@ function toast(msg) {
 // swipe-back gesture, or a hardware back button — always unwinds exactly one
 // level via popstate, landing on whatever was actually showing before it,
 // never a hardcoded view.
-let subpageStack = [];
+let subpageStack = []; // { view, trigger } — trigger is the element that opened this subpage
 
-function openSubpage(viewId) {
-  subpageStack.push(document.querySelector('section.view.active').id);
+// A view's one "title" heading — h1 on subpages, h2.view-title or the
+// .card-head h2 on tab views (see index.html) — always comes first among
+// these in document order, so a single selector finds the right one.
+function focusViewHeading(viewEl) {
+  const heading = viewEl.querySelector('h1, h2.view-title, .card-head h2');
+  if (heading) heading.focus({ preventScroll: true });
+}
+
+function openSubpage(viewId, trigger) {
+  subpageStack.push({
+    view: document.querySelector('section.view.active').id,
+    trigger: trigger || null,
+  });
   document.querySelectorAll('section.view').forEach((v) => v.classList.remove('active'));
-  document.getElementById(viewId).classList.add('active');
+  const view = document.getElementById(viewId);
+  view.classList.add('active');
   document.getElementById('app').classList.add('subpage');
   window.scrollTo(0, 0);
   history.pushState({ page: 'subpage', view: viewId }, '');
+  focusViewHeading(view);
 }
 
 function closeSubpage() {
   if (!subpageStack.length) return;
   document.querySelector('section.view.active').classList.remove('active');
-  document.getElementById(subpageStack.pop()).classList.add('active');
+  const { view: viewId, trigger } = subpageStack.pop();
+  const view = document.getElementById(viewId);
+  view.classList.add('active');
   document.getElementById('app').classList.toggle('subpage', subpageStack.length > 0);
   window.scrollTo(0, 0);
+  // Focus goes back to whatever row/button opened this subpage — falling
+  // back to the parent view's heading if it's gone (e.g. the account backing
+  // that row was just deleted).
+  if (trigger && document.contains(trigger)) trigger.focus({ preventScroll: true });
+  else focusViewHeading(view);
 }
 
-window.addEventListener('popstate', closeSubpage);
+// The popstate listener lives further down (see filter panel section) —
+// it has to check filter-panel state before falling through to
+// closeSubpage(), so there's exactly one popstate handler, not two.
 
-function openAllTx(filter) {
-  allFilter = { account: filter.account || '', category: filter.category || '' };
+// ---------- transactions: search
+function updateSearchClearVisibility() {
+  document.getElementById('all-search-clear').hidden = !document.getElementById('all-search').value;
+}
+let searchDebounceTimer;
+document.getElementById('all-search').oninput = (e) => {
+  updateSearchClearVisibility();
+  const value = e.target.value;
+  clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = setTimeout(() => {
+    searchQuery = value;
+    renderAllTransactions();
+  }, 150);
+};
+document.getElementById('all-search-clear').onclick = () => {
+  const input = document.getElementById('all-search');
+  input.value = '';
+  updateSearchClearVisibility();
+  clearTimeout(searchDebounceTimer);
+  searchQuery = '';
   renderAllTransactions();
-  openSubpage('view-all');
+  input.focus();
+};
+
+// Every entry into #view-all resets search and the applied filters — a
+// stale query silently hiding results is worse than retyping a few
+// characters — then applies whatever account/category the entry point
+// pre-selects.
+function openAllTx(filter, trigger) {
+  applied = { account: filter.account || '', category: filter.category || '', from: '', to: '' };
+  searchQuery = '';
+  document.getElementById('all-search').value = '';
+  updateSearchClearVisibility();
+  renderAllTransactions();
+  openSubpage('view-all', trigger);
 }
 
-function openGeneralSubpage() {
+// The empty state's own "Clear all filters" is the one place search and
+// filters reset together — from the user's side there's no distinction, the
+// screen is empty and they want out.
+function clearAllFiltersAndSearch() {
+  applied = { account: '', category: '', from: '', to: '' };
+  searchQuery = '';
+  document.getElementById('all-search').value = '';
+  updateSearchClearVisibility();
+  renderAllTransactions();
+}
+
+// Removing a tag writes straight to `applied` (no panel involved) and
+// re-renders immediately; the next panel open re-clones from `applied`, so
+// there's nothing else to reconcile.
+function removeFilterTag(kind, btnEl) {
+  const row = document.getElementById('all-filter-tags');
+  const scrollLeft = row.scrollLeft;
+  const tagEls = Array.from(row.children);
+  const idx = tagEls.findIndex((el) => el.contains(btnEl));
+
+  if (kind === 'account') applied.account = '';
+  else if (kind === 'category') applied.category = '';
+  else if (kind === 'date') {
+    applied.from = '';
+    applied.to = '';
+  }
+  renderAllTransactions();
+
+  const newRow = document.getElementById('all-filter-tags');
+  newRow.scrollLeft = scrollLeft;
+  const newTags = Array.from(newRow.children);
+  if (newTags.length) {
+    const target = newTags[idx] || newTags[newTags.length - 1];
+    target.querySelector('.filter-tag-remove').focus({ preventScroll: true });
+  } else {
+    document.getElementById('all-filter-open').focus({ preventScroll: true });
+  }
+}
+
+// ---------- filter panel (modal <dialog> — see index.html for why: focus
+// trapping, Escape handling, and top-layer stacking come for free, and the
+// panel's draft/discard semantics don't fit the .view/.active subpage
+// state machine used everywhere else)
+let filterPanelOpen = false;
+let filterPanelClosingViaBack = false;
+let filterPanelScrollY = 0;
+
+function isDraftDefault() {
+  return !draft.account && !draft.category && !draft.from && !draft.to;
+}
+function updateClearAllDisabled() {
+  document.getElementById('filter-clear').disabled = isDraftDefault();
+}
+function updateDateFieldEmptyState(input) {
+  input.closest('.date-field').classList.toggle('is-empty', !input.value);
+}
+function validateDateRange() {
+  const err = document.getElementById('filter-date-error');
+  const invalid = draft.from && draft.to && draft.from > draft.to;
+  err.hidden = !invalid;
+  err.textContent = invalid ? 'From must be on or before To.' : '';
+  document.getElementById('filter-apply').disabled = !!invalid;
+}
+
+// Selects/date fields are populated from the store fresh on every open (an
+// account added since the last visit should appear), keeping the current
+// draft selection where it's still valid and falling back to the default
+// otherwise — populateFilterSelect (render.js) already does that fallback.
+function populateFilterPanel() {
+  const accSel = document.getElementById('filter-account');
+  const catSel = document.getElementById('filter-category');
+  populateFilterSelect(
+    accSel,
+    data.accounts.map((a) => ({ id: a.id, label: a.name })),
+    'All accounts',
+    draft.account,
+  );
+  const cats = [...data.categories].sort((x, y) =>
+    (x.type + x.name).localeCompare(y.type + y.name),
+  );
+  populateFilterSelect(
+    catSel,
+    cats.map((c) => ({ id: c.id, label: c.name })),
+    'All categories',
+    draft.category,
+  );
+  draft.account = accSel.value;
+  draft.category = catSel.value;
+
+  const fromInput = document.getElementById('filter-from');
+  const toInput = document.getElementById('filter-to');
+  fromInput.value = draft.from;
+  toInput.value = draft.to;
+  updateDateFieldEmptyState(fromInput);
+  updateDateFieldEmptyState(toInput);
+  validateDateRange();
+  updateClearAllDisabled();
+}
+
+function openFilterPanel() {
+  draft = structuredClone(applied);
+  populateFilterPanel();
+  const dialog = document.getElementById('filter-panel');
+  filterPanelOpen = true;
+  filterPanelScrollY = window.scrollY;
+  document.body.style.overflow = 'hidden';
+  history.pushState({ filterPanel: true }, '');
+  dialog.showModal();
+  document.getElementById('all-filter-open').setAttribute('aria-expanded', 'true');
+  requestAnimationFrame(() => dialog.classList.add('open'));
+  document.getElementById('filter-panel-title').focus({ preventScroll: true });
+}
+
+// Plays the close transition, then actually closes the dialog once it ends
+// (a dropped transitionend — e.g. the tab was backgrounded mid-animation —
+// is covered by the timeout fallback, so the panel can never get stuck open).
+function animateFilterPanelClosed() {
+  filterPanelOpen = false;
+  const dialog = document.getElementById('filter-panel');
+  dialog.classList.remove('open');
+  let done = false;
+  const finish = () => {
+    if (done) return;
+    done = true;
+    dialog.close();
+    document.body.style.overflow = '';
+    window.scrollTo(0, filterPanelScrollY);
+    document.getElementById('all-filter-open').setAttribute('aria-expanded', 'false');
+    document.getElementById('all-filter-open').focus({ preventScroll: true });
+  };
+  const onEnd = (e) => {
+    if (e.target !== dialog || e.propertyName !== 'transform') return;
+    dialog.removeEventListener('transitionend', onEnd);
+    finish();
+  };
+  dialog.addEventListener('transitionend', onEnd);
+  setTimeout(finish, 400);
+}
+
+// User-initiated close (✕ / Escape / Apply already ran its own commit):
+// animate shut immediately, then consume the history entry pushed on open.
+// filterPanelClosingViaBack tells the resulting popstate not to react again.
+function requestCloseFilterPanel() {
+  filterPanelClosingViaBack = true;
+  animateFilterPanelClosed();
+  history.back();
+}
+
+document.getElementById('all-filter-open').onclick = openFilterPanel;
+document.getElementById('filter-close').onclick = requestCloseFilterPanel;
+// Escape fires 'cancel' on the dialog and would otherwise close it instantly
+// with no animation and no history bookkeeping — routed through the same
+// discard path as ✕ instead.
+document.getElementById('filter-panel').addEventListener('cancel', (e) => {
+  e.preventDefault();
+  requestCloseFilterPanel();
+});
+
+document.getElementById('filter-account').onchange = (e) => {
+  draft.account = e.target.value;
+  updateClearAllDisabled();
+};
+document.getElementById('filter-category').onchange = (e) => {
+  draft.category = e.target.value;
+  updateClearAllDisabled();
+};
+document.getElementById('filter-from').oninput = (e) => {
+  draft.from = e.target.value;
+  updateDateFieldEmptyState(e.target);
+  validateDateRange();
+  updateClearAllDisabled();
+};
+document.getElementById('filter-to').oninput = (e) => {
+  draft.to = e.target.value;
+  updateDateFieldEmptyState(e.target);
+  validateDateRange();
+  updateClearAllDisabled();
+};
+
+// Clear all resets the draft and leaves the panel open — it's not a commit,
+// applying still requires Apply filters. Does not touch `applied`.
+document.getElementById('filter-clear').onclick = () => {
+  draft = { account: '', category: '', from: '', to: '' };
+  document.getElementById('filter-account').value = '';
+  document.getElementById('filter-category').value = '';
+  const fromInput = document.getElementById('filter-from');
+  const toInput = document.getElementById('filter-to');
+  fromInput.value = '';
+  toInput.value = '';
+  updateDateFieldEmptyState(fromInput);
+  updateDateFieldEmptyState(toInput);
+  validateDateRange();
+  updateClearAllDisabled();
+};
+
+// method="dialog" would otherwise close the dialog instantly on submit —
+// prevented so the commit (`applied = draft`) and the animated close both
+// happen through the same path as every other close.
+document.getElementById('filter-form').onsubmit = (e) => {
+  e.preventDefault();
+  applied = structuredClone(draft);
+  renderAllTransactions();
+  requestCloseFilterPanel();
+};
+
+window.addEventListener('popstate', () => {
+  if (filterPanelClosingViaBack) {
+    filterPanelClosingViaBack = false;
+    return; // already animated by requestCloseFilterPanel
+  }
+  if (filterPanelOpen) {
+    // Android/OS back while the panel is open — the browser already popped
+    // our history entry, so just play the close animation now.
+    animateFilterPanelClosed();
+    return;
+  }
+  closeSubpage();
+});
+
+function openGeneralSubpage(trigger) {
   const s = data.settings;
   document.getElementById('g-na').value = s.name_a || 'A';
   document.getElementById('g-nb').value = s.name_b || 'B';
   document.getElementById('g-cur').value = s.currency || 'DKK';
   document.getElementById('g-pin').value = s.pin || '';
-  openSubpage('view-general');
+  openSubpage('view-general', trigger);
 }
 
-function openConfigAccounts() {
+function openConfigAccounts(trigger) {
   renderConfigAccounts();
-  openSubpage('view-config-accounts');
+  openSubpage('view-config-accounts', trigger);
 }
 
-function openConfigCategories() {
+function openConfigCategories(trigger) {
   renderConfigCategories();
-  openSubpage('view-config-categories');
+  openSubpage('view-config-categories', trigger);
 }
 
 // ---------- events
 document.querySelectorAll('nav button').forEach(
   (b) =>
     (b.onclick = () => {
-      document.querySelectorAll('nav button').forEach((x) => x.classList.toggle('on', x === b));
+      document.querySelectorAll('nav button').forEach((x) => {
+        x.classList.toggle('on', x === b);
+        if (x === b) x.setAttribute('aria-current', 'page');
+        else x.removeAttribute('aria-current');
+      });
+      const view = document.getElementById('view-' + b.dataset.view);
       document
         .querySelectorAll('section.view')
-        .forEach((v) => v.classList.toggle('active', v.id === 'view-' + b.dataset.view));
+        .forEach((v) => v.classList.toggle('active', v === view));
       if (b.dataset.view === 'summary') {
         summaryMonth = monthKey(todayISO());
         renderSummary();
@@ -80,11 +357,12 @@ document.querySelectorAll('nav button').forEach(
         renderBudgets();
       }
       window.scrollTo(0, 0);
+      focusViewHeading(view);
     }),
 );
 document
   .querySelectorAll('#add-tx-actions button')
-  .forEach((b) => (b.onclick = () => openTransactionPage(null, b.dataset.type)));
+  .forEach((b) => (b.onclick = () => openTransactionPage(null, b.dataset.type, b)));
 document.getElementById('month-prev').onclick = () => {
   summaryMonth = shiftMonth(summaryMonth, -1);
   renderSummary();
@@ -101,22 +379,16 @@ document.getElementById('budgets-month-next').onclick = () => {
   budgetsMonth = shiftMonth(budgetsMonth, 1);
   renderBudgets();
 };
-document.getElementById('all-filter-account').onchange = (e) => {
-  allFilter.account = e.target.value;
-  renderAllTransactions();
-};
-document.getElementById('all-filter-category').onchange = (e) => {
-  allFilter.category = e.target.value;
-  renderAllTransactions();
-};
-document.getElementById('btn-view-all').onclick = () => openAllTx({});
+document.getElementById('btn-view-all').onclick = (e) => openAllTx({}, e.currentTarget);
 document
   .querySelectorAll('.subpage-back, .subpage-cancel')
   .forEach((b) => (b.onclick = () => history.back()));
-document.getElementById('btn-settings').onclick = () => openSubpage('view-settings');
-document.getElementById('settings-general').onclick = openGeneralSubpage;
-document.getElementById('settings-accounts').onclick = openConfigAccounts;
-document.getElementById('settings-categories').onclick = openConfigCategories;
+document.getElementById('btn-settings').onclick = (e) =>
+  openSubpage('view-settings', e.currentTarget);
+document.getElementById('settings-general').onclick = (e) => openGeneralSubpage(e.currentTarget);
+document.getElementById('settings-accounts').onclick = (e) => openConfigAccounts(e.currentTarget);
+document.getElementById('settings-categories').onclick = (e) =>
+  openConfigCategories(e.currentTarget);
 document.getElementById('settings-resync').onclick = async () => {
   toast('Syncing…');
   await backgroundRefresh();
@@ -148,22 +420,45 @@ function applyThemeIcon(theme) {
     .querySelector('#btn-theme use')
     .setAttribute('href', 'src/icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
 }
-function setTheme(theme) {
+// Mirrors --bg in style.css (light/dark) — kept in sync with the identical
+// COLORS map in index.html's inline pre-paint script (that one can't reach
+// this file yet, so the values are duplicated rather than shared).
+const THEME_COLORS = { light: '#ffffff', dark: '#111111' };
+// persist=true for an explicit user choice (the toggle button), false for the
+// OS-preference listener below — only an explicit choice should stick as an
+// override that the OS listener must then respect and stay out of.
+function applyTheme(theme, persist) {
   document.documentElement.setAttribute('data-theme', theme);
-  try {
-    localStorage.setItem('hf_theme', theme);
-  } catch (e) {}
-  document
-    .querySelector('meta[name="theme-color"]')
-    .setAttribute('content', theme === 'dark' ? '#0f130f' : '#204b3c');
+  if (persist) {
+    try {
+      localStorage.setItem('hf_theme', theme);
+    } catch (e) {}
+  }
+  document.getElementById('meta-theme-color').setAttribute('content', THEME_COLORS[theme]);
   applyThemeIcon(theme);
 }
 applyThemeIcon(document.documentElement.getAttribute('data-theme') || 'light');
 document.getElementById('btn-theme').onclick = () => {
-  setTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+  applyTheme(
+    document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark',
+    true,
+  );
 };
-document.getElementById('btn-add-account').onclick = () => openAccountPage(null);
-document.getElementById('btn-add-category').onclick = () => openCategoryPage(null);
+// No stored override → keep following the OS live, same as the pre-paint
+// script does on cold launch.
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  let stored;
+  try {
+    stored = localStorage.getItem('hf_theme');
+  } catch (err) {
+    stored = null;
+  }
+  if (stored) return;
+  applyTheme(e.matches ? 'dark' : 'light', false);
+});
+document.getElementById('btn-add-account').onclick = (e) => openAccountPage(null, e.currentTarget);
+document.getElementById('btn-add-category').onclick = (e) =>
+  openCategoryPage(null, e.currentTarget);
 document.getElementById('g-share-link').onclick = async () => {
   const link =
     location.origin +
@@ -182,7 +477,8 @@ document.getElementById('g-share-link').onclick = async () => {
   }
 };
 
-document.getElementById('g-save').onclick = () => {
+document.getElementById('general-form').onsubmit = (e) => {
+  e.preventDefault();
   const payload = {
     name_a: document.getElementById('g-na').value.trim() || 'A',
     name_b: document.getElementById('g-nb').value.trim() || 'B',
