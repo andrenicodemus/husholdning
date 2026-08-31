@@ -170,7 +170,9 @@ function dueLabel(iso) {
     : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 // "26 Aug 2026" — same construction as dueLabel, plus the year, for showing a
-// transaction's date in lists.
+// transaction's date in lists. Also used as the filter tag date format (the
+// spec calls it formatDateShort there) — deliberately different from the
+// date *inputs*, which show dd-mm-yyyy per device locale.
 function txDateLabel(iso) {
   const [y, m, d] = String(iso).split('-').map(Number);
   const dt = new Date(y, (m || 1) - 1, d || 1);
@@ -178,6 +180,7 @@ function txDateLabel(iso) {
     ? String(iso)
     : dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
+const formatDateShort = txDateLabel;
 function shiftMonth(key, delta) {
   const [y, m] = key.split('-').map(Number);
   const d = new Date(y, m - 1 + delta, 1);

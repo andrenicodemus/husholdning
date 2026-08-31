@@ -11,6 +11,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Husholdning" />
+    <link rel="stylesheet" href="src/tokens.css" />
     <link rel="stylesheet" href="src/style.css" />
     <script>
       // Set the theme before first paint so there's no flash of the wrong theme.
@@ -243,63 +244,49 @@
             <h1 tabindex="-1">Transactions</h1>
           </div>
           <div class="list-search">
-            <label class="field-label sr-only" for="all-search">Search transactions</label>
-            <input
-              class="text-input"
-              id="all-search"
-              type="search"
-              inputmode="search"
-              enterkeyhint="search"
-              placeholder="Search transactions"
-              autocapitalize="off"
-              autocorrect="off"
-              autocomplete="off"
-            />
-          </div>
-          <div class="list-filter">
-            <div class="row2">
-              <div>
-                <label class="field-label" style="margin-top: 0" for="all-filter-account"
-                  >Account</label
-                >
-                <select class="select-input" id="all-filter-account"></select>
-              </div>
-              <div>
-                <label class="field-label" style="margin-top: 0" for="all-filter-category"
-                  >Category</label
-                >
-                <select class="select-input" id="all-filter-category"></select>
-              </div>
+            <label class="sr-only" for="all-search">Search transactions</label>
+            <div class="search-wrap">
+              <svg class="search-icon icon" aria-hidden="true" focusable="false">
+                <use href="src/icons/sprite.svg#search"></use>
+              </svg>
+              <input
+                class="text-input search-input"
+                id="all-search"
+                type="search"
+                inputmode="search"
+                enterkeyhint="search"
+                placeholder="Search…"
+                autocapitalize="off"
+                autocorrect="off"
+                autocomplete="off"
+              />
+              <button
+                class="search-clear"
+                id="all-search-clear"
+                type="button"
+                hidden
+                aria-label="Clear search"
+              >
+                <svg class="icon" aria-hidden="true" focusable="false">
+                  <use href="src/icons/sprite.svg#close"></use>
+                </svg>
+              </button>
             </div>
-          </div>
-          <div class="list-daterange">
             <button
+              class="icon-btn btn-ghost"
+              id="all-filter-open"
               type="button"
-              class="list-daterange-toggle"
-              id="all-date-toggle"
+              aria-label="Filter transactions"
+              aria-haspopup="dialog"
               aria-expanded="false"
-              aria-controls="all-date-fields"
             >
-              Date range
               <svg class="icon" aria-hidden="true" focusable="false">
-                <use href="src/icons/sprite.svg#chevron-down"></use>
+                <use href="src/icons/sprite.svg#filter"></use>
               </svg>
             </button>
-            <div class="row2 list-daterange-fields" id="all-date-fields" hidden>
-              <div>
-                <label class="field-label" for="all-from">From</label>
-                <input class="text-input" type="date" id="all-from" />
-              </div>
-              <div>
-                <label class="field-label" for="all-to">To</label>
-                <input class="text-input" type="date" id="all-to" />
-              </div>
-            </div>
           </div>
-          <div class="list-result-line" id="all-result-line" aria-live="polite" hidden>
-            <span id="all-result-count"></span>
-            <button type="button" class="link-btn" id="all-clear-filters">Clear filters</button>
-          </div>
+          <div class="filter-tags" id="all-filter-tags" hidden></div>
+          <div id="all-result-count" class="sr-only" role="status" aria-live="polite"></div>
           <div class="view-section">
             <div id="all-tx-list"></div>
           </div>
@@ -676,6 +663,62 @@
         </button>
       </nav>
     </div>
+
+    <!-- Transactions filter panel — a modal <dialog>, not a .view section:
+         its draft/discard semantics don't fit the subpage stack, and native
+         <dialog> gives focus trapping + Escape handling + top-layer
+         stacking for free. See app.js for the open/close choreography. -->
+    <dialog id="filter-panel" class="sheet" aria-labelledby="filter-panel-title">
+      <form method="dialog" id="filter-form" novalidate>
+        <div class="subpage-head sheet-head">
+          <button
+            class="icon-btn btn-secondary"
+            id="filter-close"
+            type="button"
+            aria-label="Close without applying"
+          >
+            <svg class="icon" aria-hidden="true" focusable="false">
+              <use href="src/icons/sprite.svg#close"></use>
+            </svg>
+          </button>
+          <h1 id="filter-panel-title" tabindex="-1">Filter transactions</h1>
+        </div>
+        <div class="sheet-body">
+          <div class="form-group">
+            <div>
+              <label class="field-label" for="filter-account">Account</label>
+              <select class="select-input" id="filter-account"></select>
+            </div>
+            <div>
+              <label class="field-label" for="filter-category">Category</label>
+              <select class="select-input" id="filter-category"></select>
+            </div>
+            <div>
+              <div class="list-sub">Date range</div>
+              <div class="row2">
+                <div>
+                  <label class="field-label" for="filter-from">From</label>
+                  <div class="date-field">
+                    <input class="text-input" type="date" id="filter-from" />
+                  </div>
+                </div>
+                <div>
+                  <label class="field-label" for="filter-to">To</label>
+                  <div class="date-field">
+                    <input class="text-input" type="date" id="filter-to" />
+                  </div>
+                </div>
+              </div>
+              <div class="field-error" id="filter-date-error" hidden></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-actions sheet-actions">
+          <button class="btn-secondary" id="filter-clear" type="button" disabled>Clear all</button>
+          <button class="btn-primary" id="filter-apply" type="submit">Apply filters</button>
+        </div>
+      </form>
+    </dialog>
 
     <div id="toast" role="status" aria-live="polite"></div>
     <!-- Local-only, gitignored: sets window.HF_DEV_URL to prefill the setup

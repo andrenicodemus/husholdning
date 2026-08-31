@@ -1,11 +1,12 @@
 /* Husholdning service worker — app shell cache */
-const CACHE = 'husholdning-v30';
+const CACHE = 'husholdning-v32';
 const SHELL = [
   './',
   './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png',
+  './src/tokens.css',
   './src/style.css',
   './src/icons/sprite.svg',
   './src/fonts/InterVariable.woff2',
@@ -24,6 +25,7 @@ const SHELL = [
   './src/components/budget-row.html',
   './src/components/account-change-row.html',
   './src/components/cat-breakdown-row.html',
+  './src/components/filter-tag.html',
 ];
 
 self.addEventListener('install', (e) => {

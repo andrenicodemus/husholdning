@@ -1,7 +1,13 @@
 // ---------- rendering
 let summaryMonth = monthKey(todayISO());
 let budgetsMonth = monthKey(todayISO());
-let allFilter = { account: '', category: '', search: '', from: '', to: '' };
+// `applied` drives the rendered list and the tag row; `searchQuery` is kept
+// separate (per spec) since it applies live and is never shown as a tag.
+// `draft` is the filter panel's working copy — see app.js for the open/
+// apply/discard choreography.
+let applied = { account: '', category: '', from: '', to: '' };
+let draft = { account: '', category: '', from: '', to: '' };
+let searchQuery = '';
 
 // A transaction's foldable search text (description, category, account
 // names), computed once per object and cached by identity. Every mutation
@@ -187,68 +193,81 @@ function populateFilterSelect(selectEl, items, allLabel, currentValue) {
   selectEl.value = items.some((it) => it.id === currentValue) ? currentValue : '';
 }
 
-function renderAllTransactions() {
-  const accSel = document.getElementById('all-filter-account');
-  const catSel = document.getElementById('all-filter-category');
-  populateFilterSelect(
-    accSel,
-    data.accounts.map((a) => ({ id: a.id, label: a.name })),
-    'All accounts',
-    allFilter.account,
-  );
-  const cats = [...data.categories].sort((x, y) =>
-    (x.type + x.name).localeCompare(y.type + y.name),
-  );
-  populateFilterSelect(
-    catSel,
-    cats.map((c) => ({ id: c.id, label: c.name })),
-    'All categories',
-    allFilter.category,
-  );
-  allFilter.account = accSel.value;
-  allFilter.category = catSel.value;
+// One tag per active `applied` filter, account/category/date order, date
+// range collapsed into a single tag. Removed from the DOM (not just hidden)
+// when nothing is applied, so it contributes no spacing.
+function tagDateRangeLabel() {
+  if (applied.from && applied.to)
+    return formatDateShort(applied.from) + ' – ' + formatDateShort(applied.to);
+  if (applied.from) return 'From ' + formatDateShort(applied.from);
+  return 'Until ' + formatDateShort(applied.to);
+}
+function renderFilterTags() {
+  const row = document.getElementById('all-filter-tags');
+  const tags = [];
+  if (applied.account) {
+    const acc = data.accounts.find((a) => a.id === applied.account);
+    if (acc) tags.push({ kind: 'account', label: acc.name });
+  }
+  if (applied.category) {
+    const cat = data.categories.find((c) => c.id === applied.category);
+    if (cat) tags.push({ kind: 'category', label: cat.name });
+  }
+  if (applied.from || applied.to) tags.push({ kind: 'date', label: tagDateRangeLabel() });
 
+  if (!tags.length) {
+    row.replaceChildren();
+    row.hidden = true;
+    return;
+  }
+  row.hidden = false;
+  row.replaceChildren();
+  for (const t of tags) {
+    const tag = component('filter-tag');
+    tag.dataset.filter = t.kind;
+    tag.querySelector('.filter-tag-label').textContent = t.label;
+    const removeBtn = tag.querySelector('.filter-tag-remove');
+    removeBtn.setAttribute('aria-label', 'Remove filter: ' + t.label);
+    removeBtn.onclick = () => removeFilterTag(t.kind, removeBtn);
+    row.appendChild(tag);
+  }
+}
+
+function renderAllTransactions() {
   let txs = data.transactions;
-  if (allFilter.account) txs = txs.filter((t) => txTouches(t, allFilter.account));
-  if (allFilter.category) {
-    const catName = (data.categories.find((c) => c.id === allFilter.category) || {}).name;
+  if (applied.account) txs = txs.filter((t) => txTouches(t, applied.account));
+  if (applied.category) {
+    const catName = (data.categories.find((c) => c.id === applied.category) || {}).name;
     txs = txs.filter((t) => t.category === catName);
   }
   // Inclusive both ends, plain string compare — same convention already
   // used for pending/upcoming status, so a reversed range (from > to) just
   // yields zero matches rather than needing special-case handling.
-  if (allFilter.from) txs = txs.filter((t) => t.date >= allFilter.from);
-  if (allFilter.to) txs = txs.filter((t) => t.date <= allFilter.to);
-  if (allFilter.search) {
-    const q = foldDanish(allFilter.search);
+  if (applied.from) txs = txs.filter((t) => t.date >= applied.from);
+  if (applied.to) txs = txs.filter((t) => t.date <= applied.to);
+  if (searchQuery) {
+    const q = foldDanish(searchQuery);
     txs = txs.filter((t) => haystackFor(t).includes(q));
   }
   txs = [...txs].sort((a, b) =>
     (b.date + (b.created_at || '')).localeCompare(a.date + (a.created_at || '')),
   );
 
-  const anyFilterActive = !!(
-    allFilter.account ||
-    allFilter.category ||
-    allFilter.search ||
-    allFilter.from ||
-    allFilter.to
-  );
-  document
-    .getElementById('all-date-toggle')
-    .classList.toggle('on', !!(allFilter.from || allFilter.to));
-  const resultLine = document.getElementById('all-result-line');
-  resultLine.hidden = !anyFilterActive;
-  if (anyFilterActive) {
-    document.getElementById('all-result-count').textContent =
-      txs.length + (txs.length === 1 ? ' result' : ' results');
-  }
+  renderFilterTags();
+
+  const anyActive = !!(applied.account || applied.category || applied.from || applied.to);
+  // Screen-reader-only — the design drops the visible count line, but
+  // keyboard/SR users still need to know the list changed. Called from the
+  // same (already-debounced) path as search, so this never fires per
+  // keystroke.
+  document.getElementById('all-result-count').textContent =
+    txs.length === 0 ? 'No results' : txs.length === 1 ? '1 result' : txs.length + ' results';
 
   const el = document.getElementById('all-tx-list');
   el.replaceChildren();
   if (!txs.length) {
     const empty = component('empty');
-    if (anyFilterActive) {
+    if (anyActive || searchQuery) {
       empty.replaceChildren();
       const title = document.createElement('div');
       title.className = 'empty-title';
@@ -258,8 +277,10 @@ function renderAllTransactions() {
       const clearBtn = document.createElement('button');
       clearBtn.type = 'button';
       clearBtn.className = 'link-btn';
-      clearBtn.textContent = 'Clear filters';
-      clearBtn.onclick = clearAllFilters;
+      clearBtn.textContent = 'Clear all filters';
+      // The one place search and filters are cleared together — from here
+      // there's no distinction, the screen is empty and they want out.
+      clearBtn.onclick = clearAllFiltersAndSearch;
       empty.append(title, sub, clearBtn);
     } else {
       empty.textContent = 'No transactions yet';
