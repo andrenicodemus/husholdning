@@ -111,10 +111,10 @@
 }
 
 :root[data-theme='light'] {
-  --bg: var(--neutral-light-0);
-  --input-bg: var(--neutral-light-100);
-  --input-placeholder: var(--neutral-light-300);
-  --card: var(--neutral-light-100);
+  /* --bg: var(--neutral-light-0); */
+  /* --input-bg: var(--neutral-light-100); */
+  /* --input-placeholder: var(--neutral-light-300); */
+  /* --card: var(--neutral-light-100); */
   --ink: var(--neutral-light-900);
   --muted: var(--neutral-light-500);
   --line: var(--neutral-light-300);
@@ -141,7 +141,8 @@
      applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
      resolved to the matching Primitives variable above. */
   --background-default: var(--neutral-light-0);
-  --background-secondary: var(--neutral-light-200);
+  --background-secondary: var(--neutral-light-150);
+  --background-inverted: var(--neutral-light-1000);
   --badge-background-expense: var(--red-50);
   --badge-background-income: var(--green-50);
   --badge-background-transfer: var(--blue-50);
@@ -153,41 +154,41 @@
   --border-medium: var(--neutral-light-400);
   --border-strong: var(--neutral-light-500);
   --brand-focus-ring: var(--brand-green-500);
-  --button-background-elevated: var(--neutral-light-200);
-  --button-background-elevated-active: var(--neutral-light-300);
-  --button-background-elevated-hover: var(--neutral-light-250);
-  --button-background-expense: var(--red-700);
-  --button-background-expense-active: var(--red-850);
-  --button-background-expense-hover: var(--red-800);
-  --button-background-ghost: var(--neutral-light-0);
-  --button-background-ghost-active: var(--neutral-light-200);
-  --button-background-ghost-hover: var(--neutral-light-150);
-  --button-background-income: var(--green-600);
-  --button-background-income-active: var(--green-800);
-  --button-background-income-hover: var(--green-700);
   --button-background-primary: var(--brand-green-700);
-  --button-background-primary-active: var(--brand-green-900);
   --button-background-primary-hover: var(--brand-green-800);
+  --button-background-primary-active: var(--brand-green-900);
   --button-background-secondary: var(--neutral-light-100);
-  --button-background-secondary-active: var(--neutral-light-200);
   --button-background-secondary-hover: var(--neutral-light-150);
+  --button-background-secondary-active: var(--neutral-light-200);
+  --button-background-ghost: var(--neutral-light-0);
+  --button-background-ghost-hover: var(--neutral-light-150);
+  --button-background-ghost-active: var(--neutral-light-200);
+  --button-background-elevated: var(--neutral-light-200);
+  --button-background-elevated-hover: var(--neutral-light-300);
+  --button-background-elevated-active: var(--neutral-light-350);
+  --button-background-expense: var(--red-700);
+  --button-background-expense-hover: var(--red-800);
+  --button-background-expense-active: var(--red-850);
+  --button-background-income: var(--green-600);
+  --button-background-income-hover: var(--green-700);
+  --button-background-income-active: var(--green-800);
   --button-background-transfer: var(--blue-600);
-  --button-background-transfer-active: var(--blue-800);
   --button-background-transfer-hover: var(--blue-700);
-  --button-icon-elevated: var(--neutral-light-700);
-  --button-icon-expense: var(--red-50);
-  --button-icon-ghost: var(--neutral-light-700);
-  --button-icon-income: var(--green-50);
+  --button-background-transfer-active: var(--blue-800);
   --button-icon-primary: var(--brand-green-150);
   --button-icon-secondary: var(--neutral-light-700);
+  --button-icon-ghost: var(--neutral-light-600);
+  --button-icon-elevated: var(--neutral-light-700);
+  --button-icon-expense: var(--red-50);
+  --button-icon-income: var(--green-50);
   --button-icon-transfer: var(--blue-50);
-  --button-text-expense: var(--red-50);
-  --button-text-ghost: var(--neutral-light-900);
-  --button-text-income: var(--green-50);
+  --button-text-primary: var(--brand-green-100);
+  --button-text-secondary: var(--neutral-light-800);
+  --button-text-ghost: var(--neutral-light-800);
   --button-text-link: var(--brand-green-500);
   --button-text-link-hover: var(--brand-green-300);
-  --button-text-primary: var(--brand-green-100);
-  --button-text-secondary: var(--neutral-light-900);
+  --button-text-expense: var(--red-50);
+  --button-text-income: var(--green-50);
   --button-text-transfer: var(--blue-50);
   --chart-budget-fill-default: var(--brand-green-700);
   --chart-budget-fill-upcoming: var(--orange-300);
@@ -205,13 +206,15 @@
   --input-icon-success: var(--green-600);
   --input-text-default: var(--neutral-light-1000);
   --input-text-error: var(--red-700);
-  --input-text-placeholder: var(--neutral-light-600);
+  --input-text-placeholder: var(--neutral-light-500);
   --input-text-success: var(--green-700);
   --tag-background-active: var(--brand-green-100);
   --tag-background-default: var(--neutral-light-100);
+  --tag-text-default: var(--neutral-light-800);
   --tag-text-active: var(--brand-green-600);
   --text-default: var(--neutral-light-1000);
   --text-disabled: var(--neutral-light-500);
+  --text-inverted: var(--neutral-light-0);
   --text-expense: var(--red-700);
   --text-income: var(--green-700);
   --text-muted: var(--neutral-light-800);
@@ -220,10 +223,10 @@
 }
 
 :root[data-theme='dark'] {
-  --bg: var(--neutral-dark-100);
-  --input-bg: var(--neutral-dark-150);
-  --input-placeholder: var(--neutral-dark-300);
-  --card: var(--neutral-dark-150);
+  /* --bg: var(--neutral-dark-100); */
+  /* --input-bg: var(--neutral-dark-150); */
+  /* --input-placeholder: var(--neutral-dark-300); */
+  /* --card: var(--neutral-dark-150); */
   --ink: var(--neutral-dark-900);
   --muted: var(--neutral-dark-600);
   --line: var(--neutral-dark-300);
@@ -250,7 +253,8 @@
      applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
      resolved to the matching Primitives variable above. */
   --background-default: var(--neutral-dark-0);
-  --background-secondary: var(--neutral-dark-200);
+  --background-secondary: var(--neutral-dark-100);
+  --background-inverted: var(--neutral-dark-1000);
   --badge-background-expense: var(--red-950);
   --badge-background-income: var(--green-950);
   --badge-background-transfer: var(--blue-950);
@@ -262,41 +266,41 @@
   --border-medium: var(--neutral-dark-400);
   --border-strong: var(--neutral-dark-500);
   --brand-focus-ring: var(--brand-green-300);
-  --button-background-elevated: var(--neutral-dark-200);
-  --button-background-elevated-active: var(--neutral-dark-300);
-  --button-background-elevated-hover: var(--neutral-dark-250);
-  --button-background-expense: var(--red-400);
-  --button-background-expense-active: var(--red-200);
-  --button-background-expense-hover: var(--red-300);
-  --button-background-ghost: var(--neutral-dark-0);
-  --button-background-ghost-active: var(--neutral-dark-150);
-  --button-background-ghost-hover: var(--neutral-dark-100);
-  --button-background-income: var(--green-400);
-  --button-background-income-active: var(--green-200);
-  --button-background-income-hover: var(--green-300);
   --button-background-primary: var(--brand-green-300);
-  --button-background-primary-active: var(--brand-green-200);
   --button-background-primary-hover: var(--brand-green-200);
+  --button-background-primary-active: var(--brand-green-200);
   --button-background-secondary: var(--neutral-dark-100);
-  --button-background-secondary-active: var(--neutral-dark-200);
   --button-background-secondary-hover: var(--neutral-dark-150);
+  --button-background-secondary-active: var(--neutral-dark-200);
+  --button-background-ghost: var(--neutral-dark-0);
+  --button-background-ghost-hover: var(--neutral-dark-150);
+  --button-background-ghost-active: var(--neutral-dark-200);
+  --button-background-elevated: var(--neutral-dark-200);
+  --button-background-elevated-hover: var(--neutral-dark-300);
+  --button-background-elevated-active: var(--neutral-dark-350);
+  --button-background-expense: var(--red-400);
+  --button-background-expense-hover: var(--red-300);
+  --button-background-expense-active: var(--red-200);
+  --button-background-income: var(--green-400);
+  --button-background-income-hover: var(--green-300);
+  --button-background-income-active: var(--green-200);
   --button-background-transfer: var(--blue-400);
-  --button-background-transfer-active: var(--blue-200);
   --button-background-transfer-hover: var(--blue-300);
-  --button-icon-elevated: var(--neutral-dark-700);
-  --button-icon-expense: var(--red-900);
-  --button-icon-ghost: var(--neutral-dark-700);
-  --button-icon-income: var(--green-900);
+  --button-background-transfer-active: var(--blue-200);
   --button-icon-primary: var(--brand-green-800);
   --button-icon-secondary: var(--neutral-dark-700);
+  --button-icon-ghost: var(--neutral-dark-600);
+  --button-icon-elevated: var(--neutral-dark-700);
+  --button-icon-expense: var(--red-900);
+  --button-icon-income: var(--green-900);
   --button-icon-transfer: var(--blue-900);
-  --button-text-expense: var(--red-900);
-  --button-text-ghost: var(--neutral-dark-900);
-  --button-text-income: var(--green-900);
+  --button-text-primary: var(--brand-green-800);
+  --button-text-secondary: var(--neutral-dark-800);
+  --button-text-ghost: var(--neutral-dark-800);
   --button-text-link: var(--brand-green-300);
   --button-text-link-hover: var(--brand-green-200);
-  --button-text-primary: var(--brand-green-800);
-  --button-text-secondary: var(--neutral-dark-900);
+  --button-text-expense: var(--red-900);
+  --button-text-income: var(--green-900);
   --button-text-transfer: var(--blue-900);
   --chart-budget-fill-default: var(--brand-green-300);
   --chart-budget-fill-upcoming: var(--orange-800);
@@ -318,9 +322,11 @@
   --input-text-success: var(--green-400);
   --tag-background-active: var(--brand-green-900);
   --tag-background-default: var(--neutral-dark-100);
+  --tag-text-default: var(--neutral-dark-800);
   --tag-text-active: var(--brand-green-300);
   --text-default: var(--neutral-dark-900);
   --text-disabled: var(--neutral-dark-400);
+  --text-inverted: var(--neutral-dark-0);
   --text-expense: var(--red-400);
   --text-income: var(--green-400);
   --text-muted: var(--neutral-dark-700);

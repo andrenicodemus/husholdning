@@ -16,9 +16,9 @@
     <script>
       // Set the theme before first paint so there's no flash of the wrong theme.
       (function () {
-        // Mirrors --bg in style.css (light/dark) — the surface the fixed
+        // Mirrors --background-default in style.css (light/dark) — the surface the fixed
         // header sits on, i.e. what the status bar visually continues from.
-        var COLORS = { light: '#ffffff', dark: '#111111' };
+        var COLORS = { light: '#ffffff', dark: '#010409' };
         try {
           var t =
             localStorage.getItem('hf_theme') ||
@@ -236,7 +236,7 @@
         <!-- TRANSACTIONS (reached via "View all" / an account / a budget — not a nav tab) -->
         <section class="view" id="view-all">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -273,7 +273,7 @@
               </button>
             </div>
             <button
-              class="icon-btn btn-ghost"
+              class="icon-btn btn-ghost icon-btn-medium"
               id="all-filter-open"
               type="button"
               aria-label="Filter transactions"
@@ -295,7 +295,7 @@
         <!-- SETTINGS: GENERAL -->
         <section class="view" id="view-general">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -347,7 +347,7 @@
         <!-- SETTINGS: ACCOUNTS -->
         <section class="view" id="view-config-accounts">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -359,15 +359,16 @@
           </div>
           <button class="btn-tertiary" id="btn-add-account">
             <svg class="icon" aria-hidden="true" focusable="false">
-              <use href="src/icons/sprite.svg#plus"></use></svg
-            >Add account
+              <use href="src/icons/sprite.svg#plus"></use>
+            </svg>
+            Add account
           </button>
         </section>
 
         <!-- SETTINGS: CATEGORIES -->
         <section class="view" id="view-config-categories">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -379,15 +380,16 @@
           </div>
           <button class="btn-tertiary" id="btn-add-category">
             <svg class="icon" aria-hidden="true" focusable="false">
-              <use href="src/icons/sprite.svg#plus"></use></svg
-            >Add category
+              <use href="src/icons/sprite.svg#plus"></use>
+            </svg>
+            Add category
           </button>
         </section>
 
         <!-- SETTINGS: MENU -->
         <section class="view" id="view-settings">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -451,7 +453,7 @@
         <!-- ACCOUNT: ADD/EDIT -->
         <section class="view" id="view-account-edit">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -510,7 +512,7 @@
         <!-- CATEGORY: ADD/EDIT -->
         <section class="view" id="view-category-edit">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -560,7 +562,7 @@
         <!-- TRANSACTION: ADD/EDIT -->
         <section class="view" id="view-transaction-edit">
           <div class="subpage-head">
-            <button class="icon-btn btn-secondary subpage-back" aria-label="Back">
+            <button class="icon-btn btn-elevated subpage-back" aria-label="Back">
               <svg class="icon" aria-hidden="true" focusable="false">
                 <use href="src/icons/sprite.svg#chevron-left"></use>
               </svg>
@@ -672,7 +674,7 @@
       <form method="dialog" id="filter-form" novalidate>
         <div class="subpage-head sheet-head">
           <button
-            class="icon-btn btn-secondary"
+            class="icon-btn btn-elevated"
             id="filter-close"
             type="button"
             aria-label="Close without applying"
@@ -685,37 +687,45 @@
         </div>
         <div class="sheet-body">
           <div class="form-group">
-            <div>
-              <label class="field-label" for="filter-account">Account</label>
-              <select class="select-input" id="filter-account"></select>
-            </div>
-            <div>
-              <label class="field-label" for="filter-category">Category</label>
-              <select class="select-input" id="filter-category"></select>
-            </div>
-            <div>
-              <div class="list-sub">Date range</div>
-              <div class="row2">
-                <div>
-                  <label class="field-label" for="filter-from">From</label>
-                  <div class="date-field">
-                    <input class="text-input" type="date" id="filter-from" />
-                  </div>
-                </div>
-                <div>
-                  <label class="field-label" for="filter-to">To</label>
-                  <div class="date-field">
-                    <input class="text-input" type="date" id="filter-to" />
-                  </div>
-                </div>
+            <div class="filters-section">
+              <div>
+                <label class="field-label" for="filter-account">Account</label>
+                <select class="select-input" id="filter-account"></select>
               </div>
-              <div class="field-error" id="filter-date-error" hidden></div>
+              <div>
+                <label class="field-label" for="filter-category">Category</label>
+                <select class="select-input" id="filter-category"></select>
+              </div>
+            </div>
+            <div class="date-range-section">
+              <div class="list-sub">Date range</div>
+              <div class="inputs-wrapper">
+                <div class="row2">
+                  <div>
+                    <label class="field-label" for="filter-from">From</label>
+                    <div class="date-field">
+                      <input class="text-input" type="date" id="filter-from" />
+                    </div>
+                  </div>
+                  <div>
+                    <label class="field-label" for="filter-to">To</label>
+                    <div class="date-field">
+                      <input class="text-input" type="date" id="filter-to" />
+                    </div>
+                  </div>
+                </div>
+                <div class="field-error" id="filter-date-error" hidden></div>
+              </div>
             </div>
           </div>
         </div>
         <div class="form-actions sheet-actions">
-          <button class="btn-secondary" id="filter-clear" type="button" disabled>Clear all</button>
-          <button class="btn-primary" id="filter-apply" type="submit">Apply filters</button>
+          <div class="row2">
+            <button class="btn-secondary" id="filter-clear" type="button" disabled>
+              Clear all
+            </button>
+            <button class="btn-primary" id="filter-apply" type="submit">Apply filters</button>
+          </div>
         </div>
       </form>
     </dialog>

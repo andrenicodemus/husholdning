@@ -36,7 +36,7 @@ html {
 
 body {
   font-family: var(--sans);
-  background: var(--bg);
+  background: var(--background-default);
   color: var(--ink);
   min-height: 100%;
   font-size: 16px;
@@ -111,17 +111,67 @@ textarea:focus-visible,
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--muted);
   font-size: 18px;
 }
 
+.icon-btn-medium {
+  width: 48px;
+  height: 48px;
+  font-size: 24px;
+}
+
 .btn-secondary {
-  background-color: var(--card);
+  background-color: var(--button-background-secondary);
+  color: var(--button-text-secondary);
+  border: 1px solid var(--border-medium);
+}
+.btn-secondary:hover {
+  background-color: var(--button-background-secondary-hover);
+  border-color: var(--border-strong);
+}
+.btn-secondary:active {
+  background-color: var(--button-background-secondary-active);
+  border-color: var(--border-strong);
+}
+.btn-secondary:disabled {
+  opacity: 0.4;
+}
+.btn-secondary .icon {
+  color: var(--button-icon-secondary);
 }
 
 .btn-ghost {
-  background: none;
-  border: none;
+  background-color: var(--button-background-ghost);
+  color: var(--button-text-ghost);
+}
+.btn-ghost:hover {
+  background-color: var(--button-background-ghost-hover);
+}
+.btn-ghost:active {
+  background-color: var(--button-background-ghost-active);
+}
+.btn-ghost:disabled {
+  opacity: 0.4;
+}
+.btn-ghost .icon {
+  color: var(--button-icon-ghost);
+}
+
+.btn-elevated {
+  background-color: var(--button-background-elevated);
+  color: var(--button-text-elevated);
+}
+.btn-elevated:hover {
+  background-color: var(--button-background-elevated-hover);
+}
+.btn-elevated:active {
+  background-color: var(--button-background-elevated-active);
+}
+.btn-elevated:disabled {
+  opacity: 0.4;
+}
+.btn-elevated .icon {
+  color: var(--button-icon-elevated);
 }
 
 .icon {
@@ -147,7 +197,7 @@ header {
   top: 0;
   right: 0;
   left: 0;
-  background-color: var(--bg);
+  background-color: var(--background-default);
   z-index: 21;
 }
 
@@ -329,7 +379,7 @@ dialog#filter-panel.sheet {
   height: 100%;
   max-width: none;
   max-height: none;
-  background: var(--bg);
+  background: var(--background-default);
   color: var(--ink);
   display: flex;
   flex-direction: column;
@@ -340,13 +390,13 @@ dialog#filter-panel.sheet.open {
   transform: translateY(0);
 }
 /* The sheet is full-height, so the backdrop is only visible for an instant
-   during the slide — matching it to --bg keeps that instant seamless rather
+   during the slide — matching it to --background-default keeps that instant seamless rather
    than a colour flash. */
 dialog#filter-panel::backdrop {
-  background: var(--bg);
+  background: var(--background-default);
 }
 .sheet-head {
-  padding: calc(12px + env(safe-area-inset-top)) 24px 0;
+  padding: calc(20px + env(safe-area-inset-top)) 24px 0;
 }
 .sheet-body {
   flex: 1;
@@ -358,7 +408,7 @@ dialog#filter-panel::backdrop {
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin-top: 0;
-  padding: 16px 24px max(24px, env(safe-area-inset-bottom));
+  padding: 0 24px max(24px, env(safe-area-inset-bottom));
 }
 /* .btn-secondary is otherwise only ever paired with .icon-btn (circular back/
    close buttons) — scoped here so "Clear all" gets a full rectangular
@@ -375,6 +425,26 @@ dialog#filter-panel::backdrop {
   opacity: 0.4;
 }
 
+.filters-section {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.date-range-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 8px 0;
+}
+.inputs-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.date-range-section .list-sub {
+  margin-top: 16px;
+}
 /* ::placeholder doesn't apply to type="date", so an empty field's "Select a
    date" hint is faked: hide the native (locale-formatted) value and draw the
    hint via ::before on the wrapper. Toggled by the `is-empty` class in JS. */
@@ -390,7 +460,7 @@ dialog#filter-panel::backdrop {
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--input-placeholder);
+  color: var(--input-text-placeholder);
   pointer-events: none;
 }
 
@@ -438,7 +508,7 @@ section.view .view-title {
   margin-right: -8px;
 }
 .card {
-  background: var(--card);
+  background: var(--background-secondary);
   border-radius: var(--radius);
   padding: 20px 16px;
   margin-bottom: 14px;
@@ -490,16 +560,17 @@ section.view .view-title {
 }
 .add-tx-actions button[data-type='expense'] {
   background: var(--expense);
-  color: var(--bg);
+  color: var(--button-text-expense);
 }
 .add-tx-actions button[data-type='expense']:hover {
   background: var(--expense-hover);
-  color: var(--bg);
+  color: var(--button-text-expense);
 }
 .add-tx-actions button[data-type='income'],
 .add-tx-actions button[data-type='transfer'] {
-  color: var(--muted);
-  border: 1px solid var(--line-strong);
+  background: var(--button-background-secondary);
+  color: var(--button-text-secondary);
+  border: 1px solid var(--border-medium);
 }
 
 .add-tx-actions button[data-type='income']:hover {
@@ -533,7 +604,7 @@ section.view .view-title {
   outline: none;
 }
 .amount-input::placeholder {
-  color: var(--input-placeholder);
+  color: var(--input-text-placeholder);
 }
 .amount-currency {
   font-size: 14px;
@@ -567,14 +638,14 @@ section.view .view-title {
   border-radius: 999px;
   font-size: 14px;
   font-weight: 500;
-  background: var(--input-bg);
-  border: 1px solid var(--line);
-  color: var(--ink);
+  background: var(--tag-background-default);
+  border: 1px solid var(--border-medium);
+  color: var(--tag-text-default);
 }
 .chip.on {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
+  background: var(--tag-background-active);
+  border-color: var(--tag-text-active);
+  color: var(--button-text-secondary);
 }
 .tint-expense .chip.on {
   background: var(--expense-soft);
@@ -601,26 +672,37 @@ section.view .view-title {
 .row2 > * {
   min-width: 0;
 }
+
 .text-input {
   width: 100%;
   padding: 11px 12px;
   border-radius: 10px;
-  border: 1px solid var(--line);
-  background-color: var(--input-bg);
+  border: 1px solid var(--input-border-default);
+  background-color: var(--input-background-default);
   outline: none;
   line-height: 1.45;
 }
+.text-input:hover {
+  border-color: var(--input-border-default-hover);
+}
 .text-input:focus {
-  border-color: var(--brand);
-  background-color: var(--card);
+  border-color: var(--input-border-default-focus);
+  background-color: var(--input-background-default-active);
+}
+.text-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.text-input::placeholder {
+  color: var(--input-text-placeholder);
 }
 
 .select-input {
   width: 100%;
   padding: 11px 34px 11px 12px;
   border-radius: 10px;
-  border: 1px solid var(--line);
-  background-color: var(--input-bg);
+  border: 1px solid var(--input-border-default);
+  background-color: var(--input-background-default);
   outline: none;
   line-height: 1.45;
   font: inherit;
@@ -632,9 +714,12 @@ section.view .view-title {
   background-position: right 10px center;
   background-size: 16px 16px;
 }
+.select-input:hover {
+  border-color: var(--input-border-default-hover);
+}
 .select-input:focus {
-  border-color: var(--brand);
-  background-color: var(--card);
+  border-color: var(--input-border-default-focus);
+  background-color: var(--input-background-default-active);
 }
 .select-input:disabled {
   opacity: 0.6;
@@ -691,8 +776,8 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   width: 100%;
   padding: 16px;
   border-radius: var(--radius);
-  background: var(--brand);
-  color: var(--bg);
+  background: var(--button-background-primary);
+  color: var(--button-text-primary);
   font-weight: 600;
   font-size: 16px;
   letter-spacing: 0.01em;
@@ -704,22 +789,34 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   opacity: 0.4;
 }
 .tint-expense .btn-primary {
-  background: var(--expense);
+  background: var(--button-background-expense);
+  color: var(--button-text-expense);
 }
 .tint-expense .btn-primary:hover {
-  background: var(--expense-hover);
+  background: var(--button-background-expense-hover);
+}
+.tint-expense .btn-primary:active {
+  background: var(--button-background-expense-active);
 }
 .tint-income .btn-primary {
-  background: var(--income);
+  background: var(--button-background-income);
+  color: var(--button-text-income);
 }
 .tint-income .btn-primary:hover {
-  background: var(--income-hover);
+  background: var(--button-background-income-hover);
+}
+.tint-income .btn-primary:active {
+  background: var(--button-background-income-active);
 }
 .tint-transfer .btn-primary {
-  background: var(--transfer);
+  background: var(--button-background-transfer);
+  color: var(--button-text-transfer);
 }
 .tint-transfer .btn-primary:hover {
-  background: var(--transfer-hover);
+  background: var(--button-background-transfer-hover);
+}
+.tint-transfer .btn-primary:active {
+  background: var(--button-background-transfer-active);
 }
 .btn-tertiary {
   display: flex;
@@ -1012,12 +1109,20 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
    (not a solid fill) so it reads as forecasted, not already spent. */
 .bar-fill-upcoming {
   height: 100%;
-  background-image: repeating-linear-gradient(45deg, var(--warn-fill) 2px 4px, var(--bg) 4px 6px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--warn-fill) 2px 4px,
+    var(--background-default) 4px 6px
+  );
   opacity: 0.6;
   transition: width 0.3s ease;
 }
 .bar-fill-upcoming.over {
-  background-image: repeating-linear-gradient(45deg, var(--expense) 2px 4px, var(--bg) 4px 6px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    var(--expense) 2px 4px,
+    var(--background-default) 4px 6px
+  );
 }
 .budget-bottom {
   display: flex;
@@ -1063,7 +1168,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   margin-bottom: 14px;
 }
 .stat {
-  background: var(--card);
+  background: var(--background-secondary);
   border-radius: var(--radius);
   padding: 18px 16px 22px;
 }
@@ -1173,7 +1278,7 @@ nav {
   bottom: 0;
   left: 0;
   right: 0;
-  background: var(--bg);
+  background: var(--background-default);
   border-top: 1px solid var(--line);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1249,8 +1354,8 @@ nav button.on {
   left: 50%;
   transform: translateX(-50%);
   bottom: calc(84px + env(safe-area-inset-bottom));
-  background: var(--ink);
-  color: var(--bg);
+  background: var(--background-inverted);
+  color: var(--text-inverted);
   font-size: 14px;
   font-weight: 600;
   padding: 10px 18px;

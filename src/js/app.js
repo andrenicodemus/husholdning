@@ -157,7 +157,7 @@ function validateDateRange() {
   const err = document.getElementById('filter-date-error');
   const invalid = draft.from && draft.to && draft.from > draft.to;
   err.hidden = !invalid;
-  err.textContent = invalid ? 'From must be on or before To.' : '';
+  err.textContent = invalid ? 'The "To" date can\'t be before the "From" date.' : '';
   document.getElementById('filter-apply').disabled = !!invalid;
 }
 
@@ -420,10 +420,10 @@ function applyThemeIcon(theme) {
     .querySelector('#btn-theme use')
     .setAttribute('href', 'src/icons/sprite.svg#' + (theme === 'dark' ? 'moon' : 'sun'));
 }
-// Mirrors --bg in style.css (light/dark) — kept in sync with the identical
+// Mirrors --background-default in style.css (light/dark) — kept in sync with the identical
 // COLORS map in index.html's inline pre-paint script (that one can't reach
 // this file yet, so the values are duplicated rather than shared).
-const THEME_COLORS = { light: '#ffffff', dark: '#111111' };
+const THEME_COLORS = { light: '#ffffff', dark: '#010409' };
 // persist=true for an explicit user choice (the toggle button), false for the
 // OS-preference listener below — only an explicit choice should stick as an
 // override that the OS listener must then respect and stay out of.

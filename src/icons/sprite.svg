@@ -81,16 +81,16 @@
     <path d="m21 21-4.35-4.35" />
   </symbol>
 
-  <symbol id="filter" viewBox="0 0 24 24">
-    <path d="M4 6h10" />
-    <path d="M18 6h2" />
-    <circle cx="16" cy="6" r="2" />
-    <path d="M4 12h2" />
-    <path d="M10 12h10" />
-    <circle cx="8" cy="12" r="2" />
-    <path d="M4 18h10" />
-    <path d="M18 18h2" />
-    <circle cx="16" cy="18" r="2" />
+  <symbol id="filter" width="24" height="24" viewBox="0 0 24 24">
+    <path d="M10 5H3"/>
+    <path d="M12 19H3"/>
+    <path d="M14 3v4"/>
+    <path d="M16 17v4"/>
+    <path d="M21 12h-9"/>
+    <path d="M21 19h-5"/>
+    <path d="M21 5h-7"/>
+    <path d="M8 10v4"/>
+    <path d="M8 12H3"/>
   </symbol>
 
   <symbol id="close" viewBox="0 0 24 24">
