@@ -270,13 +270,13 @@ function renderAllTransactions() {
     if (anyActive || searchQuery) {
       empty.replaceChildren();
       const title = document.createElement('div');
-      title.className = 'empty-title';
+      title.className = 'empty-list-title';
       title.textContent = 'No transactions match';
       const sub = document.createElement('div');
       sub.textContent = 'Try a different search, or clear the filters.';
       const clearBtn = document.createElement('button');
       clearBtn.type = 'button';
-      clearBtn.className = 'link-btn';
+      clearBtn.className = 'btn-link';
       clearBtn.textContent = 'Clear all filters';
       // The one place search and filters are cleared together — from here
       // there's no distinction, the screen is empty and they want out.

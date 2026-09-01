@@ -115,7 +115,7 @@
   /* --input-bg: var(--neutral-light-100); */
   /* --input-placeholder: var(--neutral-light-300); */
   /* --card: var(--neutral-light-100); */
-  --ink: var(--neutral-light-900);
+  /* --ink: var(--neutral-light-900); */
   --muted: var(--neutral-light-500);
   --line: var(--neutral-light-300);
   --line-strong: var(--neutral-light-400);
@@ -227,7 +227,7 @@
   /* --input-bg: var(--neutral-dark-150); */
   /* --input-placeholder: var(--neutral-dark-300); */
   /* --card: var(--neutral-dark-150); */
-  --ink: var(--neutral-dark-900);
+  /* --ink: var(--neutral-dark-900); */
   --muted: var(--neutral-dark-600);
   --line: var(--neutral-dark-300);
   --line-strong: var(--neutral-dark-400);

@@ -70,7 +70,7 @@
               </div>
             </div>
             <div class="form-actions">
-              <button class="btn-primary" type="submit" id="setup-connect">Connect</button>
+              <button class="btn btn-primary" type="submit" id="setup-connect">Connect</button>
             </div>
             <div class="err" id="setup-err"></div>
           </form>
@@ -105,19 +105,19 @@
           <div class="add-tx-card" id="add-tx-card">
             <h3>Add transaction</h3>
             <div class="add-tx-actions" id="add-tx-actions">
-              <button data-type="expense">
+              <button class="btn" data-type="expense">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use href="src/icons/sprite.svg#minus"></use>
                 </svg>
                 Expense
               </button>
-              <button data-type="income">
+              <button class="btn btn-secondary" data-type="income">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use href="src/icons/sprite.svg#plus"></use>
                 </svg>
                 Income
               </button>
-              <button data-type="transfer">
+              <button class="btn btn-secondary" data-type="transfer">
                 <svg class="icon" aria-hidden="true" focusable="false">
                   <use href="src/icons/sprite.svg#transfer"></use>
                 </svg>
@@ -128,7 +128,7 @@
           <div class="view-section">
             <div class="card-head">
               <h2>Recent</h2>
-              <button class="link-btn" id="btn-view-all">View all</button>
+              <button class="btn-link" id="btn-view-all">View all</button>
             </div>
             <div class="transactions-group" id="upcoming-wrap" style="display: none">
               <div class="list-sub">Upcoming</div>
@@ -243,49 +243,51 @@
             </button>
             <h1 tabindex="-1">Transactions</h1>
           </div>
-          <div class="list-search">
-            <label class="sr-only" for="all-search">Search transactions</label>
-            <div class="search-wrap">
-              <svg class="search-icon icon" aria-hidden="true" focusable="false">
-                <use href="src/icons/sprite.svg#search"></use>
-              </svg>
-              <input
-                class="text-input search-input"
-                id="all-search"
-                type="search"
-                inputmode="search"
-                enterkeyhint="search"
-                placeholder="Search…"
-                autocapitalize="off"
-                autocorrect="off"
-                autocomplete="off"
-              />
+          <div class="filter-area">
+            <div class="list-search">
+              <label class="sr-only" for="all-search">Search transactions</label>
+              <div class="search-wrap">
+                <svg class="search-icon icon" aria-hidden="true" focusable="false">
+                  <use href="src/icons/sprite.svg#search"></use>
+                </svg>
+                <input
+                  class="text-input search-input"
+                  id="all-search"
+                  type="search"
+                  inputmode="search"
+                  enterkeyhint="search"
+                  placeholder="Search…"
+                  autocapitalize="off"
+                  autocorrect="off"
+                  autocomplete="off"
+                />
+                <button
+                  class="search-clear"
+                  id="all-search-clear"
+                  type="button"
+                  hidden
+                  aria-label="Clear search"
+                >
+                  <svg class="icon" aria-hidden="true" focusable="false">
+                    <use href="src/icons/sprite.svg#close"></use>
+                  </svg>
+                </button>
+              </div>
               <button
-                class="search-clear"
-                id="all-search-clear"
+                class="icon-btn btn-ghost icon-btn-medium"
+                id="all-filter-open"
                 type="button"
-                hidden
-                aria-label="Clear search"
+                aria-label="Filter transactions"
+                aria-haspopup="dialog"
+                aria-expanded="false"
               >
                 <svg class="icon" aria-hidden="true" focusable="false">
-                  <use href="src/icons/sprite.svg#close"></use>
+                  <use href="src/icons/sprite.svg#filter"></use>
                 </svg>
               </button>
             </div>
-            <button
-              class="icon-btn btn-ghost icon-btn-medium"
-              id="all-filter-open"
-              type="button"
-              aria-label="Filter transactions"
-              aria-haspopup="dialog"
-              aria-expanded="false"
-            >
-              <svg class="icon" aria-hidden="true" focusable="false">
-                <use href="src/icons/sprite.svg#filter"></use>
-              </svg>
-            </button>
+            <div class="filter-tags" id="all-filter-tags" hidden></div>
           </div>
-          <div class="filter-tags" id="all-filter-tags" hidden></div>
           <div id="all-result-count" class="sr-only" role="status" aria-live="polite"></div>
           <div class="view-section">
             <div id="all-tx-list"></div>
@@ -335,11 +337,11 @@
               </div>
             </div>
             <div class="form-actions">
-              <button type="button" class="btn-tertiary" id="g-share-link">
+              <button type="button" class="btn btn-tertiary" id="g-share-link">
                 Share connection link
               </button>
-              <button type="submit" class="btn-primary" id="g-save">Save changes</button>
-              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
+              <button type="submit" class="btn btn-primary" id="g-save">Save changes</button>
+              <button type="button" class="btn btn-secondary subpage-cancel">Cancel</button>
             </div>
           </form>
         </section>
@@ -357,7 +359,7 @@
           <div class="form-group">
             <div class="settings-list" id="config-accounts-list"></div>
           </div>
-          <button class="btn-tertiary" id="btn-add-account">
+          <button class="btn btn-tertiary" id="btn-add-account">
             <svg class="icon" aria-hidden="true" focusable="false">
               <use href="src/icons/sprite.svg#plus"></use>
             </svg>
@@ -378,7 +380,7 @@
           <div class="form-group">
             <div class="settings-list" id="categories-list"></div>
           </div>
-          <button class="btn-tertiary" id="btn-add-category">
+          <button class="btn btn-tertiary" id="btn-add-category">
             <svg class="icon" aria-hidden="true" focusable="false">
               <use href="src/icons/sprite.svg#plus"></use>
             </svg>
@@ -500,9 +502,9 @@
               transaction dated today or earlier; upcoming ones only count from their date.
             </div>
             <div class="form-actions">
-              <button type="submit" class="btn-primary" id="account-save"></button>
-              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-              <button type="button" class="btn-danger" id="account-del" hidden>
+              <button type="submit" class="btn btn-primary" id="account-save"></button>
+              <button type="button" class="btn btn-secondary subpage-cancel">Cancel</button>
+              <button type="button" class="btn btn-ghost btn-danger" id="account-del" hidden>
                 Delete account
               </button>
             </div>
@@ -550,9 +552,9 @@
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="btn-primary" id="category-save"></button>
-              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-              <button type="button" class="btn-danger" id="category-del" hidden>
+              <button type="submit" class="btn btn-primary" id="category-save"></button>
+              <button type="button" class="btn btn-secondary subpage-cancel">Cancel</button>
+              <button type="button" class="btn btn-ghost btn-danger" id="category-del" hidden>
                 Delete category
               </button>
             </div>
@@ -628,9 +630,9 @@
               </div>
             </div>
             <div class="form-actions">
-              <button type="submit" class="btn-primary" id="tx-save">Save changes</button>
-              <button type="button" class="btn-cancel subpage-cancel">Cancel</button>
-              <button type="button" class="btn-danger" id="tx-del" hidden>
+              <button type="submit" class="btn btn-primary" id="tx-save">Save changes</button>
+              <button type="button" class="btn btn-secondary subpage-cancel">Cancel</button>
+              <button type="button" class="btn btn-ghost btn-danger" id="tx-del" hidden>
                 Delete transaction
               </button>
             </div>
@@ -721,10 +723,10 @@
         </div>
         <div class="form-actions sheet-actions">
           <div class="row2">
-            <button class="btn-secondary" id="filter-clear" type="button" disabled>
+            <button class="btn btn-secondary" id="filter-clear" type="button" disabled>
               Clear all
             </button>
-            <button class="btn-primary" id="filter-apply" type="submit">Apply filters</button>
+            <button class="btn btn-primary" id="filter-apply" type="submit">Apply filters</button>
           </div>
         </div>
       </form>
