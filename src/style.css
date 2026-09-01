@@ -86,7 +86,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [tabindex]:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 2px solid var(--brand-focus-ring);
   outline-offset: 2px;
 }
 [tabindex='-1']:focus {
@@ -136,7 +136,7 @@ header h1 {
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--brand);
+  color: var(--fill-brand);
 }
 
 .header-actions {
@@ -149,8 +149,8 @@ header h1 {
   font-size: 12px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: var(--badge-background-upcoming);
+  color: var(--badge-text-upcoming);
   font-weight: 600;
   display: none;
 }
@@ -208,7 +208,7 @@ body:has(#app.subpage) {
   left: 14px;
   top: 50%;
   transform: translateY(-50%);
-  color: var(--muted);
+  color: var(--input-icon-muted);
   pointer-events: none;
 }
 /* Compound selector (not bare .search-input) so this reliably beats
@@ -235,7 +235,7 @@ body:has(#app.subpage) {
   height: 44px;
   display: grid;
   place-items: center;
-  color: var(--muted);
+  color: var(--input-icon-default);
 }
 /* This author-stylesheet display:grid above otherwise beats the browser's
    own [hidden] { display: none } UA rule regardless of specificity, so the
@@ -433,7 +433,7 @@ section.view .view-title {
   font-size: 12px;
   text-transform: uppercase;
   font-weight: 700;
-  color: var(--muted);
+  color: var(--text-subdued);
   margin-bottom: 16px;
 }
 .card-head {
@@ -523,24 +523,24 @@ section.view .view-title {
 }
 .amount-currency {
   font-size: 14px;
-  color: var(--muted);
+  color: var(--text-subdued);
   font-weight: 500;
 }
 .tint-expense .amount-input {
-  color: var(--expense);
+  color: var(--text-expense);
 }
 .tint-income .amount-input {
-  color: var(--income);
+  color: var(--text-income);
 }
 .tint-transfer .amount-input {
-  color: var(--transfer);
+  color: var(--text-transfer);
 }
 
 .field-label {
   display: block;
   font-size: 14px;
   font-weight: 500;
-  color: var(--muted);
+  color: var(--text-muted);
   margin: 0 0 6px;
 }
 .chips {
@@ -563,19 +563,19 @@ section.view .view-title {
   color: var(--button-text-secondary);
 }
 .tint-expense .chip.on {
-  background: var(--expense-soft);
-  border-color: var(--expense);
-  color: var(--expense);
+  background: var(--badge-background-expense);
+  border-color: var(--text-expense);
+  color: var(--text-expense);
 }
 .tint-income .chip.on {
-  background: var(--income-soft);
-  border-color: var(--income);
-  color: var(--income);
+  background: var(--badge-background-income);
+  border-color: var(--text-income);
+  color: var(--text-income);
 }
 .tint-transfer .chip.on {
-  background: var(--transfer-soft);
-  border-color: var(--transfer);
-  color: var(--transfer);
+  background: var(--badge-background-transfer);
+  border-color: var(--text-transfer);
+  color: var(--text-transfer);
 }
 
 .row2 {
@@ -679,7 +679,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 
 /* The dropdown chevron and calendar icon above are baked-in data-URI SVGs
    (can't use currentColor as a background-image), so dark mode needs its
-   own copies with a lighter stroke to match --muted. */
+   own copies with a lighter stroke to match --field-icon-default. */
 :root[data-theme='dark'] .select-input {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238B9690' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
 }
@@ -797,22 +797,21 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 
 .btn-tertiary {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  width: 100%;
-  padding: 16px;
-  border-radius: 10px;
-  font-weight: 600;
-  border: 1px dashed var(--line);
-  color: var(--muted);
+  background: var(--button-background-secondary);
+  border: 1px dashed var(--border-medium);
+  color: var(--text-muted);
 }
+.btn-tertiary:hover {
+  background: var(--button-background-secondary-hover);
+  border-color: var(--border-strong);
+}
+.btn-tertiary:active {
+  background: var(--button-background-secondary-active);
+  border-color: var(--border-strong);
+}
+
 .btn-danger {
-  color: var(--expense);
-  font-weight: 600;
-  padding: 16px;
-  width: 100%;
+  color: var(--text-expense);
 }
 
 .btn-link {
@@ -866,14 +865,14 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   border-radius: 50%;
   flex-shrink: 0;
 }
-.tx-dot.income {
-  background: var(--income);
-}
 .tx-dot.expense {
-  background: var(--expense);
+  background: var(--button-background-expense);
+}
+.tx-dot.income {
+  background: var(--button-background-income);
 }
 .tx-dot.transfer {
-  background: var(--transfer);
+  background: var(--button-background-transfer);
 }
 .tx-main {
   display: flex;
@@ -892,11 +891,11 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .tx-title.untitled {
   font-weight: 500;
   font-style: italic;
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 .tx-sub {
   font-size: 12.5px;
-  color: var(--muted);
+  color: var(--text-muted);
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -916,7 +915,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 
 .tx-row.pending .tx-title,
 .tx-row.pending .tx-amount {
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 .tx-row.pending .tx-dot {
   opacity: 0.4;
@@ -931,8 +930,8 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   display: inline-block;
   padding: 0 7px;
   border-radius: 999px;
-  background: var(--brand-soft);
-  color: var(--brand);
+  background: var(--badge-background-upcoming);
+  color: var(--badge-text-upcoming);
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -946,22 +945,22 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   letter-spacing: 0.01em;
 }
 .category-tag.expense {
-  background: var(--expense-soft);
-  color: var(--expense);
+  background: var(--badge-background-expense);
+  color: var(--text-expense);
 }
 .category-tag.income {
-  background: var(--income-soft);
-  color: var(--income);
+  background: var(--badge-background-income);
+  color: var(--text-income);
 }
 .category-tag.transfer {
-  background: var(--transfer-soft);
-  color: var(--transfer);
+  background: var(--badge-background-transfer);
+  color: var(--text-transfer);
 }
 .list-sub {
   font-size: 14px;
   font-weight: 500;
-  color: var(--muted);
-  border-bottom: 1px solid var(--line);
+  color: var(--text-subdued);
+  border-bottom: 1px solid var(--border-medium);
   padding-bottom: 6px;
   margin-bottom: 4px;
 }
@@ -978,11 +977,11 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-size: 40px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  color: var(--brand);
+  color: var(--text-default);
 }
 .balance-hero .sub {
   font-size: 14px;
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 
 .accounts-list {
@@ -1008,10 +1007,10 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .acct-meta {
   font-size: 12.5px;
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 .acct-chevron {
-  color: var(--muted);
+  color: var(--icon-muted);
   font-size: 18px;
   padding: 0 6px;
 }
@@ -1024,7 +1023,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-size: 17px;
 }
 .acct-bal.neg {
-  color: var(--expense);
+  color: var(--text-expense);
 }
 
 .acct-right {
@@ -1037,11 +1036,11 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   letter-spacing: -0.03em;
   font-size: 12px;
   font-weight: 400;
-  color: var(--muted);
+  color: var(--text-subdued);
   white-space: nowrap;
 }
 .projected.neg {
-  color: var(--expense);
+  color: var(--text-expense);
 }
 .balance-hero .projected {
   margin-top: 2px;
@@ -1088,17 +1087,17 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .bar {
   height: 8px;
   border-radius: 999px;
-  background: var(--chart-track);
+  background: var(--chart-budget-track);
   overflow: hidden;
   display: flex;
 }
 .bar-fill {
   height: 100%;
-  background: var(--income);
+  background: var(--chart-budget-fill-default);
   transition: width 0.3s ease;
 }
 .bar-fill.over {
-  background: var(--expense);
+  background: var(--fill-expense);
 }
 .bar-fill.close {
   background: var(--warn-fill);
@@ -1118,7 +1117,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .bar-fill-upcoming.over {
   background-image: repeating-linear-gradient(
     45deg,
-    var(--expense) 2px 4px,
+    var(--fill-expense) 2px 4px,
     var(--background-default) 4px 6px
   );
 }
@@ -1133,15 +1132,15 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-weight: 600;
 }
 .budget-remaining.left {
-  color: var(--income);
+  color: var(--text-muted);
 }
 .budget-remaining.over {
-  color: var(--expense);
+  color: var(--text-expense);
 }
 .budget-total {
   letter-spacing: -0.03em;
   font-size: 13px;
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 
 /* Summary */
@@ -1157,7 +1156,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 .month-nav button {
   font-size: 20px;
   padding: 6px 14px;
-  color: var(--brand);
+  color: var(--icon-muted);
 }
 .stat-grid {
   display: grid;
@@ -1172,7 +1171,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
 }
 .stat .k {
   font-size: 12px;
-  color: var(--muted);
+  color: var(--text-subdued);
   font-weight: 500;
 }
 .stat .v {
@@ -1187,13 +1186,13 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   margin-top: 2px;
 }
 .trend-up {
-  color: var(--income);
+  color: var(--fill-income);
 }
 .trend-down {
-  color: var(--expense);
+  color: var(--fill-expense);
 }
 .trend-flat {
-  color: var(--muted);
+  color: var(--text-subdued);
 }
 .summary-section {
   display: flex;
@@ -1277,7 +1276,7 @@ nav {
   left: 0;
   right: 0;
   background: var(--background-default);
-  border-top: 1px solid var(--line);
+  border-top: 1px solid var(--border-medium);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
@@ -1292,7 +1291,7 @@ nav button {
   padding: 7px 0;
   font-size: 11px;
   font-weight: 600;
-  color: var(--muted);
+  color: var(--text-subdued);
   border-radius: 10px;
 }
 nav button .ic {
@@ -1300,8 +1299,8 @@ nav button .ic {
   line-height: 1;
 }
 nav button.on {
-  color: var(--brand);
-  background: var(--brand-soft);
+  color: var(--badge-text-upcoming);
+  background: var(--badge-background-upcoming);
 }
 
 /* Setup screen */
@@ -1312,20 +1311,20 @@ nav button.on {
   font-family: var(--mono);
   font-size: 32px;
   font-weight: 700;
-  color: var(--brand);
+  color: var(--fill-brand);
   text-align: center;
   letter-spacing: -0.03em;
   margin-bottom: 4px;
 }
 #setup .tag {
   text-align: center;
-  color: var(--muted);
+  color: var(--text-subdued);
   font-size: 14px;
   margin-bottom: 64px;
 }
 .setup-note {
   font-size: 13px;
-  color: var(--muted);
+  color: var(--text-subdued);
   margin-top: 10px;
   line-height: 1.5;
 }
@@ -1338,7 +1337,7 @@ nav button.on {
   text-align: center;
 }
 .err {
-  color: var(--expense);
+  color: var(--text-expense);
   font-size: 14px;
   font-weight: 500;
   text-align: center;
@@ -1387,14 +1386,14 @@ nav button.on {
 
 .settle-note {
   font-size: 12.5px;
-  color: var(--muted);
+  color: var(--text-subdued);
   margin-top: 8px;
 }
 
 .field-error {
   font-size: 12.5px;
   font-weight: 500;
-  color: var(--expense);
+  color: var(--text-expense);
   margin-top: 6px;
 }
 
