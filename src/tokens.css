@@ -1,13 +1,4 @@
-/* Color tokens — Figma Primitives + Semantic collections, and the app's
-   own active theme tokens (light/dark). Split out of style.css since this
-   grew to ~300 lines on its own; loaded before style.css in index.html so
-   its variables are available everywhere. */
-
-/* Figma "Primitives" collection (file "Husholdning") — Neutral Light /
-   Neutral Dark ramps, flat White/Black, and the solid brandGreen/green/
-   red/blue/orange ramps behind the semantic tokens below. Mirrors the
-   Figma variable names 1:1 and isn't wired into the UI yet; the app's own
-   tokens are still --bg/--ink/etc. */
+/* Color tokens — Primitives */
 :root {
   --neutral-light-0: #ffffff;
   --neutral-light-100: #f6f8fa;
@@ -41,6 +32,8 @@
 
   --white-0: #ffffff;
   --black-0: #111111;
+  --darken-200: #00000011;
+  --darken-800: #000000cc;
 
   --brand-green-100: #e4eee8;
   --brand-green-150: #c8dfd7;
@@ -110,47 +103,21 @@
   --orange-1000: #271f11;
 }
 
+/* Color tokens — Semantic */
 :root[data-theme='light'] {
-  /* --bg: var(--neutral-light-0); */
-  /* --input-bg: var(--neutral-light-100); */
-  /* --input-placeholder: var(--neutral-light-300); */
-  /* --card: var(--neutral-light-100); */
-  /* --ink: var(--neutral-light-900); */
-  /* --muted: var(--neutral-light-500); */
-  /* --line: var(--neutral-light-300); */
-  /* --line-strong: var(--neutral-light-400); */
-  /* --brand: #204b3c; */
-  /* --brand-soft: #e4eee8; */
-  /* --income: #1e7a4c; */
-  /* --income-hover: #1c6e43; */
-  /* --income-soft: #cce5d7; */
-  /* --expense: #b4432c; */
-  /* --expense-hover: #9e3c25; */
-  /* --expense-soft: #f0d5cb; */
-  /* --transfer: #2b5f8a; */
-  /* --transfer-hover: #264f6e; */
-  /* --transfer-soft: #ccddea; */
-  --warn: #daa058;
-  --warn-soft: #f6ebdd;
-  --warn-fill: #eaab4b;
-  /* --chart-track: var(--neutral-light-250); */
-  --menu-shadow: #00000011;
-  color-scheme: light;
-
-  /* Figma "Semantic tokens" collection, Light mode — fetched but not yet
-     applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
-     resolved to the matching Primitives variable above. */
   --background-default: var(--neutral-light-0);
   --background-secondary: var(--neutral-light-150);
   --background-inverted: var(--neutral-light-1000);
+  --badge-background-upcoming: var(--brand-green-100);
   --badge-background-expense: var(--red-50);
   --badge-background-income: var(--green-50);
   --badge-background-transfer: var(--blue-50);
-  --badge-background-upcoming: var(--brand-green-100);
+  --badge-background-warning: var(--orange-50);
+  --badge-text-upcoming: var(--brand-green-600);
   --badge-text-expense: var(--red-850);
   --badge-text-income: var(--green-800);
   --badge-text-transfer: var(--blue-800);
-  --badge-text-upcoming: var(--brand-green-600);
+  --badge-text-warning: var(--orange-800);
   --border-medium: var(--neutral-light-400);
   --border-strong: var(--neutral-light-500);
   --brand-focus-ring: var(--brand-green-500);
@@ -197,6 +164,7 @@
   --fill-brand: var(--brand-green-700);
   --fill-expense: var(--red-700);
   --fill-income: var(--green-700);
+  --fill-warning: var(--orange-700);
   --icon-default: var(--neutral-light-700);
   --icon-muted: var(--neutral-light-500);
   --input-background-default: var(--neutral-light-100);
@@ -213,6 +181,7 @@
   --input-text-error: var(--red-700);
   --input-text-placeholder: var(--neutral-light-500);
   --input-text-success: var(--green-700);
+  --menu-shadow: var(--darken-200);
   --tag-background-active: var(--brand-green-100);
   --tag-background-default: var(--neutral-light-100);
   --tag-text-default: var(--neutral-light-800);
@@ -225,49 +194,24 @@
   --text-expense: var(--red-700);
   --text-income: var(--green-700);
   --text-transfer: var(--blue-700);
+
+  color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  /* --bg: var(--neutral-dark-100); */
-  /* --input-bg: var(--neutral-dark-150); */
-  /* --input-placeholder: var(--neutral-dark-300); */
-  /* --card: var(--neutral-dark-150); */
-  /* --ink: var(--neutral-dark-900); */
-  /* --muted: var(--neutral-dark-600); */
-  /* --line: var(--neutral-dark-300); */
-  /* --line-strong: var(--neutral-dark-400); */
-  /* --brand: #5fbf94; */
-  /* --brand-soft: #1c3329; */
-  /* --income: #4fbf85; */
-  /* --income-hover: #3fa36b; */
-  /* --income-soft: hsl(149deg 47% 53% / 15%); */
-  /* --expense: #e8785c; */
-  /* --expense-hover: #d15f4a; */
-  /* --expense-soft: hsl(12deg 65% 53% / 22%); */
-  /* --transfer: #6badee; */
-  /* --transfer-hover: #5a9ad6; */
-  /* --transfer-soft: hsl(210deg 79% 68% / 20%); */
-  --warn: #e2b262;
-  --warn-soft: #3a2c17;
-  --warn-fill: #d9a54c;
-  /* --chart-track: var(--neutral-dark-250); */
-  --menu-shadow: #000000cc;
-  color-scheme: dark;
-
-  /* Figma "Semantic tokens" collection, Dark mode — fetched but not yet
-     applied anywhere; the app still uses --bg/--brand/etc. above. Aliases
-     resolved to the matching Primitives variable above. */
   --background-default: var(--neutral-dark-0);
   --background-secondary: var(--neutral-dark-100);
   --background-inverted: var(--neutral-dark-1000);
+  --badge-background-upcoming: var(--brand-green-800);
   --badge-background-expense: var(--red-950);
   --badge-background-income: var(--green-950);
   --badge-background-transfer: var(--blue-950);
-  --badge-background-upcoming: var(--brand-green-800);
+  --badge-background-warning: var(--orange-950);
+  --badge-text-upcoming: var(--brand-green-300);
   --badge-text-expense: var(--red-400);
   --badge-text-income: var(--green-400);
   --badge-text-transfer: var(--blue-400);
-  --badge-text-upcoming: var(--brand-green-300);
+  --badge-text-warning: var(--orange-400);
   --border-medium: var(--neutral-dark-400);
   --border-strong: var(--neutral-dark-500);
   --brand-focus-ring: var(--brand-green-300);
@@ -314,6 +258,7 @@
   --fill-brand: var(--brand-green-300);
   --fill-expense: var(--red-400);
   --fill-income: var(--green-400);
+  --fill-warning: var(--orange-400);
   --icon-default: var(--neutral-dark-700);
   --icon-muted: var(--neutral-dark-600);
   --input-background-default: var(--neutral-dark-100);
@@ -330,6 +275,7 @@
   --input-text-error: var(--red-400);
   --input-text-placeholder: var(--neutral-dark-500);
   --input-text-success: var(--green-400);
+  --menu-shadow: var(--darken-800);
   --tag-background-active: var(--brand-green-900);
   --tag-background-default: var(--neutral-dark-100);
   --tag-text-default: var(--neutral-dark-800);
@@ -342,4 +288,6 @@
   --text-expense: var(--red-400);
   --text-income: var(--green-400);
   --text-transfer: var(--blue-400);
+
+  color-scheme: dark;
 }

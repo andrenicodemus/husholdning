@@ -156,8 +156,8 @@ header h1 {
 }
 
 .pill.warn {
-  background: var(--warn-soft);
-  color: var(--warn);
+  background: var(--badge-background-warning);
+  color: var(--badge-text-warning);
   display: inline-block;
 }
 
@@ -1080,7 +1080,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   font-size: 12px;
   font-weight: 500;
   font-style: italic;
-  color: var(--warn);
+  color: var(--badge-text-warning);
   text-align: right;
   margin-top: 0;
 }
@@ -1100,7 +1100,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   background: var(--fill-expense);
 }
 .bar-fill.close {
-  background: var(--warn-fill);
+  background: var(--fill-warning);
 }
 /* Still-pending spending in this category — shown toned down and patterned
    (not a solid fill) so it reads as forecasted, not already spent. */
@@ -1108,7 +1108,7 @@ input[type='date'].text-input::-webkit-calendar-picker-indicator {
   height: 100%;
   background-image: repeating-linear-gradient(
     45deg,
-    var(--warn-fill) 2px 4px,
+    var(--fill-warning) 2px 4px,
     var(--background-default) 4px 6px
   );
   opacity: 0.6;
